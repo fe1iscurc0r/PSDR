@@ -127,7 +127,65 @@ int uart_putChar(uint8_t uart, char c) {
 
 > **硬件不一致（已实测）**：`main.c` 的 `configUartPeripheral()` 配置的是 **USART6**（GPIO AF8，接收 GPS），但 `include/hal.h:57` 把 `hal_gpsUart` 定义成了 **USART1**。实现按 USART6 走，并在注释里写明这个上游不一致。**这是已知待议项，不要擅自改 `hal.h` 的宏**——改了对不上 TinyGPS 的调用方。
 
-### B-1.5 · 宿主环境：不必"完全复现"，但有三个必须注意的点
+### B-1.5 · 宿主环境：天选7P 上的三条路（已实测，选 WSL2）
+
+**已实测的事实**（都是针对本仓库跑出来的，不是通用经验）：
+
+| 检查项 | 结果 |
+|---|---|
+| `#include` 文件名大小写不匹配 | **无**（无大小写地雷，Windows 上不会因大小写挂掉）|
+| 仅大小写不同的同名文件 | **无** |
+| 路径长度 > 260（Windows MAX_PATH）| **0 个**（最长 82 字符）|
+| 路径含 Windows 非法字符 `:*?"<>` | **无** |
+| POSIX 头 (`unistd.h` / `sys/*.h`) 引用 | 仅在 **不参与编译** 的文件里（`_sbrk.c`/`_startup.c`/`_syscalls.c`/`Trace.h`）|
+| 参与编译的 749 个源文件 | **纯裸机固件，无 POSIX 依赖**（`arm-none-eabi-gcc` 自带 newlib 头）|
+
+**三条路的对比**：
+
+| 方案 | 结论 |
+|---|---|
+| **① WSL2 + Ubuntu**（推荐） | ✅ **选这个**。GNU make 完整、`$(wildcard)`/`$(VPATH)`/`$(filter-out)` 全部可用；apt 装 `gcc-arm-none-eabi` 13.2.1 与我验证时**完全同版本**；仓库放原生 ext4 |
+| ② Windows 原生 ARM GCC + MSYS2/make | ⚠️ 可行但没必要。ARM 官方 Windows 包在（`arm-gnu-toolchain-13.2.rel1-mingw-w64-i686-arm-none-eabi.zip`，347 MB），但**必须**另配 GNU make（MSYS2），且需处理路径分隔符 |
+| ③ Windows 原生 + nmake/cmd | ❌ **不可行**。Makefile 用了 `$(wildcard)` / `$(VPATH)` / `$(filter-out)` / `$(addprefix)` 等 GNU make 专有语法，nmake 直接不认 |
+
+**❌ 不要直接用 Windows 原生工具链**，不是因为"Linux 更好"，而是三条具体理由：
+1. **必须额外装 GNU make**（MSYS2/mingw32-make），否则 Makefile 的 GNU 语法全废；
+2. **Windows 路径分隔符**与 Makefile 里的 `/` 混用需要额外处理；
+3. **换来零收益** —— 锚点由 **链接脚本 + startup 汇编 + MCU 宏**决定（`mem.ld` 里 `RAM ORIGIN=0x20000000` / `FLASH ORIGIN=0x08000000`），**不是编译器决定的**。换 Windows 版编译器不会让锚点更准。
+
+⚠️ **WSL2 的两个坑**（照做，否则必踩）：
+
+**坑 1 · WSL2 里不要在 `/mnt/c/` 下编译**
+- WSL2 跨文件系统（9p/drvfs）访问 `/mnt/c` 极慢，749 个源文件编译会卡死到看不出在动。
+- ✅ 仓库放 WSL2 **原生 ext4** 内（`~/PSDR`），编译产物再拷回 Windows。
+- 验证：`cd ~/PSDR && stat -f -c %T .` 应输出 `ext2fs`/`ext4`；若是 `drvfs`/`9p` 就换位置。
+
+**坑 2 · 用 Windows 版 Git 克隆会毁掉 Makefile**
+- 已实测：上游全部文件为 LF（0 个 CRLF），但**仓库内没有 `.gitattributes`** —— 没有任何保护。
+- Git for Windows 默认 `core.autocrlf=true` 会把 LF 转成 CRLF。Makefile 的 recipe 行靠 **Tab** 缩进，
+  CRLF 转换后变成 `Tab+CR`，`make` 报 `missing separator` 直接罢工。
+- ✅ **两条路，任选**：
+  - 在 WSL2 里用 Linux 版 git 克隆（WSL2 内 git 默认 `autocrlf=false`，**天然无此问题**）← 推荐
+  - 或用 Windows 版 git，但克隆**前**先设 `git config --global core.autocrlf input`
+- ❌ 不要用编辑器手动改换行符 —— 会引入无关 diff。
+
+**推荐操作路径**：
+```bash
+# WSL2 (Ubuntu) 内
+sudo apt update && sudo apt install -y gcc-arm-none-eabi make git
+git clone https://github.com/fe1iscurc0r/PSDR.git ~/PSDR
+cd ~/PSDR
+stat -f -c %T .          # 确认是 ext2fs/ext4, 不是 drvfs/9p
+git remote add upstream https://github.com/MichaelRColton/PSDR.git
+git fetch upstream --prune
+git checkout workorders/2026-10-30-psdr-takeover-linux-build-kicad
+git reset --hard origin/workorders/2026-10-30-psdr-takeover-linux-build-kicad
+```
+
+**Kali（PEP 668）**：若改在 Kali 上做，注意禁止系统级 `pip install`；本项目无需 pip 装任何东西，
+临时要装用 `python3 -m venv`。
+
+
 
 编译 STM32 是**交叉编译**，工具链自包含。所需仅四项：`arm-none-eabi-gcc` / `make` / `git` / `python3`（python3 只用于锚点比对脚本）。
 **没有任何一项依赖 Ubuntu 特有功能** —— Kali(Debian 系)、WSL2 Ubuntu、原生 Linux 均可。

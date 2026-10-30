@@ -35,7 +35,40 @@ git reset --hard origin/workorders/2026-10-30-psdr-takeover-linux-build-kicad
 2. **必须带全 7 个分支**：`PSDR_F7` 是 STM32F756 平台，而 **2.6.1 版硬件 BOM 用的正是 STM32F756** —— 只留 master 会缺最接近目标硬件的整条固件线。
 3. **GitHub 连不上就配代理重试**（`git config --global http.proxy <你的代理>`），**绝不能因此降级成浅克隆或只拉 master**。仓库本身约 182 MB，耐心等。
 
-## 宿主环境：不需要"完全复现"，但有三个坑
+## 宿主环境：选 WSL2（已实测，Windows 原生工具链不要用）
+
+这台机器只有 Windows，最多装 WSL2 → **就用 WSL2 + Ubuntu**。
+
+**不要直接用 Windows 原生 ARM 工具链**，三个理由：
+1. Makefile 用了 `$(wildcard)` / `$(VPATH)` / `$(filter-out)` 等 GNU make 专有语法，
+   必须另装 GNU make（MSYS2），否则 nmake 直接不认；
+2. Windows 路径分隔符要和 Makefile 里的 `/` 混着处理；
+3. **换来零收益** —— 锚点由链接脚本 + startup 汇编 + MCU 宏决定（`mem.ld`:
+   `RAM ORIGIN=0x20000000` / `FLASH ORIGIN=0x08000000`），**不是编译器决定的**。
+
+**好消息（已实测本仓库）**：无大小写地雷、无超长路径（最长 82 字符）、无 Windows 非法字符、
+参与编译的 749 个源文件是纯裸机固件无 POSIX 依赖。所以 WSL2 上不会踩这些坑。
+
+**WSL2 两个必踩的坑**：
+
+1. **不要在 `/mnt/c/` 下编译** —— 跨文件系统访问极慢，749 个文件编译会卡死。
+   ✅ 仓库放 WSL2 原生 ext4（`~/PSDR`），编完再拷回 Windows。
+   验证：`stat -f -c %T .` 应输出 `ext2fs`/`ext4`，是 `drvfs`/`9p` 就换地方。
+
+2. **用 Windows 版 Git 克隆会毁掉 Makefile** ——
+   实测上游全部是 LF，但**仓库没有 `.gitattributes`**（无保护）。
+   Git for Windows 默认 `core.autocrlf=true` 会转 CRLF，Makefile 靠 Tab 缩进，
+   转完 `make` 报 `missing separator` 罢工。
+   ✅ **推荐**：在 WSL2 里用 Linux 版 git 克隆（WSL2 内 git 默认 `autocrlf=false`，天然无此问题）。
+   或用 Windows 版 git，但克隆**前**先 `git config --global core.autocrlf input`。
+
+**具体怎么装**（WSL2 Ubuntu 内）：
+```bash
+sudo apt update && sudo apt install -y gcc-arm-none-eabi make git
+```
+装出来的 gcc 是 13.2.1，和验证时的版本完全一致。
+
+
 
 编译 STM32 是**交叉编译**，工具链自包含。只要 `arm-none-eabi-gcc` + `make` + `git`（+ `python3` 跑锚点比对脚本）就够，**没有任何一项依赖 Ubuntu 特有功能** —— Kali、WSL2 Ubuntu、原生 Linux 都可以。
 
