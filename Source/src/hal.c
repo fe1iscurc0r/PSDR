@@ -229,7 +229,6 @@ const Gpio_Pin RED_LED =
 //    { 4, TIM4 }
 //};
 
-static uint32_t halMilliseconds;
 //static uint32_t timingDelay;
 
 static hal_sysTickCallback sysTickCallback = 0; //Was NULL, but NULL isn't defined? Where is it defined?
@@ -262,7 +261,21 @@ hal_getCurrentTime_ms (void)
 {
   // get the current system millisecond count
 
-  return halMilliseconds;
+  // Upstream bug: the only writer of halMilliseconds was the commented-out
+  // SysTick_Handler above, so this returned a constant 0 and every TinyGPS
+  // timestamp (hal_getCurrentTime_ms()) was dead. HAL_GetTick() is the real
+  // ms clock once SysTick_Handler calls HAL_IncTick().
+  return HAL_GetTick();
+}
+
+bool
+hal_checkTimeout (uint32_t startTime_ms, uint32_t interval_ms)
+{
+  // TinyGPS depends on this; upstream declared it in hal.h but never defined it.
+  // hal.h declares it "extern inline", so C99 requires an external definition
+  // here in a .c file, not another inline definition in the header.
+  // Comparison is unsigned-subtraction safe across the HAL tick wrap.
+  return (uint32_t) (HAL_GetTick() - startTime_ms) >= interval_ms;
 }
 
 void

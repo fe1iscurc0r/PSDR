@@ -74,6 +74,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "misc.h"
+#include "stm32f4xx_hal_conf.h"   /* provides assert_param(); without it the macro is an implicit func decl -> link failure */
 
 /** @addtogroup STM32F4xx_StdPeriph_Driver
   * @{

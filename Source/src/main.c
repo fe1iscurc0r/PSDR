@@ -344,6 +344,7 @@ void doNothing()
 void
 SysTick_Handler (void)
 {
+	HAL_IncTick();
 	millis++;
   timer_tick ();
   Tick();

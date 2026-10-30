@@ -1,0 +1,156 @@
+# Reproduce the Eclipse CDT "GNU Tools for ARM Embedded" Debug build on Linux.
+#
+# Provenance: derived from docs/psdr-handoff/Makefile.linux (master @ 45acd0f).
+# Exclusion table transcribed verbatim from Source/.cproject Debug config.
+#
+# Source-level defect fixes this build depends on (see docs/psdr-build-notes.md):
+#   1  src/misc.c   + #include "stm32f4xx_hal_conf.h"   (assert_param was an implicit decl)
+#   2  src/hal.c    + hal_checkTimeout() definition     (declared extern inline in hal.h, never defined)
+#   3  src/main.c   + HAL_IncTick() in SysTick_Handler  (HAL_GetTick() was a constant 0)
+#   4  src/hal.c    hal_getCurrentTime_ms() -> HAL_GetTick(); upstream read a
+#                    never-incremented static, so every TinyGPS timestamp was 0
+#   5  src/uart.c   SPL-era, unlinkable in a HAL-only tree -> excluded here and
+#                    replaced by src/uart_hal_stub.c (TinyGPS needs uart_getChar)
+#
+# Deliberate differences from upstream .cproject (all documented, none silent):
+#   a) stm32f4xx_hal_adc_ex.c / _dac_ex.c / _rtc_ex.c are NOT excluded. Upstream
+#      excluded them, but the retained adc.c/dac.c/rtc.c reference __weak
+#      callbacks defined inside -> broken link.
+#   b) -fcommon: GCC 10+ defaults to -fno-common; main.h carries tentative
+#      definitions (e.g. UART_HandleTypeDef UartHandle). This restores the
+#      original GCC 4.7 semantics rather than hiding a problem.
+#   c) all three linker scripts are passed together. Passing only sections.ld
+#      leaves ORIGIN(RAM) unresolved -> _estack = 0xFFFFFFFF, which links
+#      without error but produces firmware that hangs on boot.
+#   d) .S sources get their own compile rule. arm_bitreversal_32 is defined only
+#      in DSP_Lib/Source/TransformFunctions/arm_bitreversal2.S; a *.c-only
+#      wildcard drops it -> undefined reference to arm_bitreversal_32.
+#   e) --gc-sections is ON by default because upstream .cproject Debug sets
+#      linker.gcsections=true. Build with GC=0 to reproduce the un-garbage-
+#      collected sizes quoted in the handoff notes.
+#
+# Not reproduced from upstream, recorded rather than changed: upstream Debug
+# also passes -fsigned-char -ffreestanding -g3 -O0. -O0 is already the default;
+# -g3 does not affect the text/data/bss reported by size(1). -fsigned-char can
+# shift codegen, so sizes quoted here are not byte-comparable against an
+# Eclipse-produced build; the vector anchors are.
+
+TARGET=PSDR
+BUILD=build_linux
+PREFIX=arm-none-eabi-
+CC=$(PREFIX)gcc
+CP=$(PREFIX)objcopy
+SZ=$(PREFIX)size
+CPU=-mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16
+DEFS=-DUSE_HAL_DRIVER -DSTM32F429xx -DARM_MATH_CM4 -D__FPU_PRESENT -DOS_USE_TRACE_SEMIHOSTING_DEBUG -DUSE_FULL_ASSERT
+INCS=-Iinclude -Isystem/include -Isystem/include/cmsis -Isystem/include/stm32f4-hal -Ildscripts -IDSP_Lib/Include -IDSP_Lib/Include/Common
+CFLAGS=$(CPU) $(DEFS) $(INCS) -std=gnu99 -fcommon -ffunction-sections -fdata-sections -Wall --specs=nano.specs
+
+GC?=1
+LDSCRIPTS=-Tldscripts/mem.ld -Tldscripts/libs.ld -Tldscripts/sections.ld
+LDFLAGS=$(CPU) $(LDSCRIPTS) -nostartfiles
+ifeq ($(GC),1)
+LDFLAGS+=-Wl,--gc-sections
+endif
+LIBS=-lc -lm -lnosys
+
+# --- exclusions from .cproject (Debug config) ----------------------------------
+HAL_EXCLUDE = \
+ system/src/stm32f4-hal/stm32f4xx_hal_can.c \
+ system/src/stm32f4-hal/stm32f4xx_hal_crc.c \
+ system/src/stm32f4-hal/stm32f4xx_hal_cryp.c \
+ system/src/stm32f4-hal/stm32f4xx_hal_cryp_ex.c \
+ system/src/stm32f4-hal/stm32f4xx_hal_dcmi.c \
+ system/src/stm32f4-hal/stm32f4xx_hal_dma2d.c \
+ system/src/stm32f4-hal/stm32f4xx_hal_dma_ex.c \
+ system/src/stm32f4-hal/stm32f4xx_hal_eth.c \
+ system/src/stm32f4-hal/stm32f4xx_hal_hash.c \
+ system/src/stm32f4-hal/stm32f4xx_hal_hash_ex.c \
+ system/src/stm32f4-hal/stm32f4xx_hal_hcd.c \
+ system/src/stm32f4-hal/stm32f4xx_hal_i2s.c \
+ system/src/stm32f4-hal/stm32f4xx_hal_i2s_ex.c \
+ system/src/stm32f4-hal/stm32f4xx_hal_irda.c \
+ system/src/stm32f4-hal/stm32f4xx_hal_msp_template.c \
+ system/src/stm32f4-hal/stm32f4xx_hal_nand.c \
+ system/src/stm32f4-hal/stm32f4xx_hal_nor.c \
+ system/src/stm32f4-hal/stm32f4xx_hal_pccard.c \
+ system/src/stm32f4-hal/stm32f4xx_hal_pcd.c \
+ system/src/stm32f4-hal/stm32f4xx_hal_rng.c \
+ system/src/stm32f4-hal/stm32f4xx_hal_sai.c \
+ system/src/stm32f4-hal/stm32f4xx_hal_sd.c \
+ system/src/stm32f4-hal/stm32f4xx_hal_sdram.c \
+ system/src/stm32f4-hal/stm32f4xx_hal_smartcard.c \
+ system/src/stm32f4-hal/stm32f4xx_hal_sram.c \
+ system/src/stm32f4-hal/stm32f4xx_hal_wwdg.c \
+ system/src/stm32f4-hal/stm32f4xx_ll_fmc.c \
+ system/src/stm32f4-hal/stm32f4xx_ll_fsmc.c \
+ system/src/stm32f4-hal/stm32f4xx_ll_sdmmc.c \
+ system/src/stm32f4-hal/stm32f4xx_ll_usb.c
+
+# ILI9341_t3.c is an Arduino/Teensy import (needs SPI.h / Arduino types).
+# uart.c is SPL-era and cannot link against HAL-only (defect 5); uart_hal_stub.c
+# replaces the two symbols TinyGPS actually uses and is picked up by the
+# src/*.c wildcard automatically.
+SRC_EXCLUDE = src/ILI9341_t3.c src/uart.c
+
+# CMSIS DSP: upstream excludes the radix2 FFT variants (main.c uses radix4)
+DSP_EXCLUDE = \
+ DSP_Lib/Source/TransformFunctions/arm_cfft_radix2_q31.c \
+ DSP_Lib/Source/TransformFunctions/arm_cfft_radix2_q15.c \
+ DSP_Lib/Source/TransformFunctions/arm_cfft_radix2_init_q31.c \
+ DSP_Lib/Source/TransformFunctions/arm_cfft_radix2_init_q15.c \
+ DSP_Lib/Source/TransformFunctions/arm_cfft_radix2_init_f32.c \
+ DSP_Lib/Source/TransformFunctions/arm_cfft_radix2_f32.c
+
+C_SRCS  = $(filter-out $(SRC_EXCLUDE),$(wildcard src/*.c))
+C_SRCS += $(filter-out $(HAL_EXCLUDE),$(wildcard system/src/stm32f4-hal/*.c))
+C_SRCS += $(wildcard system/src/cmsis/*.c)
+C_SRCS += $(wildcard system/src/diag/*.c)
+C_SRCS += $(wildcard system/src/cortexm/*.c)
+C_SRCS += $(wildcard system/src/newlib/*.c)
+C_SRCS += $(wildcard DSP_Lib/Source/CommonTables/*.c)
+C_SRCS += $(filter-out $(DSP_EXCLUDE),$(wildcard DSP_Lib/Source/TransformFunctions/*.c))
+C_SRCS += $(wildcard DSP_Lib/Source/FastMathFunctions/*.c)
+C_SRCS += $(wildcard DSP_Lib/Source/BasicMathFunctions/*.c)
+C_SRCS += $(wildcard DSP_Lib/Source/ComplexMathFunctions/*.c)
+
+ASM_SRCS = $(wildcard DSP_Lib/Source/TransformFunctions/*.S)
+
+VPATH = src:system/src/stm32f4-hal:system/src/cmsis:system/src/diag:system/src/cortexm:system/src/newlib:DSP_Lib/Source/CommonTables:DSP_Lib/Source/TransformFunctions:DSP_Lib/Source/FastMathFunctions:DSP_Lib/Source/BasicMathFunctions:DSP_Lib/Source/ComplexMathFunctions
+OBJDIR=$(BUILD)/obj
+OBJS=$(addprefix $(OBJDIR)/,$(C_SRCS:.c=.o))
+OBJS+=$(addprefix $(OBJDIR)/,$(ASM_SRCS:.S=.o))
+
+all: $(BUILD)/$(TARGET).elf $(BUILD)/$(TARGET).hex $(BUILD)/$(TARGET).bin
+
+$(OBJDIR)/%.o: %.c
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJDIR)/%.o: %.S
+	@mkdir -p $(dir $@)
+	$(CC) $(CPU) -c $< -o $@
+
+$(BUILD)/$(TARGET).elf: $(OBJS)
+	@mkdir -p $(BUILD)
+	$(CC) $(LDFLAGS) $(OBJS) $(LIBS) -Wl,-Map=$(BUILD)/$(TARGET).map -o $@
+
+$(BUILD)/$(TARGET).hex: $(BUILD)/$(TARGET).elf
+	$(CP) -O ihex $< $@
+	$(SZ) $<
+
+$(BUILD)/$(TARGET).bin: $(BUILD)/$(TARGET).elf
+	$(CP) -O binary $< $@
+
+# REF defaults to the upstream 2016 artifact committed in the repo.
+REF?=Debug/PSDR.hex
+
+anchors: $(BUILD)/$(TARGET).elf
+	$(PREFIX)objcopy -O binary --only-section=.isr_vector $(BUILD)/$(TARGET).elf $(BUILD)/$(TARGET).isr.bin
+	$(PREFIX)nm $(BUILD)/$(TARGET).elf | grep -E "_estack|__stack"
+	python3 ../docs/psdr-handoff/anchor_check.py $(BUILD)/$(TARGET).elf $(REF)
+
+clean:
+	rm -rf $(BUILD)
+
+.PHONY: all clean anchors
