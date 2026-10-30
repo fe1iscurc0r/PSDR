@@ -1,0 +1,119 @@
+# Reproduce the Eclipse CDT "GNU Tools for ARM Embedded" Debug build on Linux.
+#
+# 排除表逐字转录自 Source/.cproject (master @ 45acd0f) 的 Debug 配置。
+#
+# ⚠️ 缺陷修复说明（本脚本不绕过，请在源码层修）：
+#   缺陷1  Source/src/misc.c  缺 #include "stm32f4xx_hal_conf.h"  -> 源码层加 include
+#   缺陷2  hal_checkTimeout() 全仓无实现                         -> 源码层实现 (见 PATCH-NOTES.md)
+#   缺陷3  Source/src/uart.c  USART_HandleTypeDef 类型错误        -> 源码层改类型
+#   缺陷4  .cproject 排除表排除了 adc_ex.c/dac_ex.c               -> 本脚本已不排除它们
+#
+# 本脚本与上游的两处刻意差异：
+#   1) 不排除 system/src/stm32f4-hal/stm32f4xx_hal_adc_ex.c 与 _dac_ex.c
+#      （上游 Debug 配置排除了它们，但被保留的 adc.c/dac.c 引用其 __weak 回调 -> 断链）
+#   2) 保留 src/uart.c（缺陷3 修好后它是可编译的；TinyGPS 依赖其中的 uart_getChar）
+#   3) 加 -fcommon：GCC 10+ 默认 -fno-common，老代码靠 tentative definition
+#      -> 大量 multiple definition。-fcommon 是对齐原 GCC 4.7 语义，不是掩盖问题。
+#   4) 三个链接脚本一起传：-Tmem.ld -Tlibs.ld -Tsections.ld
+#      只传 sections.ld 会导致 ORIGIN(RAM) 不解析 -> _estack=0xFFFFFFFF（静默失效）
+
+TARGET=PSDR
+BUILD=build_linux
+PREFIX=arm-none-eabi-
+CC=$(PREFIX)gcc
+CP=$(PREFIX)objcopy
+SZ=$(PREFIX)size
+CPU=-mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16
+DEFS=-DUSE_HAL_DRIVER -DSTM32F429xx -DARM_MATH_CM4 -D__FPU_PRESENT -DOS_USE_TRACE_SEMIHOSTING_DEBUG -DUSE_FULL_ASSERT
+INCS=-Iinclude -Isystem/include -Isystem/include/cmsis -Isystem/include/stm32f4-hal -Ildscripts -IDSP_Lib/Include -IDSP_Lib/Include/Common
+CFLAGS=$(CPU) $(DEFS) $(INCS) -std=gnu99 -fcommon -ffunction-sections -fdata-sections -Wall --specs=nano.specs
+LDSCRIPT=ldscripts/sections.ld
+LIBS=-lc -lm -lnosys
+
+# --- exclusions from .cproject (Debug config) ----------------------------------
+HAL_EXCLUDE = \
+ system/src/stm32f4-hal/stm32f4xx_hal_adc_ex.c \
+ system/src/stm32f4-hal/stm32f4xx_hal_can.c \
+ system/src/stm32f4-hal/stm32f4xx_hal_crc.c \
+ system/src/stm32f4-hal/stm32f4xx_hal_cryp.c \
+ system/src/stm32f4-hal/stm32f4xx_hal_cryp_ex.c \
+ system/src/stm32f4-hal/stm32f4xx_hal_dac_ex.c \
+ system/src/stm32f4-hal/stm32f4xx_hal_dcmi.c \
+ system/src/stm32f4-hal/stm32f4xx_hal_dma2d.c \
+ system/src/stm32f4-hal/stm32f4xx_hal_dma_ex.c \
+ system/src/stm32f4-hal/stm32f4xx_hal_eth.c \
+ system/src/stm32f4-hal/stm32f4xx_hal_hash.c \
+ system/src/stm32f4-hal/stm32f4xx_hal_hash_ex.c \
+ system/src/stm32f4-hal/stm32f4xx_hal_hcd.c \
+ system/src/stm32f4-hal/stm32f4xx_hal_i2s.c \
+ system/src/stm32f4-hal/stm32f4xx_hal_i2s_ex.c \
+ system/src/stm32f4-hal/stm32f4xx_hal_irda.c \
+ system/src/stm32f4-hal/stm32f4xx_hal_msp_template.c \
+ system/src/stm32f4-hal/stm32f4xx_hal_nand.c \
+ system/src/stm32f4-hal/stm32f4xx_hal_nor.c \
+ system/src/stm32f4-hal/stm32f4xx_hal_pccard.c \
+ system/src/stm32f4-hal/stm32f4xx_hal_pcd.c \
+ system/src/stm32f4-hal/stm32f4xx_hal_rng.c \
+ system/src/stm32f4-hal/stm32f4xx_hal_rtc_ex.c \
+ system/src/stm32f4-hal/stm32f4xx_hal_sai.c \
+ system/src/stm32f4-hal/stm32f4xx_hal_sd.c \
+ system/src/stm32f4-hal/stm32f4xx_hal_sdram.c \
+ system/src/stm32f4-hal/stm32f4xx_hal_smartcard.c \
+ system/src/stm32f4-hal/stm32f4xx_hal_sram.c \
+ system/src/stm32f4-hal/stm32f4xx_hal_wwdg.c \
+ system/src/stm32f4-hal/stm32f4xx_ll_fmc.c \
+ system/src/stm32f4-hal/stm32f4xx_ll_fsmc.c \
+ system/src/stm32f4-hal/stm32f4xx_ll_sdmmc.c \
+ system/src/stm32f4-hal/stm32f4xx_ll_usb.c
+
+# 上游 Debug 配置排除 src/uart.c 与 src/ILI9341_t3.c。
+# ILI9341_t3.c 是 Arduino/Teensy 外来文件（含 SPI.h / Arduino 类型），必须排除。
+# uart.c 在缺陷3 修好后应重新纳入编译（TinyGPS 依赖 uart_getChar）。
+SRC_EXCLUDE = src/ILI9341_t3.c
+
+# CMSIS DSP：上游排除 radix2 FFT 变体（保留 radix4，main.c 用的是 radix4）
+DSP_EXCLUDE = \
+ DSP_Lib/Source/TransformFunctions/arm_cfft_radix2_q31.c \
+ DSP_Lib/Source/TransformFunctions/arm_cfft_radix2_q15.c \
+ DSP_Lib/Source/TransformFunctions/arm_cfft_radix2_init_q31.c \
+ DSP_Lib/Source/TransformFunctions/arm_cfft_radix2_init_q15.c \
+ DSP_Lib/Source/TransformFunctions/arm_cfft_radix2_init_f32.c \
+ DSP_Lib/Source/TransformFunctions/arm_cfft_radix2_f32.c
+
+C_SRCS  = $(filter-out $(SRC_EXCLUDE),$(wildcard src/*.c))
+C_SRCS += $(filter-out $(HAL_EXCLUDE),$(wildcard system/src/stm32f4-hal/*.c))
+C_SRCS += $(wildcard system/src/cmsis/*.c)
+C_SRCS += $(wildcard system/src/diag/*.c)
+C_SRCS += $(wildcard system/src/cortexm/*.c)
+C_SRCS += $(wildcard system/src/newlib/*.c)
+C_SRCS += $(wildcard DSP_Lib/Source/CommonTables/*.c)
+C_SRCS += $(filter-out $(DSP_EXCLUDE),$(wildcard DSP_Lib/Source/TransformFunctions/*.c))
+C_SRCS += $(wildcard DSP_Lib/Source/FastMathFunctions/*.c)
+C_SRCS += $(wildcard DSP_Lib/Source/BasicMathFunctions/*.c)
+C_SRCS += $(wildcard DSP_Lib/Source/ComplexMathFunctions/*.c)
+
+VPATH = src:system/src/stm32f4-hal:system/src/cmsis:system/src/diag:system/src/cortexm:system/src/newlib:DSP_Lib/Source/CommonTables:DSP_Lib/Source/TransformFunctions:DSP_Lib/Source/FastMathFunctions:DSP_Lib/Source/BasicMathFunctions:DSP_Lib/Source/ComplexMathFunctions
+OBJDIR=$(BUILD)/obj
+OBJS=$(addprefix $(OBJDIR)/,$(C_SRCS:.c=.o))
+
+all: $(BUILD)/$(TARGET).elf $(BUILD)/$(TARGET).hex $(BUILD)/$(TARGET).bin
+
+$(OBJDIR)/%.o: %.c
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD)/$(TARGET).elf: $(OBJS)
+	@mkdir -p $(BUILD)
+	$(CC) $(CPU) -Tldscripts/mem.ld -Tldscripts/libs.ld -Tldscripts/sections.ld $(OBJS) $(LIBS) -nostartfiles -Wl,-Map=$(BUILD)/$(TARGET).map -o $@
+
+$(BUILD)/$(TARGET).hex: $(BUILD)/$(TARGET).elf
+	$(CP) -O ihex $< $@
+	$(SZ) $<
+
+$(BUILD)/$(TARGET).bin: $(BUILD)/$(TARGET).elf
+	$(CP) -O binary $< $@
+
+clean:
+	rm -rf $(BUILD)
+
+.PHONY: all clean
