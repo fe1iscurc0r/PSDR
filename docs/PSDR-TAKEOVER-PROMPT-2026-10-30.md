@@ -35,6 +35,30 @@ git reset --hard origin/workorders/2026-10-30-psdr-takeover-linux-build-kicad
 2. **必须带全 7 个分支**：`PSDR_F7` 是 STM32F756 平台，而 **2.6.1 版硬件 BOM 用的正是 STM32F756** —— 只留 master 会缺最接近目标硬件的整条固件线。
 3. **GitHub 连不上就配代理重试**（`git config --global http.proxy <你的代理>`），**绝不能因此降级成浅克隆或只拉 master**。仓库本身约 182 MB，耐心等。
 
+## 宿主环境：不需要"完全复现"，但有三个坑
+
+编译 STM32 是**交叉编译**，工具链自包含。只要 `arm-none-eabi-gcc` + `make` + `git`（+ `python3` 跑锚点比对脚本）就够，**没有任何一项依赖 Ubuntu 特有功能** —— Kali、WSL2 Ubuntu、原生 Linux 都可以。
+
+**别追 gcc 小版本**：真正要锁死的是二进制锚点（见下），它与编译器版本无关。gcc 版本不同只让 size 漂几字节。
+
+⚠️ **三个坑**：
+
+1. **Windows 换行符会毁掉 Makefile**（用 Git for Windows 克隆时必中）
+   实测：上游全部文件是 LF，但**仓库里没有 `.gitattributes`** —— 没有保护。
+   Git for Windows 默认 `core.autocrlf=true` 会把 LF 转 CRLF，Makefile 靠 Tab 缩进，
+   转换后 `make` 直接报 `missing separator` 罢工。
+   ✅ **克隆前**先设：`git config --global core.autocrlf input`
+   （或在仓内 `git config core.autocrlf false && git checkout -- .`）
+
+2. **WSL2 里不要在 `/mnt/c/` 下编译** —— 跨文件系统访问极慢，749 个文件编译会卡死。
+   ✅ 仓库放 WSL2 原生 ext4 内（`~/PSDR`），编完再拷回 Windows。
+   验证：`stat -f -c %T .` 应输出 `ext2fs`/`ext4`，若是 `drvfs`/`9p` 就换位置。
+
+3. **Kali 的 PEP 668** 禁止系统级 `pip install`。本项目不需要 pip 装东西，
+   临时要装就用 `python3 -m venv`。
+
+**推荐分工**：编译验证放 Kali（真 Linux，无 CRLF 问题）；天选7 的 WSL2 当本地仓存代码。
+
 ## 克隆后验收（贴真实命令输出）
 
 ```bash

@@ -127,6 +127,41 @@ int uart_putChar(uint8_t uart, char c) {
 
 > **硬件不一致（已实测）**：`main.c` 的 `configUartPeripheral()` 配置的是 **USART6**（GPIO AF8，接收 GPS），但 `include/hal.h:57` 把 `hal_gpsUart` 定义成了 **USART1**。实现按 USART6 走，并在注释里写明这个上游不一致。**这是已知待议项，不要擅自改 `hal.h` 的宏**——改了对不上 TinyGPS 的调用方。
 
+### B-1.5 · 宿主环境：不必"完全复现"，但有三个必须注意的点
+
+编译 STM32 是**交叉编译**，工具链自包含。所需仅四项：`arm-none-eabi-gcc` / `make` / `git` / `python3`（python3 只用于锚点比对脚本）。
+**没有任何一项依赖 Ubuntu 特有功能** —— Kali(Debian 系)、WSL2 Ubuntu、原生 Linux 均可。
+
+**真正要锁死的不是发行版，是二进制锚点**（见 B-3）：
+`_estack=0x20030000` 与 `Reset=0x080001B5` 与编译器版本无关（不换 MCU 与链接脚本的前提下）。
+**gcc 小版本不同只会让 size 漂几字节，锚点不变。不要为了追版本号折腾。**
+
+⚠️ **三个必踩的坑（按宿主环境二选一）**：
+
+**坑 1 · Windows 换行符会毁掉 Makefile**（天选7 用 Git for Windows 克隆时必中）
+- 已实测：上游仓库**全部文件为 LF（0 个 CRLF）**，但**仓库内没有 `.gitattributes`** —— 即无任何保护。
+- Git for Windows 默认 `core.autocrlf=true` 会把 LF 转成 CRLF。Makefile 的 recipe 行靠 **Tab** 缩进，
+  CRLF 转换后 Tab 变成 `Tab+CR`，`make` 报 `missing separator` 直接罢工。
+- ✅ 克隆前先设：
+  ```bash
+  git config --global core.autocrlf input
+  ```
+  或克隆后在仓内 `git config core.autocrlf false && git checkout -- .`
+- ❌ 不要用 `git config --global core.autocrlf false` 之外的方式"绕过"——**不要**手动开编辑器改换行符，会引入无关 diff。
+
+**坑 2 · WSL2 里不要在 `/mnt/c/` 下编译**
+- WSL2 跨文件系统（9p/drvfs）访问 `/mnt/c` 极慢，749 个源文件编译会卡死到看不出在动。
+- ✅ 仓库放 WSL2 **原生 ext4** 内（`~/PSDR`），编译产物再拷回 Windows。
+- 验证：`cd ~/PSDR && stat -f -c %T .` 应输出 `ext2fs`/`ext4`，若是 `drvfs`/`9p` 就换位置。
+
+**坑 3 · Kali 注意 PEP 668**
+- Kali 的 Python 禁止系统级 `pip install`。本项目**不需要 pip 装任何东西**（python3 仅跑标准库脚本），
+  但若临时要装工具：`python3 -m venv` 建虚拟环境。
+
+**推荐分工**：编译验证放 Kali（真 Linux，apt 装包零障碍，无 CRLF 问题）；
+天选7 的 WSL2 当"本地仓"存放代码即可（注意坑 1、坑 2）。
+无论在哪台机器做，验收标准完全一样 —— 见 B-3。
+
 ### B-2 · 构建配置的两个坑（照做，否则固件静默失效）
 
 1. **链接脚本要三个一起传**：
