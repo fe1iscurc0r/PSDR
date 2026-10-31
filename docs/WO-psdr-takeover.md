@@ -626,9 +626,12 @@ U172 pin 4（NC）、U30 pin 6、J153 pin 6、EARPHONE pin 12。
 
 ### C-12 由网表 + 2016 PDF 版面生成 KiCad 原理图（2026-10-31）
 
-**先确认前提，避免做无用功**：上游 `468dc41` 上同时存在 2.6.1 的 PADS
-Layout ASCII（`Hardware/PSDR.asc`）和 10 页原理图 PDF
-（`Hardware/PSDR_2.6.1_Schematic_2016-07-31.pdf`），所以
+**先确认前提，避免做无用功**：上游 `PSDR_Rebuild`/`PSDR_F7`/`PSDR_F7_DMA`
+的 `468dc41` 上同时存在 2.6.1 的 PADS Layout ASCII（`Hardware/PSDR.asc`）
+和 10 页原理图 PDF——上游路径是 `Hardware/PSDR Schematic.pdf`（同一 blob
+`5390527`，346496 B），本分支按日期重命名为
+`Hardware/PSDR_2.6.1_Schematic_2016-07-31.pdf`。注意 `master` 上同名文件
+是 **2014 的 8 页旧版**（blob `bdf02d2`，317207 B），不是这一份。所以
 ①不需要装 PADS 二进制解析器，②"唯一可读的是旧版 PDF"不成立，
 ③.emn/IDX 里只有 `BOARD_OUTLINE`/`DRILLED_HOLES`/`PLACEMENT`，没有 `NETS`。
 既然这一轮拿到了源，就不开 issue、也不提"补 PDF"的 PR（那是重复文件）。
