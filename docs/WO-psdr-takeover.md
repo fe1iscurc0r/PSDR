@@ -3,10 +3,10 @@
 分支：`workorders/2026-10-30-psdr-takeover-linux-build-kicad`
 执行机：天选7P（Windows 11 26300）+ WSL2 Ubuntu 24.04（构建用）
 
-> **当前状态：任务 A 完成并通过验收；任务 B 源码修复完成、构建验证卡在"需要一次重启"
-> （WSL2 `VirtualMachinePlatform` 门槛），未跑成真构建前不宣称通过；任务 C 完成，
-> 但带 5 项 SKIP（见 §C-8，其中 .kicad_sch 和 4 铜层是硬缺口，制板仍走 `dist/gerber/`）；
-> 任务 D 的本施工记录已写、本地提交已落，未推 `origin`。**
+> **当前状态：任务 A 通过验收；任务 B 通过（GC=1 与 GC=0 各一次完整构建，0 error、
+> 365 warning、锚点 `_estack=0x20030000` / Reset `0x080001B5` 与 2016 上游 hex 一致，
+> 尺寸对账见 §B-4）；任务 C 完成但带 5 项 SKIP（见 §C-8，`.kicad_sch` 与 4 铜层是硬缺口，
+> 制板仍走 `dist/gerber/`）；任务 D 记录已写、本地提交已落，未推 `origin`。**
 > 本记录不含任何未经真实命令验证的"已完成"。
 
 ---
@@ -75,18 +75,20 @@ git -c http.proxy=http://127.0.0.1:7890 -c https.proxy=http://127.0.0.1:7890 clo
 
 ---
 
-## 任务 B · Linux 交叉编译复现 —— 源码已修，构建待跑
+## 任务 B · Linux 交叉编译复现 —— 通过
 
 ### B-1 环境
 
-本机无 WSL / 无 Docker。装 WSL2 的进展与卡点：
+WSL2 的门槛是 `VirtualMachinePlatform`：装完 WSL 3.0.3 后 `wsl --install -d Ubuntu-24.04`
+仍返回"直到重新启动系统前更改将不会生效"，`wsl -l -v` 里没有发行版。**重启一次**后才
+注册成功（经确认后重启）。重启后的实际环境：
 
-- `wsl --install --no-launch`（提权）成功装上 **WSL 3.0.3，内核 6.18.54.1**，无需重启即生效。
-- `wsl --install -d Ubuntu-24.04 --no-launch` 返回
-  `请求的操作成功。直到重新启动系统前更改将不会生效。`
-  随后 `wsl -l -v` 仍是"没有已安装的分发"——**启用 `VirtualMachinePlatform`
-  需要重启**，所以发行版还没注册。
-- 因此构建验证卡在"需要一次重启"。在得到明确同意前没有重启机器。
+```
+WSL 版本 3.0.3.0，内核 6.18.54.1-microsoft-standard-WSL2
+Ubuntu 24.04.5 LTS，VERSION 2，24 vCPU，ext4 995G 可用
+arm-none-eabi-gcc (15:13.2.rel1-2) 13.2.1 20231009
+GNU size 2.42 / GNU Make 4.3 / git 2.43.0 / Python 3.12.3
+```
 
 版本口径核实（真实包索引）：
 
@@ -118,70 +120,90 @@ docs/psdr-handoff/anchor_check.py  N  锦点自证脚本
 而 `TinyGPS.c:174/327/335` 的时间戳全部取自它。这个不影响链接，但让 GPS 超时判据
 永久失效——工单和评估报告都没提到。
 
-### B-3 已验证的部分（不需要编译器就能验的）
+### B-3 真实构建结果
 
-用 MSYS2 的 GNU Make 4.4.1 做了 dry-run 解析与源码集断言（`make -n`），全部通过：
+在 WSL2 的 ext4 上从**本地工作树**克隆 `43497b3`（不是 GitHub：本地领先 origin 2 个
+提交，从 GitHub 拉会拿到未修的树），`GC=1`（对齐上游 `.cproject` Debug 的
+`linker.gcsections=true`）与 `GC=0` 各跑一次完整构建：
 
-| 断言 | 期望 | 实测 |
+| 项 | GC=1（与 2016 真机同配置） | GC=0 |
 |---|---|---|
-| Makefile 解析 | 无 `missing separator` | exit 0，142 个编译单元渲染正常 |
-| `src/uart.c` | 被排除 | 0 次出现 |
-| `src/uart_hal_stub.c` | 被编入 | 1 次 |
-| `stm32f4xx_hal_adc_ex.c` / `_dac_ex.c` / `_rtc_ex.c` | 不排除 | 3 个都在 |
-| `arm_bitreversal2.S` | 有编译规则 | 已作为编译单元出现 |
-| `arm_cfft_radix2_*` | 排除 | 0 次 |
-| `ILI9341_t3.c` | 排除 | 0 次 |
-| 链接行 | 三个 `-T` + `-nostartfiles` + `--gc-sections` | 全部存在 |
+| `make` 退出码 | 0 | 0 |
+| `error:` | **0** | **0** |
+| `warning:` | 365 | 365 |
+| `text` | **133644** | **984844** |
+| `data` | **2884** | **3004** |
+| `bss` | **18152** | **18208** |
+| `PSDR.bin` | 136580 B | 987900 B |
+| anchors | PASS | PASS |
 
-**注意：这只证明 Makefile 结构正确，不证明能编译链接。** `0 error` 与锦点比对
-必须等 WSL2 起来真跑一次才算。
+warning 构成：`array` 132 / `implicit` 28 / `conflicting` 13 / `size` 12 / `inline` 10 /
+`passing` 8 / 其余分散。365 条与工单给的"365 warning"一致。
 
-### B-4 待办的硬指标
-
-```
-make -f Makefile.linux           → 0 error，warning 数百条
-arm-none-eabi-size               → text/data/bss（见下）
-make -f Makefile.linux anchors   → _estack=0x20030000, Reset=0x080001B5, PASS
-```
-
-`--gc-sections` 开与关各跑一次（`GC=1` / `GC=0`），把两组尺寸都记下来，用来判定
-交接材料里 984908 与 1077236 哪个对应哪种配置。
-
-### B-4.1 重启后的续跑清单（**均未执行**，开机后按序跑并贴真实输出）
-
-重启只为让 `VirtualMachinePlatform` 生效。Windows 侧：
+`make -f Makefile.linux GC=1 anchors` 原文：
 
 ```
-wsl --install -d Ubuntu-24.04 --no-launch
-wsl -l -v                       # 期望 Ubuntu-24.04 / VERSION 2 / STATE Stopped
-wsl -d Ubuntu-24.04 -u root -- bash -lc 'apt update && apt install -y gcc-arm-none-eabi make git python3'
+reference hex base : 0x08000000
+vector bytes       : new=804  ref=804
+initial SP     upstream=0x20030000  new=0x20030000  expected=0x20030000  OK
+reset vector   upstream=0x080001B5  new=0x080001B5  expected=0x080001B5  OK
+byte-for-byte over vector table: 438/804 (54.5%)
+first divergence at vector offset 8 (0x08)
+RESULT: PASS
 ```
 
-`-u root` 是为了跳过首次进发行版的交互式建号向导；`gcc-arm-none-eabi` 在 noble
-universe 里是 `15:13.2.rel1-2`，与出报告的人同版本（见 §B-1 版本表）。
+两个绑定锚点与 2016 年上游 `Debug/PSDR.hex` 完全一致。向量表只有 438/804 字节相同，
+是因为从第 3 项起每个 handler 的地址都随代码布局移动；工单指定的判据就是这两个锚点。
 
-Linux 侧，**克隆源必须是 Windows 工作树，不是 GitHub**：
+构建产物不入仓，落在 `D:\my git\PSDR-build-artifacts\`（elf/hex/bin/map + 全部构建日志）。
 
-```bash
-cd ~ && git clone "/mnt/d/my git/PSDR" PSDR   # 本地领先 origin 2 个提交，从 GitHub 拉会拿到未修的树
-cd ~/PSDR && git config core.autocrlf false && git log --oneline -1   # 期望 b8e60a8
-cd Source
-make -f Makefile.linux -j"$(nproc)" GC=1      # 先 GC=1（对齐 .cproject Debug 的 linker.gcsections=true）
-make -f Makefile.linux anchors
-make -f Makefile.linux GC=0                   # 再 GC=0，取第二组尺寸
-```
+### B-4 交接材料两个尺寸数字的来源（已证实）
 
-若 apt 需要走宿主机代理：网关地址为 `ip route show default | awk '{print $3}'`，
-代理形如 `http://<网关>:7890`，用 `apt -o Acquire::http::Proxy=...` 单命令级传入，
-不写进 `/etc/apt/apt.conf.d/`。
+| 来源 | text | data | bss | 对应配置 | 实测 | 差 |
+|---|---|---|---|---|---|---|
+| 工单 | 984908 | 3004 | 18220 | GC=0 + `.cproject` 的 HAL 排除表 | 984844 / 3004 / 18208 | −64 / 0 / −12 |
+| 评估报告 | 1077236 | 2988 | 18216 | GC=0 + **不排除**任何 HAL 模块 | 1077356 / 3004 / 18212 | +120 / +16 / −4 |
+| 2016 上游 hex | — | — | — | GC=1 + 排除表 | 我们 GC=1 镜像 136580 B | 参考 137656 B，−0.78% |
+
+1. **两个数字之差不是 `--gc-sections`**，而是**有没有执行 `.cproject` 的 HAL 排除表**：
+   全 HAL 比排除表多 92512 字节 text，正好填上交接材料里 92328 的缺口。
+2. 两者都是 **GC=0**。GC 打开后 text 从 984844 掉到 133644，少掉的 851200 字节全在
+   `.text`，主体是 CMSIS-DSP 的系数表（`Weights_8192` 64K、`twiddleCoef_*` 32K、
+   `realCoef*` 32K…），它们只被无人调用的 DSP 函数引用。
+3. **2016 年真机固件是 GC=1**：参考 hex 的镜像跨度 137656 字节，我们 GC=1 的镜像
+   136580 字节，差 1076 字节（0.78%，来自 2016 年那套 GCC 与本机 13.2.1 的代码生成
+   差异）。交接材料引用的两个尺寸都是"没开 GC 的废尺寸"，不能当验收目标。
+4. 残差（−64/−12 与 +120/+16/−4 字节）来自源码状态差异，不是编译标志。实测把
+   `.cproject` 的 `-fsigned-char -ffreestanding -g3 -O0` 补进 GC=0，得到
+   984476/2996/18204，**离目标更远**（data 反而少 8）。
+5. `mem.ld` 里 FLASH 是 2048K，1.08 MB 的变体也装得下——不能用"超 flash"来排除它。
+
+### B-4.1 执行记录与本轮新坑
+
+实际执行与原清单的差异：
+
+- `wsl --install -d Ubuntu-24.04 --no-launch --web-download` 一次成功；`-u root` 确实
+  跳过了首次进发行版的建号向导。
+- 直连可用（`archive.ubuntu.com` 返回 200），**没有用代理**；apt 装出的正是 13.2.1。
+- Git Bash 把 `/mnt/d/...` 当 POSIX 路径转成 Windows 路径再交给 `wsl.exe`，git 收到
+  `C:/Program Files/Git/mnt/...` 并把 `C:` 当主机名，报 `Could not resolve hostname c`。
+  必须加 `MSYS_NO_PATHCONV=1`。
+- WSL 里 `/tmp` 是 tmpfs，`wsl.exe` 每次调用是独立会话，命令退出 VM 就停，`/tmp` 下的
+  日志随即消失。日志一律落 `/root/`。
+- `make CFLAGS+="..."` 在命令行是**替换**不是追加（GNU make 命令行变量语义），会把整个
+  CFLAGS 换成只剩附加项。做对照构建要临时 `sed` 改 Makefile，跑完 `git checkout --` 还原。
+- 365 条 warning 里有 12 条 `size of symbol 'oneSmall' changed from 2 ... to 144`，是
+  `-fcommon` 下 `images.c` 的 144 字节定义与别处的 2 字节暂定定义合并时的提示；实测
+  `oneSmall` 在 elf 里解析成 144 字节（`T oneSmall`），不影响产物。
 
 ---
 
 ## 交接材料内部的矛盾（工单未覆盖，逐条列出）
 
-1. **尺寸数字冲突**：工单 `text 984908 / data 3004 / bss 18220 / 365 warning`
-   vs 评估报告 `text 1077236 / data 2988 / bss 18216 / 354 warning`。差 92,328 字节。
-   推测为 `--gc-sections` 开关差异，待 B-4 证实。
+1. ~~尺寸数字冲突~~ **已解决（§B-4）**：工单 `984908/3004/18220` 与评估报告
+   `1077236/2988/18216` 差 92,328 字节，原因不是 `--gc-sections`，而是后者多编了
+   `.cproject` 排除掉的 HAL 模块；两者都没开 GC，而 2016 真机镜像证明出厂固件是 GC=1。
+   warning 数两份材料写 365 与 354，我们两套配置实测都是 365——354 这一项无法复现。
 2. **`Makefile.linux` 号称"已验证可编译"，但它链接不上**：缺 `.S` 编译规则，
    而 `arm_bitreversal_32` 只定义在 `arm_bitreversal2.S` 里。工单 B-2.4 自己要求补
    这条规则——说明给出的脚本不是产出那组数字的版本。同时它也没有 `--gc-sections`，
