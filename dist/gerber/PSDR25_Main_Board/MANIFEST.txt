@@ -1,0 +1,24 @@
+PSDR gerber package -- board: PSDR25 Main Board
+source dir: D:/my git/PSDR/Hardware/Gerbers/PSDR25 Main Board
+bytes are copied verbatim; only names are normalised.
+
+PSDR25_Main_Board-Drill.drl    <- 0 - drillfile.TXT              drill/excellon                 669 holes, 10 tools [1=.014",2=.03346",3=.037",4=.0374",5=.03937",6=.04724",7=.08",8=.11811",9=.11811",10=.12598"], header='% M48 INCH,LZ', M30=True, PTH/NPTH marked=no
+F_SilkS.gbr                    <- 1 - top-ss.GTO                 top silkscreen                 strokes=6527 flash=0 ap=6 size=98.96x64.11mm origin=26.16,26.16mm FS=3.5 warn=0
+F_Mask.gbr                     <- 2 - top-sm.GTS                 top solder mask                strokes=4608 flash=221 ap=27 size=99.69x64.7mm origin=25.55,25.55mm FS=3.5 warn=0
+F_Cu.gbr                       <- 3 - top-art.GTL                top copper                     strokes=42857 flash=841 ap=31 size=99.69x64.7mm origin=25.55,25.55mm FS=3.5 warn=0
+In1_Cu.gbr                     <- 4 - L2.p.G1                    inner layer 2 (L2 power)       strokes=36876 flash=170 ap=9 size=99.33x63.98mm origin=25.91,25.91mm FS=3.5 warn=0
+In2_Cu.gbr                     <- 5 - L3.G2                      inner layer 3 (L3)             strokes=17275 flash=336 ap=10 size=98.98x63.98mm origin=25.91,25.91mm FS=3.5 warn=0
+B_Cu.gbr                       <- 6 - bot-art.GBL                bottom copper                  strokes=41728 flash=805 ap=27 size=99.69x64.7mm origin=25.55,25.55mm FS=3.5 warn=0
+B_Mask.gbr                     <- 7 - bot-sm.GBS                 bottom solder mask             strokes=4726 flash=185 ap=23 size=99.69x64.7mm origin=25.55,25.55mm FS=3.5 warn=0
+B_SilkS.gbr                    <- 8 - bot-ss.GBO                 bottom silkscreen              strokes=8535 flash=0 ap=7 size=98.72x63.35mm origin=25.61,26.42mm FS=3.4 warn=0
+Fab_Notes.gbr                  <- 9 - fabnotes.GBR               fabrication notes (not for fab) strokes=670 flash=0 ap=1 size=100.03x65.02mm origin=25.39,25.39mm FS=3.5 warn=0
+Edge_Cuts.gbr                  <- 9 - fabnotes.GBR               board outline (recovered)      knife-line-only layer whose extent brackets the copper; source was named 9 - fabnotes.GBR
+
+byte-identity: 11/11 copied files sha256-match their source
+
+FINDINGS
+  - Edge_Cuts.gbr recovered from Fab_Notes.gbr (knife-only, 100.03x65.02 mm)
+  - layers mix coordinate formats 3.4/3.5 -- a 3.4 file read as 3.5 shifts every feature 10x
+
+All standard layers present.
+

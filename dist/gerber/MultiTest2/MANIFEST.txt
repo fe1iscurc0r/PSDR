@@ -1,0 +1,20 @@
+PSDR gerber package -- board: MultiTest2
+source dir: D:/my git/PSDR/Hardware/Test Boards/MultiTest2 Gerbers
+bytes are copied verbatim; only names are normalised.
+
+B_Cu.gbr                       <- bot-art.pho                    bottom copper                  strokes=13057 flash=399 ap=8 size=77.09x49.78mm origin=25.91,25.91mm FS=3.5 warn=0
+B_Mask.gbr                     <- bot-sm.pho                     bottom solder mask             strokes=74 flash=56 ap=4 size=76.64x47.93mm origin=25.91,26.36mm FS=3.5 warn=0
+MultiTest2-Drill.drl           <- drillfile.drl                  drill/excellon                 401 holes, 4 tools [1=.014",2=.037",3=.11811",4=.11811"], header='% M48 INCH,LZ', M30=True, PTH/NPTH marked=no
+Fab_Notes.gbr                  <- fabnotes.pho                   fabrication notes (not for fab) strokes=4 flash=0 ap=2 size=78.36x51.05mm origin=25.27,25.27mm FS=3.5 warn=0
+F_Cu.gbr                       <- top-art.pho                    top copper                     strokes=23081 flash=567 ap=27 size=77.09x49.78mm origin=25.91,25.91mm FS=3.5 warn=0
+F_Mask.gbr                     <- top-sm.pho                     top solder mask                strokes=2502 flash=224 ap=23 size=76.64x47.93mm origin=25.91,26.36mm FS=3.5 warn=0
+F_SilkS.gbr                    <- top-ss.pho                     top silkscreen                 strokes=6184 flash=0 ap=7 size=87.44x47.9mm origin=15.65,27.42mm FS=3.4 warn=0
+
+byte-identity: 7/7 copied files sha256-match their source
+
+FINDINGS
+  - NO board outline layer -> fab cannot cut the board
+  - layers mix coordinate formats 3.4/3.5 -- a 3.4 file read as 3.5 shifts every feature 10x
+
+MISSING for JLC fab order: B_SilkS.gbr, Edge_Cuts.gbr
+

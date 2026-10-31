@@ -1,0 +1,21 @@
+PSDR gerber package -- board: Keychain
+source dir: D:/my git/PSDR/Hardware/Keychain/Gerbers
+bytes are copied verbatim; only names are normalised.
+
+B_Cu.gbr                       <- psdr_keychain.gbl              bottom copper                  strokes=8729 flash=111 ap=19 size=35.05x19.81mm origin=25.65,25.65mm FS=3.5 warn=0
+B_SilkS.gbr                    <- psdr_keychain.gbo              bottom silkscreen              strokes=190 flash=0 ap=5 size=33.63x16.08mm origin=24.4,27.51mm FS=3.4 warn=0
+Unidentified__psdr_keychain.gbr <- psdr_keychain.gbr              UNIDENTIFIED                   no layer name and no recognised PADS extension .gbr -- strokes=264 flash=0 ap=2 size=44.16x24.33mm origin=25.27,25.27mm FS=3.4 warn=0
+B_Mask.gbr                     <- psdr_keychain.gbs              bottom solder mask             strokes=1542 flash=70 ap=14 size=34.8x19.56mm origin=25.78,25.78mm FS=3.5 warn=0
+F_Cu.gbr                       <- psdr_keychain.gtl              top copper                     strokes=4199 flash=76 ap=10 size=35.05x19.81mm origin=25.65,25.65mm FS=3.5 warn=0
+F_SilkS.gbr                    <- psdr_keychain.gto              top silkscreen                 strokes=357 flash=0 ap=2 size=21.96x4.27mm origin=30.68,27.75mm FS=3.5 warn=0
+F_Mask.gbr                     <- psdr_keychain.gts              top solder mask                strokes=1528 flash=35 ap=6 size=34.8x19.56mm origin=25.78,25.78mm FS=3.5 warn=0
+Keychain-Drill.drl             <- psdr_keychain.txt              drill/excellon                 78 holes, 6 tools [1=.014",2=.03346",3=.03346",4=.037",5=.04528",6=.2"], header='% M48 INCH,LZ', M30=True, PTH/NPTH marked=no
+
+byte-identity: 8/8 copied files sha256-match their source
+
+FINDINGS
+  - NO board outline layer -> fab cannot cut the board
+  - layers mix coordinate formats 3.4/3.5 -- a 3.4 file read as 3.5 shifts every feature 10x
+
+MISSING for JLC fab order: Edge_Cuts.gbr
+

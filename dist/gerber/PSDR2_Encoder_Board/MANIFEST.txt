@@ -1,0 +1,17 @@
+PSDR gerber package -- board: PSDR2 Encoder Board
+source dir: D:/my git/PSDR/Hardware/Gerbers/PSDR2 Encoder Board
+bytes are copied verbatim; only names are normalised.
+
+B_SilkS.gbr                    <- 10_bot-ss.GBO                  bottom silkscreen              strokes=7 flash=0 ap=2 size=14.5x9.9mm origin=111.0,78.95mm FS=3.5 warn=0
+Edge_Cuts.gbr                  <- 1_boardoutline.GKO             board outline                  strokes=132 flash=0 ap=1 size=40.03x13.03mm origin=85.39,77.39mm FS=3.5 warn=0
+PSDR2_Encoder_Board-Drill.drl  <- 2_drillfile.TXT                drill/excellon                 12 holes, 4 tools [1=.016",2=.037",3=.039",4=.125"], header='% M48 INCH,LZ', M30=True, PTH/NPTH marked=no
+F_SilkS.gbr                    <- 3_top-ss.GTO                   top silkscreen                 strokes=2 flash=0 ap=2 size=0.25x0.25mm origin=110.61,87.27mm FS=3.5 warn=0
+F_Mask.gbr                     <- 4_top-sm.GTS                   top solder mask                strokes=10 flash=10 ap=4 size=33.46x9.34mm origin=86.74,80.6mm FS=3.5 warn=0
+F_Cu.gbr                       <- 5_top-art.GTL                  top copper                     strokes=898 flash=12 ap=8 size=39.29x12.29mm origin=85.76,77.75mm FS=3.5 warn=0
+B_Cu.gbr                       <- 8_bot-art.GBL                  bottom copper                  strokes=751 flash=12 ap=8 size=39.29x12.29mm origin=85.76,77.75mm FS=3.5 warn=0
+B_Mask.gbr                     <- 9_bot-sm.GBS                   bottom solder mask             strokes=10 flash=10 ap=4 size=33.46x9.34mm origin=86.74,80.6mm FS=3.5 warn=0
+
+byte-identity: 8/8 copied files sha256-match their source
+
+All standard layers present.
+

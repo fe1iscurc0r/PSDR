@@ -1,0 +1,19 @@
+PSDR gerber package -- board: MultiTestBoard
+source dir: D:/my git/PSDR/Hardware/Gerbers/MultiTestBoard
+bytes are copied verbatim; only names are normalised.
+
+B_Cu.gbr                       <- bot-art.pho                    bottom copper                  strokes=5489 flash=242 ap=9 size=50.47x64.7mm origin=74.42,25.55mm FS=3.5 warn=0
+B_Mask.gbr                     <- bot-sm.pho                     bottom solder mask             strokes=105 flash=47 ap=5 size=49.86x64.7mm origin=74.42,25.55mm FS=3.5 warn=0
+MultiTestBoard-Drill.drl       <- drillfile.drl                  drill/excellon                 248 holes, 5 tools [1=.014",2=.037",3=.03937",4=.11811",5=.11811"], header='% M48 INCH,LZ', M30=True, PTH/NPTH marked=no
+Fab_Notes.gbr                  <- fabnotes.pho                   fabrication notes (not for fab) strokes=392 flash=0 ap=2 size=77.19x70.76mm origin=48.34,25.27mm FS=3.5 warn=0
+F_Cu.gbr                       <- top-art.pho                    top copper                     strokes=10268 flash=322 ap=18 size=50.47x64.7mm origin=74.42,25.55mm FS=3.5 warn=0
+F_Mask.gbr                     <- top-sm.pho                     top solder mask                strokes=1206 flash=127 ap=14 size=49.86x64.7mm origin=74.42,25.55mm FS=3.5 warn=0
+F_SilkS.gbr                    <- top-ss.pho                     top silkscreen                 strokes=3494 flash=0 ap=6 size=60.36x62.79mm origin=64.16,26.15mm FS=3.5 warn=0
+
+byte-identity: 7/7 copied files sha256-match their source
+
+FINDINGS
+  - NO board outline layer -> fab cannot cut the board
+
+MISSING for JLC fab order: B_SilkS.gbr, Edge_Cuts.gbr
+

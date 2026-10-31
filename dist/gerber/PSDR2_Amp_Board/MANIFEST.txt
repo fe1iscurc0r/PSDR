@@ -1,0 +1,20 @@
+PSDR gerber package -- board: PSDR2 Amp Board
+source dir: D:/my git/PSDR/Hardware/Gerbers/PSDR2 Amp Board
+bytes are copied verbatim; only names are normalised.
+
+B_Cu.gbr                       <- bot-art.pho                    bottom copper                  strokes=2969 flash=39 ap=14 size=12.83x26.21mm origin=25.91,26.01mm FS=3.5 warn=0
+B_Mask.gbr                     <- bot-sm.pho                     bottom solder mask             strokes=479 flash=23 ap=9 size=12.82x25.65mm origin=25.91,26.03mm FS=3.5 warn=0
+B_SilkS.gbr                    <- bot-ss.pho                     bottom silkscreen              strokes=566 flash=0 ap=5 size=12.75x24.01mm origin=25.35,25.65mm FS=3.5 warn=0
+PSDR2_Amp_Board-Drill.drl      <- drillfile.drl                  drill/excellon                 21 holes, 2 tools [1=.016",2=.037"], header='% M48 INCH,LZ', M30=True, PTH/NPTH marked=no
+Fab_Notes.gbr                  <- fabnotes.pho                   fabrication notes (not for fab) strokes=583 flash=0 ap=2 size=34.98x31.39mm origin=15.45,25.37mm FS=3.5 warn=0
+F_Cu.gbr                       <- top-art.pho                    top copper                     strokes=665 flash=21 ap=8 size=12.83x26.21mm origin=25.91,26.01mm FS=3.5 warn=0
+F_Mask.gbr                     <- top-sm.pho                     top solder mask                strokes=5 flash=5 ap=2 size=11.94x1.78mm origin=26.8,49.91mm FS=3.5 warn=0
+F_SilkS.gbr                    <- top-ss.pho                     top silkscreen                 strokes=200 flash=0 ap=3 size=11.87x24.38mm origin=25.27,25.27mm FS=3.5 warn=0
+
+byte-identity: 8/8 copied files sha256-match their source
+
+FINDINGS
+  - NO board outline layer -> fab cannot cut the board
+
+MISSING for JLC fab order: Edge_Cuts.gbr
+

@@ -1,0 +1,20 @@
+PSDR gerber package -- board: PSDR25_Encoder Board
+source dir: D:/my git/PSDR/Hardware/Gerbers/PSDR25_Encoder Board
+bytes are copied verbatim; only names are normalised.
+
+B_Cu.gbr                       <- PSDR25_Encoder_Board.GBL       bottom copper                  strokes=698 flash=30 ap=7 size=18.99x24.49mm origin=25.91,25.91mm FS=3.5 warn=0
+B_Mask.gbr                     <- PSDR25_Encoder_Board.GBS       bottom solder mask             strokes=15 flash=15 ap=5 size=18.83x24.33mm origin=25.99,25.99mm FS=3.5 warn=0
+Edge_Cuts.gbr                  <- PSDR25_Encoder_Board.GML       board outline (recovered from .GML) strokes=103 flash=0 ap=1 size=20.03x25.53mm origin=25.39,25.39mm FS=3.5 warn=0
+F_Cu.gbr                       <- PSDR25_Encoder_Board.GTL       top copper                     strokes=1024 flash=33 ap=11 size=18.99x24.49mm origin=25.91,25.91mm FS=3.5 warn=0
+F_SilkS.gbr                    <- PSDR25_Encoder_Board.GTO       top silkscreen                 strokes=257 flash=0 ap=4 size=17.85x19.75mm origin=28.13,28.27mm FS=3.5 warn=0
+F_Mask.gbr                     <- PSDR25_Encoder_Board.GTS       top solder mask                strokes=156 flash=18 ap=7 size=18.83x24.33mm origin=25.99,25.99mm FS=3.5 warn=0
+PSDR25_Encoder_Board-Drill.drl <- PSDR25_Encoder_Board.txt       drill/excellon                 30 holes, 5 tools [1=.014",2=.02756",3=.037",4=.039",5=.11811"], header='% M48 INCH,LZ', M30=True, PTH/NPTH marked=no
+
+byte-identity: 7/7 copied files sha256-match their source
+
+FINDINGS
+  - no .GKO in this set: .GML contour promoted to Edge_Cuts.gbr
+  - F_SilkS.gbr reaches 0.56mm outside the outline (right 0.56mm)
+
+MISSING for JLC fab order: B_SilkS.gbr
+

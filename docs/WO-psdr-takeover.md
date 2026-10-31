@@ -3,8 +3,11 @@
 分支：`workorders/2026-10-30-psdr-takeover-linux-build-kicad`
 执行机：天选7P（Windows 11 26300）+ WSL2 Ubuntu 24.04（构建用）
 
-> **当前状态：任务 A 完成并通过验收；任务 B 源码修复完成、构建验证待 WSL2 重启后执行；
-> 任务 C / D 未开始。** 本记录不含任何未经真实命令验证的"已完成"。
+> **当前状态：任务 A 完成并通过验收；任务 B 源码修复完成、构建验证卡在"需要一次重启"
+> （WSL2 `VirtualMachinePlatform` 门槛），未跑成真构建前不宣称通过；任务 C 完成，
+> 但带 5 项 SKIP（见 §C-8，其中 .kicad_sch 和 4 铜层是硬缺口，制板仍走 `dist/gerber/`）；
+> 任务 D 的本施工记录已写、本地提交已落，未推 `origin`。**
+> 本记录不含任何未经真实命令验证的"已完成"。
 
 ---
 
@@ -170,21 +173,301 @@ make -f Makefile.linux anchors   → _estack=0x20030000, Reset=0x080001B5, PASS
 
 ---
 
-## 任务 C · Eagle → KiCad —— 未开始
+## 任务 C · 硬件文件转换 —— 已完成（但转换源不是 Eagle，见 C-1）
 
-已核实的现状（本机 `file` 命令）：
+### C-0 一句话结论
+
+工单写的路径是 Eagle → KiCad。**这条路在本仓库里走不通**（Eagle 文件是二进制，
+KiCad 10 的 Eagle 插件读不了，见 C-2）。实际走的是另一条有数据的通道：
+`Hardware/BOMs/PSDR_2.6.1/psdr26.emn` + `.emp` 是 **PADS Layout 9.5 的 ASCII 导出**，
+里面有板框、孔表和 391 个器件的贴装坐标。从它生成 KiCad 板子，再用
+KiCad 自己的 plot 输出反解回来跟**原始 PADS Gerber** 对账，得到
+亚微米级偏差（C-5）。`.kicad_sch` 与 SolidWorks 壳体**如实标 SKIP**（C-8）。
+
+### C-1 交付物清单（真实 `ls`）
 
 ```
-Hardware/PSDR.sch: data      ← Eagle 二进制格式，非 XML
-Hardware/PSDR.pcb: data
-Hardware/Enclosure/          ← SolidWorks .SLDPRT，嘉立创EDA 不吃
+$ ls -la dist/kicad/
+-rw-r--r-- 229724  PSDR_2.6.1-drc.json          # kicad-cli 10.0.6 DRC 报告（UTF-8, mm）
+-rw-r--r-- 721924  PSDR_2.6.1.kicad_pcb         # 生成物
+-rw-r--r--   2297  PSDR_2.6.1.kicad_prl         # KiCad 打开时自动创建
+（无 .kicad_sch —— 见 C-8 SKIP-1）
+
+$ ls dist/gerber/          # 9 个板集，目录 + 同名 zip 各一份
+Keychain/  MultiTest2/  MultiTestBoard/  PSDR1/  PSDR25_Encoder_Board/
+PSDR25_Main_Board/  PSDR2_Amp_Board/  PSDR2_Encoder_Board/  PSDR2_Main_Board/
++ 9 个 .zip（Keychain 59925 … PSDR25_Main_Board 444355 B）
+
+$ ls tools/
+gerbparse.py 10762          # RS-274X 读：FS/MO/OF/AP/AD/AM/LP, G00-G04, G74/G75, D01-D03, 弧
+gerber_normalize.py 16001   # 老式扩展名 → 规范名 + MANIFEST + sha256 自证
+pads_parse.py 7021          # PADS 9.5 ASCII 固定列位读（.emn / .emp）
+kicad_from_pads.py 14936    # .emn/.emp + Gerber 实测环宽 → KiCad 10 .kicad_pcb
+kicad_board_header.kicad_pcb 2134   # KiCad 10.0.6 生成的板头，逐字复用
+kicad_roundtrip_check.py 5963       # 反向对账（C-5 的判据）
 ```
 
-板子 4 块：`PSDR1` / `PSDR2 Main Board` / `PSDR2 Encoder Board` / `PSDR2 Amp Board`。
-本机未装 KiCad；已确认用 winget 装 KiCad 9（KiCad 8+ 才有原生 Eagle 导入）。
-SolidWorks 部分按工单要求如实标 SKIP，不试图转换。
+`kicad_board_header.kicad_pcb` 是本轮补进去的：之前 `kicad_from_pads.py` 的
+`--template` 指向 `%TEMP%\kctest\from_pads.kicad_pcb`，那是个会话临时文件，
+新克隆上跑不起来。改成仓库内默认路径后重跑，产物与之前**除 UUID 外逐字节相同**
+（`diff` 去掉 `(uuid` 行后 211611 = 211611 字节，无差异）。
 
-## 任务 D · 提交归档 —— 未开始
+### C-2 障碍核实：工单的四条，实测结论
 
-不推上游 `MichaelRColton/PSDR`，不动 `PSDR_F7`，不碰射频逻辑。
-推送 origin 属对外动作，等构建验收数据齐了再单独确认。
+| 工单断言 | 实测 | 处理 |
+|---|---|---|
+| Eagle 二进制 `.sch`/`.pcb`，无 `.brd` | ✅ `file` 报 `data`；`kicad-cli` 导入报 `XML 解析错误：'not well-formed'`，**但 exit 0** | 放弃 Eagle 路线 |
+| 老式 Gerber 扩展名 | ✅ `0 - drillfile.TXT` / `3 - top-art.GTL` / `9 - fabnotes.GBR` 等 9 套 | `tools/gerber_normalize.py` 规范化 |
+| `Hardware/Enclosure/` 是 SolidWorks | ✅ `.SLDPRT`/`.SLDASM` | SKIP，不转换（工单也这么要求） |
+| **"板子共 4 块"** | ❌ **实测 9 个 Gerber 板集** | 偏差报告见 C-3 |
+
+**板集数量偏差（工单要求报告）**：除 PSDR1 / PSDR2 Main / Encoder / Amp 四块外，
+还有 `PSDR25_Main_Board`、`PSDR25_Encoder_Board`（2.5 版）、`MultiTestBoard`、
+`MultiTest2`、`Keychain`（测试板与配件板）。**9 vs 4**。
+
+另外两条工单没提、但直接影响"能不能下单"的缺陷：
+
+1. **板框层缺失**：9 套里只有 5 套有独立轮廓层。`PSDR25_Main_Board` 的轮廓是从
+   `9 - fabnotes.GBR` 里**按刀线单独提取**恢复的（该文件只有 670 条画线、1 个孔径，
+   是纯工艺标注层）。`Keychain`/`MultiTest*` 等没有可恢复轮廓。
+2. **同一套 Gerber 内坐标格式混用 `3.5` 与 `3.4`**：`F_SilkS` 是 `3.4`，`F_Cu` 是 `3.5`。
+   按 `3.5` 读 `3.4` 会把每个特征放大 10 倍。`gerber_normalize.py` 逐文件记 `FS=`。
+
+### C-3 为什么 KiCad 自带的 PADS 导入器不能用
+
+KiCad 10 的 PADS 导入器认的是 `*PADS-POWERPCB*` 方言；这里的文件是
+`BOARD_FILE 3.0` 固定列位 ASCII（PADS Layout 9.5）。导入器**报成功但返回空板**，
+这是个静默失败，不能靠它。所以写了 `tools/pads_parse.py` 按列位读：
+
+```
+OUTLINE_TAG=slice(0,6)  OUTLINE_X=slice(6,36)  OUTLINE_Y=slice(36,66)  OUTLINE_ARC=slice(66,96)
+MOVE_X=slice(0,30) MOVE_Y=slice(30,60) MOVE_Z=slice(60,90) MOVE_ROT=slice(90,100)
+MOVE_SIDE=slice(100,110) MOVE_STATE=slice(110,120)
+NAME_TYPE=slice(0,45) NAME_DECAL=slice(45,90) NAME_REFDES=slice(90,None)
+```
+
+自检输出（`python tools/pads_parse.py` 的真实结果）：
+
+```
+units THOU | sections ['BOARD_OUTLINE','DRILLED_HOLES','HEADER','PLACEMENT']
+outline 68 vertices, 25 arced, closed=True | stray ['35.4']
+holes 466  plating {'PTH':439,'NPTH':27}  kind {'VIA':419,'PIN':47}
+components 391  side {'BOTTOM':182,'TOP':209}  state {'PLACED':369,'MCAD':22}
+decals 57 | .emp defines 57 | missing: none
+```
+
+`DRILLED_HOLES` 段每行的**名字列就是位号**（VIA 才是 `VIA`），这一点是后面把
+47 个 PIN 孔挂回封装的依据。
+
+### C-4 三个不能靠猜的约定，全部实测钉死
+
+1. **PADS 圆弧**：角度记在**段的终点顶点**上，正负按 PADS 顶点顺序，幅值=包含角
+   （可以 >180°）。圆心 = 弦中点 + sign(a)·左法向·r·cos(a/2)。
+   证据：给 `gerbparse.py` 加了原生弧捕获（`Gerber.arcs`），把 `.emn` 的 25 段弧
+   与原始 Gerber 的 25 段弧逐段配对，**25/25 命中，|圆心角| 与 |G02/G03 扫掠角|
+   差 < 0.05°**。同时发现原始 Gerber 轮廓的**遍历方向与 PADS 相反**（所以 25 段全是
+   G03，而 PADS 角度多为负），第一次测试因此两段都差 2.4 mm。
+2. **KiCad 封装正变换**（用 3 个已知探针封装实测，F.Cu 与 B.Cu 同式）：
+   `abs = origin + K(rot)·local`，`K(t) = [[cos t, sin t], [-sin t, cos t]]`，文件 Y 向下。
+   挂孔要用**逆变换** `K(-rot)`。这里踩过坑：写成 `K(rot)` 后 rot=0 的 454 个孔全对，
+   只有 12 个错（USB×4、J170×4、CW1×2、CW2×2），错 1.5–4 mm、有的落到板外负坐标。
+3. **坐标系桥**：PADS THOU ×0.0254；Gerber 特征 = PADS 坐标 + 1.0 inch 绘图原点；
+   KiCad 的 drill/gerber 导出对 Y 取负。
+
+### C-5 往返验证（转换是否"对"的唯一硬证据）
+
+`.emn` → KiCad → `kicad-cli` 反解回原始 PADS Gerber：
+
+```
+$ kicad-cli pcb export gerbers --layers "Edge.Cuts" -o /tmp/rt dist/kicad/PSDR_2.6.1.kicad_pcb
+$ kicad-cli pcb export drill --format excellon --drill-origin absolute -u mm -o /tmp/rt dist/kicad/PSDR_2.6.1.kicad_pcb
+$ python tools/kicad_roundtrip_check.py --edge-export /tmp/rt/PSDR_2.6.1-Edge_Cuts.gm1 \
+                                        --drill-export /tmp/rt/PSDR_2.6.1.drl
+board from .emn      : 99.9998 x 64.9986 mm
+Edge.Cuts segments   : original 670 (25 arcs), KiCad re-export 670 (25 arcs)
+outline extent       : original 99.9998 x 64.9986 mm, KiCad 99.9998 x 64.9986 mm
+contour deviation    : KiCad->original max 0.00053 mm, original->KiCad max 0.00053 mm
+drill hits exported  : 466 (from .emn: 466)
+worst hole offset    : 0.00063 mm (tolerance 0.010 mm)
+plated / unplated    : 439 / 27  (.emn says 439 PTH / 27 NPTH)
+RESULT: PASS            rc=0
+```
+
+生成器的自述输出：
+
+```
+wrote D:\my git\PSDR\dist\kicad\PSDR_2.6.1.kicad_pcb  (721924 bytes)
+  board 99.9998 x 64.9986 mm | Edge.Cuts 67 segments, 25 arcs
+  footprints 391 (209 TOP / 182 BOTTOM), 0 with no .emp body polygon
+  vias 419 | PIN holes 47 attached to 25 components, 0 unmatched
+  copper rings 318/466 holes matched a F_Cu/B_Cu flash within 2 mil
+```
+
+**两处必须记住的降级**：
+- `318/466`：148 个孔在配对的 2.5 版 Gerber 里找不到 flash（2.6.1 的贴装 vs 2.5 的
+  制板文件，本就差一代），这些孔用默认环宽 32 mil 或 drill+2×0.15 mm 兜底 —— **环宽
+  不是实测值**，DRC 的边距判定要按这条打折看（C-6 已逐条分开处理）。
+- `.emp` 只有 57 个 body 多边形，**没有焊盘叠层**。所以焊盘是"孔 + 实测环"重建的
+  圆形/环形近似，异形的 SMD 引脚形状丢了（`.emn` 里也没有 SMD 焊盘数据）。
+
+### C-6 DRC：364 条，逐类判断是否影响生产
+
+```
+$ kicad-cli pcb drc --severity-all --format json --units mm \
+      --output dist/kicad/PSDR_2.6.1-drc.json dist/kicad/PSDR_2.6.1.kicad_pcb
+发现 364 条违规项
+发现 0 个未连接的项目
+保存 DRC 报告到 dist/kicad/PSDR_2.6.1-drc.json
+rc=0
+```
+
+**不写成"通过"**：364 条真实存在。分类与判断：
+
+| 类型 | 条数 | 级别 | 判断 |
+|---|---|---|---|
+| `lib_footprint_issues` | 199 | warning | **不影响生产**。391 个封装来自合成，磁盘上没有 `PSDR_PADS` 库；几何已内嵌在 `.kicad_pcb` 里，KiCad/嘉立创EDA 都按内嵌几何渲染。要消警就把封装导成 `.pretty` 并写 `.kicad_pro` 库表，本单没做（超出工单范围）。 |
+| `courtyards_overlap` | 135 | error | **转换伪影，不影响生产**。`.emp` 从没有定义 courtyard，是我按 body 外扩 0.25 mm 合成的。RF 密板本来就这样。 |
+| `npth_inside_courtyard` | 11 | error | 同上伪影（安装孔/定位孔落进合成 courtyard）。 |
+| `pth_inside_courtyard` | 10 | error | 同上伪影。 |
+| `copper_edge_clearance` | 9 | error | **需要分开的 5 + 4**，见下。 |
+
+9 条边距逐条与**原始 2.5 Gerber 自身**对测（不经过我的转换器，用已经能复现
+安装孔数字的同一套算法）：
+
+| 对象 | KiCad mm | 原始 Gerber mm | 最近原始铜 | 判定 |
+|---|---|---|---|---|
+| M1 焊盘 1 | 0.1486 | **0.1487** | F_Cu ap151 flash 0.2244 in | 原设计如此 |
+| M2 焊盘 1 | 0.1500 | **0.1500** | F_Cu ap151 flash | 原设计如此 |
+| M3 焊盘 1 | 0.1500 | **0.1500** | F_Cu ap151 flash | 原设计如此 |
+| USB 焊盘 1 | 0.4074 | **0.4074** | F_Cu ap72 flash 0.0620 in | 原设计如此 |
+| USB 焊盘 4 | 0.4090 | **0.4089** | F_Cu ap72 flash | 原设计如此 |
+| CW1 焊盘 1 | 0.3410 | — | **0.30 mm 内无原始铜** | 无法证实，环宽是兜底值 |
+| CW1 焊盘 2 | 0.0000 | — | 同上 | 同上 |
+| CW2 焊盘 1 | 0.0000 | — | 同上 | 同上 |
+| CW2 焊盘 2 | 0.3411 | — | 同上 | 同上 |
+
+- 前 5 条：**KiCad 报的数与原始 Gerber 量出的数在 0.0001 mm 内相同** ⇒ 转换器没造
+  出边距问题，这 5 条是 2016 年原板属性。M1–M3 是 `MH3M_PLATED`（3 mm 安装孔）
+  外围 5.70 mm 铜环距板边 0.15 mm；USB 是 `MICROUSB_H12192CT-ND` 固定孔。
+  对生产：0.15 mm 已低于嘉立创 0.2 mm 的常规铜到板边要求，但这是**孔环**不是走线，
+  且安装孔环本来就要贴边；下单时按"金属化安装孔、允许贴边"处理即可，不需要改板。
+- 后 4 条：`CW1`/`CW2` = `MORSE_PADDLE_CONTACTS`（电键插孔，rot=315°/135°），落在
+  板框右侧**内凹缺口**带（x>88.3 mm，y 16–26 mm）里。2.5 版 Gerber 在那儿根本没有铜，
+  所以 0.0000 mm 是我给的兜底环跨过了板框，**不能当成原板缺陷上报**；要定论得拿
+  2.6.1 的制板文件（本仓库里没有，仓库里最新只到 2.5 main board）。
+
+板框本身也确认了非线性：右侧在 y≈16–26 mm 处退到 x=88.3 mm，另有 100 mm 边界上的
+多段台阶 + 25 段圆弧 —— 所以"板子 100×65 mm"只是外接矩形。
+
+原始 Gerber 里铜离板边的总体事实（同一套量法，全板扫描）：F_Cu 有 **740** 个特征端点
+在 0.50 mm 以内、B_Cu 有 **718** 个，其中 F_Cu 4 个 / B_Cu 9 个端点的铜越过最近的轮廓线
+0.14–0.88 mm。这块板本来就大量把铜送到板边（边缘 SMA 连接器 + 电键插孔）。
+
+### C-7 BOM 停产件核对（工单第 4 步）
+
+工单要求核对两条。结论：**位号归属对，"替代件"的措辞需要修正 —— 两个"替代件"
+都不是替代，而是本来就在 BOM 里的那个东西。**
+
+原始 BOM（`Hardware/BOMs/PSDR_2.6.1/PSDR2.6.1_BOM.xls`，唯一 sheet `PSDR25BOM`）
+用 LibreOffice 权威转 CSV 后的真实行：
+
+```
+Item 77 | Ref Des U304        | Qty 1 | Type MMIC-AMP_HMC482ST   | Vendor Digikey | Vendor Part # 599-1068-1-ND
+        | 备注列: "Name mismatch is okay, The Digikey part # is the correct part"
+Item 79 | Ref Des U16,24,30   | Qty 3 | Type RF_DPDT_MASWSS0129TR| Vendor Digikey | Vendor Part # 1465-1374-1-ND
+```
+
+四条独立证据：
+
+1. **位号对上**：`psdr26.emn` 里 U304 = `MMIC-AMP-HMC482ST`（BOTTOM, rot=270），
+   U16/U24/U30 都是 `RF_DPDT_MASWSS0129TR`（TOP, rot=0）。与工单的
+   "RF 放大器 U304"、"RF DPDT 开关 U16/U24/U30" 完全一致。
+2. **`.emp` 里有 `RF_DPDT_MASWSS0129TR` 这个 decal** ⇒ 2.6.1 设计里 MASWSS0129
+   就是**已定案的原厂件**，不是"替代品"。工单写的 `MASWSS0129TR-3000` 与
+   `MASWSS0129TR` 是**同一颗 MACOM/Peregrine GaAs pHEMT MMIC DPDT 开关**，
+   `-3000` 是整盘（工厂包装 3000）订购码，工单列的 Richardson 是分销商。
+   ⇒ **改的是采购渠道，不是料**。
+3. **`599-1068-1-ND` 的真相**：`.xls` 里这一行的超链接是
+   `https://www.digikey.com/product-detail/en/rfmd/SXB-2089Z/599-1068-1-ND/937042`
+   ⇒ 这个 Digi-Key 料号指向的就是 **RFMD `SXB-2089Z`**，也就是工单说的"替代件"。
+    designer 自己在 2.5 版就注了 `*Not the part listed in Type`，2.6/2.6.1 又注了
+   `Name mismatch is okay, The Digikey part # is the correct part`。
+   ⇒ **footprint/Type 名（HMC482ST，Hittite）是过期标签，实际买的从始至终是 SXB-2089Z**。
+   真正要做的动作是把 BOM 的 `Mfg Part #` 补成 `SXB-2089Z` 并把 decal 改名，
+   而不是"找个替代件"。
+4. **`Mfg` / `Mfg Part #` 两列在 89 行里只有 5 行有值** —— 整张 BOM 是按 Digi-Key
+   料号索引的，**没有原厂料号**。这才是这块板最大的采购风险：SKU 一失效就没有
+   可搜索的料号。嘉立创/立创商城是按 MPN 索引的，**下单前必须把 89 行全部补出 MPN**。
+   `Vendor` 列：Digikey 87 / Coilcraft 1 / Mini-Circuits 1。
+
+**"停产"这个判据本身，本机没能独立验证**：`OctopartBOM.csv` 85 个有数据的行里
+**只有 2 行**丢光了 Manufacturer/MPN/URL，正是这两个 SKU（强相关，但不是官方生命周期
+状态）；直接查 Digi-Key 两个产品页都返回 `403 Forbidden`。所以工单的"DigiKey 停产"
+当作**上游已核实的前提**接受，我不复述为实测结论。
+
+### C-8 SKIP 清单（转不了的如实标，不假装成功）
+
+| # | 项 | 原因（可复核） |
+|---|---|---|
+| SKIP-1 | `.kicad_sch` 原理图 | **仓库里不存在任何网表**。`psdr26.emn` 只有 4 个段 `BOARD_OUTLINE / DRILLED_HOLES / HEADER / PLACEMENT`（`grep -c '.NETS'` = 0），`.emp` 只有 57 个 body 多边形、无引脚数据（`_sections()` 返回空）；Eagle `.sch` 是二进制读不了；`find Hardware` 里没有任何 netlist 形状的文件。没有连接关系 ⇒ 原理图不可能重建，只能画符号。 |
+| SKIP-2 | `Hardware/Enclosure/` SolidWorks 壳体/装配 | `.SLDPRT`/`.SLDASM`，嘉立创EDA 无对应能力，工单也明确要求不要试图转换。 |
+| SKIP-3 | Eagle `.sch`/`.pcb` | 二进制（非 XML）格式；KiCad 10.0.6 Eagle 插件报 `XML 解析错误：'not well-formed'` 却 **exit 0**（假成功）。要转必须先有 Eagle 7/8 本体，本机没有。 |
+| SKIP-4 | 铜走线 / 内层 / 网络 | `.emn` 无 `TRACE` 段 ⇒ 生成的 KiCad 板是 **2 个铜层（F.Cu/B.Cu）**，而真实板是 **4 层**（`In1_Cu`=L2 power、`In2_Cu`=L3，见 `dist/gerber/PSDR25_Main_Board/MANIFEST.txt`）。走线与电源层只能看原始 Gerber，不能看这块 KiCad 板。 |
+| SKIP-5 | 器件真实焊盘形状 | `.emp` 无 pad stack（C-5）。 |
+
+**制板用哪套**：给嘉立创EDA 下单/生产请直接用 `dist/gerber/` 的规范化 Gerber（含
+真实 4 层铜）；`dist/kicad/` 只是可编辑的板框+贴装+孔位参考。
+
+### C-9 本轮新踩的坑（工单未覆盖）
+
+1. `python` / `python3` 是 WindowsApps 存根，直接执行报 `Python was not found`；
+   真解释器在 `C:\Users\ASUS\python-sdk\python3.13.2\python.exe`（从 `PATH` 里的
+   `…\Scripts` 反推出来的），本轮所有 Python 都用绝对路径。
+2. **KiCad 的 PADS 导入器静默返回空板并报成功**（C-3）。同理 Eagle 导入器
+   打印错误但 `exit 0`。**"rc=0 不等于导入了东西"**，必须回读板子统计。
+3. 圆弧 bug 定位法：把 `.emn` 的 25 段弧与原始 Gerber 的原生弧（给 `gerbparse.py`
+   新加的 `Gerber.arcs`）配对，而不是靠肉眼看图 —— 第一次"两个符号都错 2.4 mm"
+   就是因为没有原生弧可对。
+4. `K(rot)` vs `K(-rot)`：454 对 / 12 错的分布非常有欺骗性（rot=0 时两者相同）。
+5. 在 PADS 帧算完圆心再翻 Y；先翻 Y 再算圆心会得到 102.54 × 67.54 mm 的"放大板框"。
+6. KiCad 10 的 s-表达式语法与 8 不同：`(footprint "LIB:NAME")`、`(property "Reference" …)`、
+   `gr_arc` 要 `(start)(mid)(end)(stroke)`；手写的头文件在 line 91 报
+   `Expecting symbol|number. Got '('` —— 正确写法抄自
+   `share/kicad/demos/stickhub/StickHub.kicad_pcb`，最终固化成
+   `tools/kicad_board_header.kicad_pcb`。
+7. `kicad-cli pcb export pos -f ascii` 不认 `-f`，要用 `--format ascii`；且
+   `attr … exclude_from_pos_files` 会把探针从位置文件里悄悄剔除。
+8. DRC 的中文 `description` 在 GBK 控制台下显示为乱码 —— **文件本身是合法 UTF-8**
+   （`decode('utf-8')` 不报错），用 `PYTHONIOENCODING=utf-8` 才看得对。别误判成
+   KiCad 写坏了编码。
+9. 读 `.xls`：本机没 `xlrd`；手撸 BIFF8 在一条带 rich-text 选项字节的 SST 字符串上
+   失去同步（**已删除这个半成品工具**）。正解是 LibreOffice 无头转换，一条命令：
+   ```
+   "/c/Program Files/LibreOffice/program/soffice.exe" --headless --norestore \
+     --convert-to 'csv:Text - txt - csv (StarCalc):44,34,76,1,,0,false,true,true,false,false,-1' \
+     --outdir <dir> <file.xls>
+   ```
+   （最后的 `-1` = 每个 sheet 出一个文件。）
+10. 转换器依赖 `%TEMP%` 里的模板文件（C-1）：**临时文件当输入 = 不可复现**，已入库。
+
+---
+
+## 任务 D · 提交归档
+
+待推清单（工单列的）与本轮实际状态：
+
+```
+Source/Makefile.linux        N  已在 96e06ce
+Source/src/uart_hal_stub.c   N  已在 96e06ce
+Source/src/{hal,main,misc,uart}.c  已在 96e06ce
+docs/psdr-build-notes.md     已在 96e06ce
+dist/kicad/                  N  本轮
+dist/gerber/                 N  本轮（SolidWorks 大件未进仓，符合工单）
+tools/                       N  本轮新增（工单没列，但转换与自证脚本是交付物的一部分）
+docs/WO-psdr-takeover.md     M  本文件
+```
+
+`Hardware/Enclosure/`（SolidWorks，未改）没有复制进 `dist/`，仓库里原样存在。
+
+**不推上游 `MichaelRColton/PSDR`，不动 `PSDR_F7`，不碰射频逻辑。**
+推送 `origin`（fork）属对外动作，等构建验收数据齐了再单独确认。

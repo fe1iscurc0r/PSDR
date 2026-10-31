@@ -1,0 +1,22 @@
+PSDR gerber package -- board: PSDR2 Main Board
+source dir: D:/my git/PSDR/Hardware/Gerbers/PSDR2 Main Board
+bytes are copied verbatim; only names are normalised.
+
+In1_Cu.gbr                     <- PSDR2.G1                       inner layer 2 (L2 power)       strokes=10493 flash=235 ap=10 size=99.29x64.29mm origin=25.76,25.76mm FS=3.5 warn=0
+In2_Cu.gbr                     <- PSDR2.G2                       inner layer 3 (L3)             strokes=20300 flash=171 ap=6 size=99.29x64.29mm origin=25.76,25.76mm FS=3.5 warn=0
+B_Cu.gbr                       <- PSDR2.GBL                      bottom copper                  strokes=39559 flash=797 ap=34 size=99.29x64.29mm origin=25.76,25.76mm FS=3.5 warn=0
+B_SilkS.gbr                    <- PSDR2.GBO                      bottom silkscreen              strokes=2203 flash=0 ap=5 size=107.89x63.6mm origin=17.61,26.29mm FS=3.5 warn=0
+B_Mask.gbr                     <- PSDR2.GBS                      bottom solder mask             strokes=3656 flash=287 ap=29 size=98.23x64.08mm origin=25.8,25.86mm FS=3.5 warn=0
+Edge_Cuts.gbr                  <- PSDR2.GKO                      board outline                  strokes=522 flash=0 ap=1 size=100.03x65.03mm origin=25.39,25.39mm FS=3.5 warn=0
+F_Cu.gbr                       <- PSDR2.GTL                      top copper                     strokes=32177 flash=916 ap=35 size=99.29x64.29mm origin=25.76,25.76mm FS=3.5 warn=0
+F_SilkS.gbr                    <- PSDR2.GTO                      top silkscreen                 strokes=3746 flash=0 ap=6 size=98.94x63.96mm origin=26.06,25.87mm FS=3.5 warn=0
+F_Mask.gbr                     <- PSDR2.GTS                      top solder mask                strokes=2751 flash=406 ap=28 size=97.71x64.08mm origin=25.86,25.86mm FS=3.5 warn=0
+PSDR2_Main_Board-Drill.drl     <- PSDR2.TXT                      drill/excellon                 572 holes, 7 tools [1=.016",2=.02756",3=.037",4=.0374",5=.039",6=.125",7=.12598"], header='% M48 INCH,LZ', M30=True, PTH/NPTH marked=no
+
+byte-identity: 10/10 copied files sha256-match their source
+
+FINDINGS
+  - B_SilkS.gbr reaches 7.78mm outside the outline (left 7.78mm)
+
+All standard layers present.
+

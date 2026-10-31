@@ -1,0 +1,21 @@
+PSDR gerber package -- board: PSDR1
+source dir: D:/my git/PSDR/Hardware/Gerbers/PSDR1
+bytes are copied verbatim; only names are normalised.
+
+B_Cu.gbr                       <- PSDR1.GBL                      bottom copper                  strokes=12731 flash=643 ap=13 size=99.39x63.45mm origin=25.7,25.7mm FS=3.5 warn=0
+B_SilkS.gbr                    <- PSDR1.GBO                      bottom silkscreen              strokes=3864 flash=0 ap=4 size=99.37x63.47mm origin=27.13,25.99mm FS=3.5 warn=0
+B_Mask.gbr                     <- PSDR1.GBS                      bottom solder mask             strokes=109 flash=91 ap=6 size=96.85x59.99mm origin=28.04,26.75mm FS=3.5 warn=0
+Edge_Cuts.gbr                  <- PSDR1.GKO                      board outline                  strokes=123 flash=0 ap=1 size=100.03x64.08mm origin=25.39,25.39mm FS=3.5 warn=0
+F_Cu.gbr                       <- PSDR1.GTL                      top copper                     strokes=40193 flash=844 ap=32 size=99.39x63.45mm origin=25.7,25.7mm FS=3.5 warn=0
+F_SilkS.gbr                    <- PSDR1.GTO                      top silkscreen                 strokes=6625 flash=0 ap=6 size=97.32x63.56mm origin=27.94,25.38mm FS=3.5 warn=0
+F_Mask.gbr                     <- PSDR1.GTS                      top solder mask                strokes=4255 flash=292 ap=25 size=96.89x60.05mm origin=28.04,26.69mm FS=3.5 warn=0
+PSDR1-Drill.drl                <- PSDR1.TXT                      drill/excellon                 651 holes, 7 tools [1=.016",2=.037",3=.039",4=.046",5=.04724",6=.125",7=.12598"], header='% M48 INCH,LZ', M30=True, PTH/NPTH marked=no
+Unidentified__PSDR1.pho        <- PSDR1.pho                      UNIDENTIFIED                   no layer name and no recognised PADS extension .pho -- strokes=12119 flash=0 ap=2 size=100.33x64.33mm origin=25.27,25.27mm FS=3.5 warn=0
+
+byte-identity: 9/9 copied files sha256-match their source
+
+FINDINGS
+  - B_SilkS.gbr reaches 1.08mm outside the outline (right 1.08mm)
+
+All standard layers present.
+
