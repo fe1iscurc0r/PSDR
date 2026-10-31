@@ -52,12 +52,17 @@ python tools/pads_asc_to_kicad.py --asc Hardware/PSDR.asc \
 
 UUIDs are derived with `uuid5(NAMESPACE_URL, "psdr261/...")`, so the same input
 produces byte-identical output; a diff after regeneration is a real change.
+The generator writes LF line endings, and `.gitattributes` pins the KiCad files
+to LF so a Windows checkout with `core.autocrlf=true` does not turn every
+regenerated file into a whole-file diff.
 
 `--pcb FILE` optionally copies the footprint field from a `.kicad_pcb` (the
 PADS decal name, e.g. `PSDR_PADS:CAP_0603`). Without it that one property is
 empty; nothing else changes (391 lines out of ~104000). The board itself is
 not part of this change: `.emn`/`.emp` carry only outline, holes and placement,
 so the reconstructed board has no pads for 366 of 391 parts and no routing.
+Note that with the footprint field empty ERC reports no warnings at all, since
+`footprint_link_issues` is the only check that fires.
 
 ## Verification
 
