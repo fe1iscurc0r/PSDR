@@ -5,8 +5,10 @@
 
 > **当前状态：任务 A 通过验收；任务 B 通过（GC=1 与 GC=0 各一次完整构建，0 error、
 > 365 warning、锚点 `_estack=0x20030000` / Reset `0x080001B5` 与 2016 上游 hex 一致，
-> 尺寸对账见 §B-4）；任务 C 完成但带 5 项 SKIP（见 §C-8，`.kicad_sch` 与 4 铜层是硬缺口，
-> 制板仍走 `dist/gerber/`）；任务 D 记录已写、本地提交已落，未推 `origin`。**
+> 尺寸对账见 §B-4）；任务 C 完成但带 5 项 SKIP（见 §C-8：4 铜层未覆盖；`.kicad_sch`
+> 仍未产出，但它的前置缺口已补齐——2.6.1 的 PADS Layout ASCII 与 10 页原理图 PDF 已入库，
+> 网表 391 器件 / 278 网 / 1132 引脚并通过四重校验，见 §C-11）；制板仍走 `dist/gerber/`；
+> 任务 D 记录已写、已推 `origin`（fork），未碰上游。**
 > 本记录不含任何未经真实命令验证的"已完成"。
 
 ---
@@ -227,8 +229,11 @@ RESULT: PASS
 
 ### C-0 一句话结论
 
-工单写的路径是 Eagle → KiCad。**这条路在本仓库里走不通**（Eagle 文件是二进制，
-KiCad 10 的 Eagle 插件读不了，见 C-2）。实际走的是另一条有数据的通道：
+工单写的路径是 Eagle → KiCad。**这个前提不成立**：仓库里的 `.sch`/`.pcb` 不是 Eagle，
+而是 **PADS Logic / PADS Layout 二进制**（`Hardware/README.md` 原文：
+"Schematics and Board layout files are for Mentorgraphics PADS"；文件头
+`00 fe 0d 00` / `00 ff 26 20`），KiCad 10 的 Eagle 插件当然读不了，见 C-2。
+实际走的是另一条有数据的通道：
 `Hardware/BOMs/PSDR_2.6.1/psdr26.emn` + `.emp` 是 **PADS Layout 9.5 的 ASCII 导出**，
 里面有板框、孔表和 391 个器件的贴装坐标。从它生成 KiCad 板子，再用
 KiCad 自己的 plot 输出反解回来跟**原始 PADS Gerber** 对账，得到
@@ -266,7 +271,7 @@ kicad_roundtrip_check.py 5963       # 反向对账（C-5 的判据）
 
 | 工单断言 | 实测 | 处理 |
 |---|---|---|
-| Eagle 二进制 `.sch`/`.pcb`，无 `.brd` | ✅ `file` 报 `data`；`kicad-cli` 导入报 `XML 解析错误：'not well-formed'`，**但 exit 0** | 放弃 Eagle 路线 |
+| `.sch`/`.pcb` 二进制，无 `.brd` | ✅ `file` 报 `data`；KiCad Eagle 插件报 `XML 解析错误：'not well-formed'`，**但 exit 0**（因为这些文件根本不是 Eagle，是 PADS） | 放弃 Eagle 路线，改走 PADS ASCII（`.emn`/`.emp`） |
 | 老式 Gerber 扩展名 | ✅ `0 - drillfile.TXT` / `3 - top-art.GTL` / `9 - fabnotes.GBR` 等 9 套 | `tools/gerber_normalize.py` 规范化 |
 | `Hardware/Enclosure/` 是 SolidWorks | ✅ `.SLDPRT`/`.SLDASM` | SKIP，不转换（工单也这么要求） |
 | **"板子共 4 块"** | ❌ **实测 9 个 Gerber 板集** | 偏差报告见 C-3 |
@@ -404,7 +409,9 @@ rc=0
 - 后 4 条：`CW1`/`CW2` = `MORSE_PADDLE_CONTACTS`（电键插孔，rot=315°/135°），落在
   板框右侧**内凹缺口**带（x>88.3 mm，y 16–26 mm）里。2.5 版 Gerber 在那儿根本没有铜，
   所以 0.0000 mm 是我给的兜底环跨过了板框，**不能当成原板缺陷上报**；要定论得拿
-  2.6.1 的制板文件（本仓库里没有，仓库里最新只到 2.5 main board）。
+  2.6.1 的制板文件——它在 `PSDR_Rebuild` 的 `468dc41` 里确实存在
+  （`Hardware/Gerbers/PSDR261 Main Board/`：钻孔 + GTO/GTS/GTL/G1/G2/GBL/GBS/GBO +
+  fabnotes，共 10 个文件），只是 `master` 与任务 C 用的 `dist/gerber/` 里没有（见 §C-10）。
 
 板框本身也确认了非线性：右侧在 y≈16–26 mm 处退到 x=88.3 mm，另有 100 mm 边界上的
 多段台阶 + 25 段圆弧 —— 所以"板子 100×65 mm"只是外接矩形。
@@ -459,9 +466,9 @@ Item 79 | Ref Des U16,24,30   | Qty 3 | Type RF_DPDT_MASWSS0129TR| Vendor Digike
 
 | # | 项 | 原因（可复核） |
 |---|---|---|
-| SKIP-1 | `.kicad_sch` 原理图 | **仓库里不存在任何网表**。`psdr26.emn` 只有 4 个段 `BOARD_OUTLINE / DRILLED_HOLES / HEADER / PLACEMENT`（`grep -c '.NETS'` = 0），`.emp` 只有 57 个 body 多边形、无引脚数据（`_sections()` 返回空）；Eagle `.sch` 是二进制读不了；`find Hardware` 里没有任何 netlist 形状的文件。没有连接关系 ⇒ 原理图不可能重建，只能画符号。 |
+| SKIP-1 | `.kicad_sch` 图形化原理图 | **前置缺口已补齐，图形仍未生成**（原判据"唯一可读的 PDF 是 2014 旧版"已由 §C-10 推翻，此处是修正后的状态）。① 2.6.1 的 **10 页原理图 PDF** 与 **PADS Layout ASCII** 都在 `PSDR_Rebuild@468dc41`，本轮已复制进本分支（`Hardware/PSDR_2.6.1_Schematic_2016-07-31.pdf`、`Hardware/PSDR.asc`）；② 从 `.asc` 已提取**完整网表**：391 器件 / 278 网 / 1132 连接引脚 / 41 未连接（全部可解释为 NC、基准点、安装孔），四重校验见 §C-11；③ `Hardware/PSDR.sch` 仍是 PADS Logic 二进制，开源工具读不了，但**不再阻塞网表**。⇒ 现在缺的只是"按 2.6.1 版面画的 `.kicad_sch`"，连接关系已有权威来源。 |
 | SKIP-2 | `Hardware/Enclosure/` SolidWorks 壳体/装配 | `.SLDPRT`/`.SLDASM`，嘉立创EDA 无对应能力，工单也明确要求不要试图转换。 |
-| SKIP-3 | Eagle `.sch`/`.pcb` | 二进制（非 XML）格式；KiCad 10.0.6 Eagle 插件报 `XML 解析错误：'not well-formed'` 却 **exit 0**（假成功）。要转必须先有 Eagle 7/8 本体，本机没有。 |
+| SKIP-3 | `.sch`/`.pcb` 源文件 | 工单称 Eagle，实测是 **PADS Logic / PADS Layout 二进制**（`Hardware/README.md`："Schematics and Board layout files are for Mentorgraphics PADS"；头 `00 fe 0d 00` / `00 ff 26 20`）。KiCad 10.0.6 的 Eagle 插件报 `XML 解析错误：'not well-formed'` 却 **exit 0**（假成功）——因为它不是 Eagle XML。要转这两个二进制必须先有 PADS Logic/Layout 本体，本机没有；**但 2.6.1 的 PADS Layout ASCII（`Hardware/PSDR.asc`）已在库里，二进制不再阻塞网表**，只影响"图形原理图"（§C-11）。 |
 | SKIP-4 | 铜走线 / 内层 / 网络 | `.emn` 无 `TRACE` 段 ⇒ 生成的 KiCad 板是 **2 个铜层（F.Cu/B.Cu）**，而真实板是 **4 层**（`In1_Cu`=L2 power、`In2_Cu`=L3，见 `dist/gerber/PSDR25_Main_Board/MANIFEST.txt`）。走线与电源层只能看原始 Gerber，不能看这块 KiCad 板。 |
 | SKIP-5 | 器件真实焊盘形状 | `.emp` 无 pad stack（C-5）。 |
 
@@ -500,6 +507,270 @@ Item 79 | Ref Des U16,24,30   | Qty 3 | Type RF_DPDT_MASWSS0129TR| Vendor Digike
    （最后的 `-1` = 每个 sheet 出一个文件。）
 10. 转换器依赖 `%TEMP%` 里的模板文件（C-1）：**临时文件当输入 = 不可复现**，已入库。
 
+### C-10 原理图与网表复核（2026-10-31 二次修正）
+
+上一版 §C-10 有两处判断是错的，先认：
+
+1. **"唯一可读的 PDF 是 2014 旧版"错**。`master` 上 `Hardware/PSDR Schematic.pdf`
+   确实是 2014 的 8 页旧图，但 `git log --all` 显示 `PSDR_Rebuild` 的
+   **`468dc41`（2016-07-31，"PSDR 2.6.1 PCB complete"）** 里还有一份
+   **10 页、346,496 B 的 2.6.1 原理图 PDF**（`CreationDate` 2016-07-26，
+   文字层含 `U121` / `U185` / `Si5338` / `HMC1023` / `STM32F746`）。
+   `CreationDate` 只说明文档创建时间，**不能当版本判据**；判版本要看内容和全分支历史。
+2. **"当前版本的原理图只在 PADS 二进制里"也错**。同一提交里还有
+   `Hardware/PSDR.asc`——**PADS Layout 的 ASCII 设计数据库**
+   （1,641,124 B，头 `!PADS-POWERPCB-V9.5-BASIC! DESIGN DATABASE ASCII FILE 1.0`），
+   `*PARTTYPE*` / `*PART*` / `*ROUTE*` 三段直接给出引脚表、位号表和连接关系。
+   它不是图形原理图，但它是**机器可读、可逐脚对账的 2.6.1 网表来源**。
+
+现在的事实表：
+
+| 文件 | 位置 | 是什么 | 版本证据 |
+|---|---|---|---|
+| `Hardware/PSDR Schematic.pdf` | `master` / 本分支 | 8 页，317,207 B | 2014-10-28 旧版（比 2.6.1 少 16 个位号） |
+| `Hardware/PSDR_2.6.1_Schematic_2016-07-31.pdf` | 本分支新增（源 `468dc41`） | 10 页，346,496 B | `CreationDate` 2016-07-26；含 2.6.1 器件 |
+| `Hardware/PSDR.sch` | 本分支 | PADS Logic 二进制，525,874 B | 2016-05-07 提交；开源工具读不了 |
+| `Hardware/PSDR.asc` | 本分支新增（源 `468dc41`） | **PADS Layout ASCII 1.0**，1,641,124 B | `468dc41`，2.6.1 PCB complete |
+| `Hardware/BOMs/PSDR_2.6.1/psdr26.emn`/`.emp` | 本分支 | PADS IDX ASCII | 只有 `BOARD_OUTLINE`/`DRILLED_HOLES`/`PLACEMENT`，无 `NETS` |
+
+**结论：网表问题已解决**（§C-11）。剩下的只有"图形化原理图"（`.kicad_sch`）：
+现在既不需要从 PDF 反推连接，也不需要逆 PADS 二进制——连接关系有权威来源，
+图形照 2.6.1 PDF 的 10 页版面生成即可。
+
+两份新增文件的字节与来源一致（`git show 468dc41:<path> | sha256sum` 与落盘文件相同）：
+
+```
+d479afe3238df038d76debf22cf8fdd382603fba2996bec8c2c2a3fb4204f231  Hardware/PSDR.asc
+c366775af458b3a8b9cb220c4ae29f90b6f25961efc0b1fff2518d61f964b699  Hardware/PSDR_2.6.1_Schematic_2016-07-31.pdf
+```
+
+### C-11 从 PADS Layout ASCII 提取 2.6.1 网表（2026-10-31）
+
+**输入**：`Hardware/PSDR.asc`。**工具**：`tools/pads_asc_netlist.py`（只依赖标准库）。
+**产物**：`dist/netlist/PSDR_2.6.1_netlist.csv`（1132 行，列
+`net,refdes,pin,pin_name,part_type`）与同名 `.json`（含未连接引脚表）。
+
+三段各管一件事：
+
+- `*PARTTYPE*`：每种封装的引脚表（`1.0.U.NC1` = 引脚 1、类型 U、名 NC1）；
+- `*PART*`：位号 → 封装（`U287  VARIABLE_FILTER_HMC1023 …`）；
+- `*ROUTE*`：每个 `*SIGNAL*` 是**一个连通簇**，簇内每行是两列 `位号.引脚`；
+  同一网络被铜分成几块就有几个簇，取并集即该网全部引脚。
+
+实测：
+
+```
+$ python tools/pads_asc_netlist.py Hardware/PSDR.asc \
+      --csv dist/netlist/PSDR_2.6.1_netlist.csv \
+      --json dist/netlist/PSDR_2.6.1_netlist.json
+parts            391
+part types       57
+nets             278
+signal clusters  364 (18 nets with >1 island)
+connected pins   1132
+unconnected pins 41
+placed pins      1173
+problems         0
+```
+
+网络大小分布：2 脚 169 个、3 脚 74 个、4 脚 13 个、5 脚 7 个、6 脚 3 个、7 脚 3 个，
+其余 9/10/11/13/23/50/58/261 脚各 1–2 个（GND 261、+3V3 58、+3V3_CPU 50、
+HALF_VCC 23）。**没有 1 脚网络**，所以不存在"孤立焊盘被当成了网"。
+
+四重校验（都是独立证据，不是同一份数据换个说法）：
+
+1. **位号集合**：391/391 与 `psdr26.emn` 的 placement 位号完全相同，双向差集为空。
+2. **网名 vs 2.6.1 PDF**：132 个命名网络里 **131 个**能在 PDF 文字层找到
+   （把 `/`、`-`、`\` 归一后比对），只差 `BOOST_LOOP`（图上没有可提取的标签）；
+   另 146 个是 `$$$NNNNN` 自动名，图上本来就不显示。反向也查了：PDF 里 6.7 pt 的
+   网标级文字，除标题/注释/封装名外全能在网表里找到（`SWCLK`/`SWDIO` 是 PDF 把
+   `JTCK/SWCLK`、`JTMS/SWDIO` 拆成了两段），**没有"图上有、网表没有"的网络**。
+3. **固件引脚表**：`Source/src/hal.c` 的 28 条 `Gpio_Pin` 定义，按"端口+脚号"
+   在 PCB 里查找，**27 条落在同一网络**（其中 3 条只是取名不同：
+   `MIC_SWITCH`→`MIC_SELECT`、`PREAMP_POWER`→`PREAMP_SHTDWN`、
+   `FILTER_GAIN_POT_SCLK`→`FILTER/GAIN_POT_CLK`；`\EARPHONE_INSERTED`、
+   `FLIP-FLOP_POWER`、`AUDIO_AMP_\SHDN` 的转义与连字符同样对上）。
+4. **设计者自己在图上的注释**：2.6.1 PDF 第 3 页 Si5338 旁写
+   "IN5/6: Feedback. **Leave 5 unconnected and 6 grounded**"；
+   网表里 U241 pin 5 未连接、pin 6 在 GND，逐条对上。
+
+**一条实质冲突（不是解析问题）**：
+
+| 信号 | 固件 `Source/src/hal.c:169` | 2.6.1 PCB / PDF |
+|---|---|---|
+| `GPS_RESET` | `GPIOE, GPIO_PIN_15`（注释还写着 `//2.5`） | MCU **PD15（pin 62）**；PE15（pin 45）走 `LED_3` → R99 |
+
+三份独立证据都指向 PD15：PCB 网表（`GPS_RESET` = `GPSR.1` + `U121.62` + `U185.8`）、
+封装引脚名（pin 62 = `PD15_T4-4_*`）、PDF 第 2 页（引脚号 62 旁的网标就是
+`GPS_RESET`）。`git blame` 显示这行自 2016-04-18 起没再改过，而 2.6.1 PCB 是
+2016-07-31 完成的。⇒ 在 2.6.1 板上按现在的固件跑，`GPS_RESET` 的写操作会落到
+`LED_3`（PE15），GPS 模块的复位脚（PD15）没有任何代码驱动。
+**只记录，不改**（工单护栏：不碰固件/射频逻辑）。
+
+**41 个未连接引脚**：F1–F6 基准点、M4–M7 安装孔、X1/X2 晶振外壳、L39/L82 的
+pin 5（半孔）、U185 的 10 个 NC + VOUT、U241 的 7 个（IN3/IN5/INTR/CLK1B/CLK2B/
+CLK3A/CLK3B）、U253/U260 的 pin 7（NC）、U287 VBG、U314 VREF、U15 HB、
+U172 pin 4（NC）、U30 pin 6、J153 pin 6、EARPHONE pin 12。
+其中 `VBG`/`VREF`/`HB` 是模拟偏置脚，**是否该外接电容要对照数据手册再定**
+（本轮不下结论）；其余都有封装层面的 NC/机械解释。
+
+**同提交里还有 2.6.1 真正的 4 层 Gerber**：`Hardware/Gerbers/PSDR261 Main Board/`
+（钻孔 + GTO/GTS/GTL/G1/G2/GBL/GBS/GBO + fabnotes），`master` 上没有。
+任务 C 的 `dist/gerber/` 用的是 2.5 主板的原始 Gerber（§C-8 SKIP-4）；
+要出 2.6.1 生产包应改用它，这不在本工单的 C 阶段范围内，先记录。
+
+本轮 PDF 侧的工具（poppler 24.02、PyMuPDF 1.28.2）和中间脚本留在
+`D:\my git\PSDR-build-artifacts\sch_261\`、`sch_preview\`（不入仓）。
+
+---
+
+### C-12 由网表 + 2016 PDF 版面生成 KiCad 原理图（2026-10-31）
+
+**先确认前提，避免做无用功**：上游 `468dc41` 上同时存在 2.6.1 的 PADS
+Layout ASCII（`Hardware/PSDR.asc`）和 10 页原理图 PDF
+（`Hardware/PSDR_2.6.1_Schematic_2016-07-31.pdf`），所以
+①不需要装 PADS 二进制解析器，②"唯一可读的是旧版 PDF"不成立，
+③.emn/IDX 里只有 `BOARD_OUTLINE`/`DRILLED_HOLES`/`PLACEMENT`，没有 `NETS`。
+既然这一轮拿到了源，就不开 issue、也不提"补 PDF"的 PR（那是重复文件）。
+上游真正缺的是 **KiCad 原生原理图**，这是本节做的事。
+
+**输入三份，各管一件事**：
+
+| 输入 | 提供 |
+|---|---|
+| `dist/netlist/PSDR_2.6.1_netlist.json`（§C-11） | 谁连谁 |
+| PDF 文字层的 refdes 坐标 | 谁在哪一页、页内大致位置 |
+| `dist/kicad/PSDR_2.6.1.kicad_pcb` | 位号全集 + 封装名 |
+
+生成器 `tools/pads_asc_to_kicad.py`（标准库，无第三方依赖）。
+
+**连接模型：每脚一个全局标签，不画线。** 每个引脚端点放一个与 PADS
+网名同名的 `global_label`（1.0 mm 字号），未连接引脚放 `no_connect`。
+理由：PDF 的走线是版面艺术品，重画既没有信息增益、又没法自动校验；
+全局标签跨页生效，网表可以机检。代价是读图靠标签而不是靠线，见文末局限。
+
+**符号**：按 `*PARTTYPE*` 引脚表生成 57 个矩形体符号，引脚左右各半、1 脚件
+放右侧、间距 2.54 mm、引脚长 3.81 mm。符号坐标 Y 向上、原理图 Y 向下，
+所以绝对引脚位置 = `(ox + px, oy - py)`。
+
+**版面**：每张子图对应 PDF 一页，纸面直接取 PDF 页面尺寸
+1584×1224 pt = 558.8×431.8 mm；根图 A2（594×420 mm），9 张层次图排 3×3。
+
+```
+$ python tools/pads_asc_to_kicad.py --asc Hardware/PSDR.asc \
+      --pdf Hardware/PSDR_2.6.1_Schematic_2016-07-31.pdf \
+      --pcb dist/kicad/PSDR_2.6.1.kicad_pcb --out dist/kicad
+parts            391
+part types       57
+nets             278
+connected pins   1132
+pdf pages used   [2, 3, 4, 5, 6, 7, 8, 9, 10]
+ambiguous refs   11 ['+', '-', '1PPS', 'CLK', 'DAC1', 'DAC2', 'GND', 'LIPO', 'NRST', 'SCL', 'SDA']
+unplaced refs    []
+page  parts  types  body-overlaps  file
+   2     57     17             0  PSDR_2.6.1-p02.kicad_sch
+   3     44      7             0  PSDR_2.6.1-p03.kicad_sch
+   4     33      9             0  PSDR_2.6.1-p04.kicad_sch
+   5     48      4             0  PSDR_2.6.1-p05.kicad_sch
+   6     49     14             0  PSDR_2.6.1-p06.kicad_sch
+   7     14      7             0  PSDR_2.6.1-p07.kicad_sch
+   8     58     18             0  PSDR_2.6.1-p08.kicad_sch
+   9     58     12             0  PSDR_2.6.1-p09.kicad_sch
+  10     30      6             0  PSDR_2.6.1-p10.kicad_sch
+```
+
+页码→内容：2 MCU/GPS/USB、3 时钟(Si5338)、4 模拟开关/驱动、5 RX/TX 基带、
+6 音频/麦克风、7 人机(桨/LED/LCD)、8 电源、9 射频前端、10 可变滤波器。
+第 1 页 PDF 只有注释没有器件，不建子图。
+
+**四道校验，都是独立证据**：
+
+1. **网表对账**（能不能用）：
+
+```
+$ kicad-cli sch export netlist --format kicadxml \
+      --output psdr261_kicad.xml dist/kicad/PSDR_2.6.1.kicad_sch
+$ python tools/kicad_netlist_compare.py \
+      --pads dist/netlist/PSDR_2.6.1_netlist.json --kicad psdr261_kicad.xml
+pads nets            278
+kicad nets (raw)     319
+kicad nets (in pads) 278
+pads connected pins  1132
+kicad covered pins   1132
+components           391
+identical nets       278
+only in pads         0
+only in kicad        0
+pins missing         0
+pins in >1 net       0
+RESULT: partitions identical
+```
+
+   比的是"引脚集合的划分"而不是网名顺序：278 个网逐个比对成员集合，
+   278 个完全相同；1132 个已连引脚零遗漏。`kicad nets (raw) 319` 多出的
+   41 个就是 no-connect 单脚网。网名 276/278 逐字符相同，另 2 个只差
+   PADS 的上划线转义（`AUDIO_AMP_\SHDN` ↔ `AUDIO_AMP_~{SHDN}`、
+   `\EARPHONE_INSERTED` ↔ `~{EARPHONE_INSERTED}`）。
+
+2. **几何重合**（会不会连错）：`tools/kicad_sch_geomcheck.py` 把每个文件的
+   引脚绝对坐标与标签锚点算出来找重合，10 个文件 **connection points 1173
+   （= 1132 标签 + 41 no-connect）、conflicts 0**。（这一步是必须的：KiCad 里
+   两个引脚落在同一点就是短路，而网表导出会照单全收。）
+
+3. **ERC**：`kicad-cli sch erc --severity-all` → **0 error、391 warning**，
+   391 条全是 `[footprint_link_issues] 当前配置中不包含封装库 'PSDR_PADS'`。
+   这是预期的：封装数据内嵌在 `.kicad_pcb` 里，没有单独导出 .pretty 库。
+
+4. **能解析、能升级**：kiutils 解析 10 个原理图（根图 9 张层次图；子图
+   器件 57/44/33/48/49/14/58/58/30 = 391，全局标签 238/111/122/104/122/38/
+   118/164/115 = 1132，no-connect 41）与 57 符号的 `.kicad_sym`；
+   `kicad-cli sym upgrade` 报"符号库未更新"（已是当前格式），rc=0。
+
+**三条踩过的坑（工单未覆盖）**：
+
+1. **短桩 T 型短路**：最初在每脚引出 2.54 mm 短桩再放标签，相邻器件的
+   桩端点会重合，6 个网被并成一个（GND、+3V3、+3V3_CPU、+5V_BOOST、
+   `$$$14035`、`$$$19436`）。改成标签直接落在引脚端点后仍剩 5 个——这次是
+   **两个相邻 2 脚元件本体被摆到引脚尖重合**（如 C119.2 与 C120.1 同在
+   (370.425, 248.751)，一个 GND 一个 +3V3_CPU）。最终在布局的 relax() 里
+   把碰撞包络从"本体宽度"扩到 `w/2 + 引脚长 + 0.5`，重生成后 0 重合。
+   结论：**靠网表对账抓不住短路**，必须先做几何重合检查，否则两个网被
+   合并后导出端看到的是"一个更大的网"，只在划分比对里表现为 2 个网缺失。
+2. **上划线只转义了首字母**：PADS 用 `\WORD` 表示整词上划线，最初的正则
+   只包住第一个字符（`AUDIO_AMP_~{S}HDN`）。改成整词 `~{WORD}`。
+3. **多行文本要写 `\n` 转义**：根图注释一长条被页边裁掉。esc() 补上
+   换行→`\n` 转义并手动分三行；同时把根图从 A3 换成 A2，因为 A3 的 3×3
+   网格会压到右下角标题栏上。
+
+**局限（如实列出，不假装是重画的图）**：
+
+- 这是**连通性模型**：引脚之间没有导线，靠同名全局标签连接；原图的走线
+  形状、器件符号外观、旁注都不在其中。要"看图"仍以 2016 PDF 为准。
+- 11 个 1 脚测试焊盘的位号（`+` `-` `1PPS` `CLK` `DAC1` `DAC2` `GND`
+  `LIPO` `NRST` `SCL` `SDA`）在 PDF 文字层里有多个同名候选，无法唯一
+  定位，统一摆在各页底部条带；**连通性不受影响**（网表按位号取，不按坐标）。
+- 封装链接指向未随仓发布的 `PSDR_PADS` 库，所以 ERC 恒有 391 条 warning。
+- 没做：层次图的 sheet pin（全局标签已跨页，不需要）；按 PDF 重绘走线。
+
+**产物**（`dist/kicad/`，合计 2137579 字节）：
+
+```
+PSDR_2.6.1.kicad_sch        6318 字节   根图，A2，9 张层次图
+PSDR_2.6.1-p02..p10.kicad_sch        子图 9 张，合计 1042766 字节
+PSDR_2.6.1.kicad_sym      133244 字节   57 个符号
+PSDR_2.6.1.kicad_pro        1139 字节   工程文件（含 sheet 列表）
+sym-lib-table                167 字节   ${KIPRJMOD} 相对路径
+```
+
+（`dist/kicad/` 里另有上一轮生成的 `PSDR_2.6.1.kicad_pcb` 721924 字节、
+`.kicad_prl`、`-drc.json`，未变。）
+
+新增工具：`tools/pads_asc_to_kicad.py`（生成器）、
+`tools/kicad_netlist_compare.py`（网表划分比对）、
+`tools/kicad_sch_geomcheck.py`（几何重合检查）。
+UUID 用 `uuid5(NAMESPACE_URL, "psdr261/…")` 派生，同一输入重跑输出逐字节
+相同，便于审阅 diff。
+
 ---
 
 ## 任务 D · 提交归档
@@ -515,6 +786,24 @@ dist/kicad/                  N  本轮
 dist/gerber/                 N  本轮（SolidWorks 大件未进仓，符合工单）
 tools/                       N  本轮新增（工单没列，但转换与自证脚本是交付物的一部分）
 docs/WO-psdr-takeover.md     M  本文件
+```
+
+2026-10-31 追加（原理图/网表，**尚未提交**；上面那次推送之后新增）：
+
+```
+Hardware/PSDR.asc                              N  2.6.1 PADS Layout ASCII（源 468dc41）
+Hardware/PSDR_2.6.1_Schematic_2016-07-31.pdf   N  2.6.1 原理图 PDF（源 468dc41）
+tools/pads_asc_netlist.py                      N  网表提取器（标准库）
+dist/netlist/PSDR_2.6.1_netlist.{csv,json}     N  391 器件 / 278 网 / 1132 引脚
+tools/pads_asc_to_kicad.py                     N  KiCad 原理图生成器
+tools/kicad_netlist_compare.py                 N  网表划分比对
+tools/kicad_sch_geomcheck.py                   N  几何重合检查
+dist/kicad/PSDR_2.6.1.kicad_sch                N  根图（A2，9 张层次图）
+dist/kicad/PSDR_2.6.1-p02..p10.kicad_sch       N  子图 9 张，391 器件
+dist/kicad/PSDR_2.6.1.kicad_sym                N  57 个符号
+dist/kicad/PSDR_2.6.1.kicad_pro                N  工程文件
+dist/kicad/sym-lib-table                       N  符号库表
+docs/WO-psdr-takeover.md                       M  §C-10 二次修正 + §C-11/§C-12 新增
 ```
 
 `Hardware/Enclosure/`（SolidWorks，未改）没有复制进 `dist/`，仓库里原样存在。
