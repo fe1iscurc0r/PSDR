@@ -788,7 +788,7 @@ tools/                       N  本轮新增（工单没列，但转换与自证
 docs/WO-psdr-takeover.md     M  本文件
 ```
 
-2026-10-31 追加（原理图/网表，**尚未提交**；上面那次推送之后新增）：
+2026-10-31 追加（原理图/网表，已提交为 `199d552` + `59ea7f4`）：
 
 ```
 Hardware/PSDR.asc                              N  2.6.1 PADS Layout ASCII（源 468dc41）
@@ -824,6 +824,22 @@ c13cf4e8429d33acf9dcac786e6c7440923da69f   (local)
 c13cf4e8429d33acf9dcac786e6c7440923da69f   (remote，tree 相同 = 内容逐字节一致)
 ahead/behind = 0 0
 ```
+
+2026-10-31 第二次推送（原理图 + 网表）：
+
+```
+$ git -c http.proxy=http://127.0.0.1:7890 -c https.proxy=... push -u origin HEAD
+   61f1e20..59ea7f4  HEAD -> workorders/2026-10-30-psdr-takeover-linux-build-kicad
+
+$ git fetch origin <branch> && git rev-parse HEAD^{tree} origin/<branch>^{tree}
+2b6299b5d915821c714e85db1de4f30ac02578b8   (local)
+2b6299b5d915821c714e85db1de4f30ac02578b8   (remote)
+ahead/behind = 0 0
+```
+
+直连 `github.com:443` 本轮再次失败（`Failed to connect ... after 21071 ms`），
+加 `-c http.proxy`/`-c https.proxy` 指向本机 7890 后一次成功——与 §D 末尾
+记录的"api 通 ≠ git 直连通"一致，代理仍是单命令级，没有写进任何配置。
 
 分支里的 `8d410f9` 是 `b8e60a8` 改写后的版本：原 message
 body 误写"实物 12 层板中主控为 4 层"，实际是主控板 4 铜层；只改 message，树未动
