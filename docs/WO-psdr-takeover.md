@@ -147,6 +147,34 @@ make -f Makefile.linux anchors   → _estack=0x20030000, Reset=0x080001B5, PASS
 `--gc-sections` 开与关各跑一次（`GC=1` / `GC=0`），把两组尺寸都记下来，用来判定
 交接材料里 984908 与 1077236 哪个对应哪种配置。
 
+### B-4.1 重启后的续跑清单（**均未执行**，开机后按序跑并贴真实输出）
+
+重启只为让 `VirtualMachinePlatform` 生效。Windows 侧：
+
+```
+wsl --install -d Ubuntu-24.04 --no-launch
+wsl -l -v                       # 期望 Ubuntu-24.04 / VERSION 2 / STATE Stopped
+wsl -d Ubuntu-24.04 -u root -- bash -lc 'apt update && apt install -y gcc-arm-none-eabi make git python3'
+```
+
+`-u root` 是为了跳过首次进发行版的交互式建号向导；`gcc-arm-none-eabi` 在 noble
+universe 里是 `15:13.2.rel1-2`，与出报告的人同版本（见 §B-1 版本表）。
+
+Linux 侧，**克隆源必须是 Windows 工作树，不是 GitHub**：
+
+```bash
+cd ~ && git clone "/mnt/d/my git/PSDR" PSDR   # 本地领先 origin 2 个提交，从 GitHub 拉会拿到未修的树
+cd ~/PSDR && git config core.autocrlf false && git log --oneline -1   # 期望 b8e60a8
+cd Source
+make -f Makefile.linux -j"$(nproc)" GC=1      # 先 GC=1（对齐 .cproject Debug 的 linker.gcsections=true）
+make -f Makefile.linux anchors
+make -f Makefile.linux GC=0                   # 再 GC=0，取第二组尺寸
+```
+
+若 apt 需要走宿主机代理：网关地址为 `ip route show default | awk '{print $3}'`，
+代理形如 `http://<网关>:7890`，用 `apt -o Acquire::http::Proxy=...` 单命令级传入，
+不写进 `/etc/apt/apt.conf.d/`。
+
 ---
 
 ## 交接材料内部的矛盾（工单未覆盖，逐条列出）
