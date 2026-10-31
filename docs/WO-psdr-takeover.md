@@ -543,5 +543,18 @@ body 误写"实物 12 层板中主控为 4 层"，实际是主控板 4 铜层；
 凭据坑（推之前连挂两次）：全局 `credential.helper` 指向
 `C:/Program\ Files/Git/mingw64/bin/git-credential-manager.exe`，该文件不存在（GCM 实际在
 `ucrt64/bin`）；而直接写带空格的绝对路径会让 git 的 shell 把它拆成 `C:/Program:`。
-可用组合是**把 `ucrt64/bin` 加进 `PATH` + `-c credential.helper=manager`**，凭据由
-Windows 凭据管理器里的 `git:https://github.com` 提供。
+临时可用组合是"把 `ucrt64/bin` 加进 `PATH` + `-c credential.helper=manager`"。
+
+**已永久修正**（备份 `~/.gitconfig.bak-20261031`）：用 `!` 开头的 shell 形式并加引号，
+路径带空格也不会被拆，且不依赖 `PATH`：
+
+```
+[credential]
+	helper =
+	helper = !"C:/Program Files/Git/ucrt64/bin/git-credential-manager"
+```
+
+第一行空值用于清掉 system 级（`C:/Program Files/Git/etc/gitconfig`）里那条失效的
+`manager`。改完不带任何 `-c` 覆盖实测：`git credential fill` 取到
+`username=fe1iscurc0r`，`git push` 返回 `Everything up-to-date`、rc=0。凭据本身仍由
+Windows 凭据管理器里的 `git:https://github.com` 提供，没有落地任何明文令牌。
