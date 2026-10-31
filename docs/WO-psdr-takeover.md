@@ -520,4 +520,28 @@ docs/WO-psdr-takeover.md     M  本文件
 `Hardware/Enclosure/`（SolidWorks，未改）没有复制进 `dist/`，仓库里原样存在。
 
 **不推上游 `MichaelRColton/PSDR`，不动 `PSDR_F7`，不碰射频逻辑。**
-推送 `origin`（fork）属对外动作，等构建验收数据齐了再单独确认。
+
+已推 `origin`（fork），单命令级代理，未改全局配置：
+
+```
+$ git -c ... push -u origin HEAD
+To https://github.com/fe1iscurc0r/PSDR.git
+   f30b11a..bb4d118  HEAD -> workorders/2026-10-30-psdr-takeover-linux-build-kicad
+branch '...' set up to track 'origin/...'.
+push rc=0
+
+$ git fetch origin <branch> && git rev-parse HEAD^{tree} origin/<branch>^{tree}
+c13cf4e8429d33acf9dcac786e6c7440923da69f   (local)
+c13cf4e8429d33acf9dcac786e6c7440923da69f   (remote，tree 相同 = 内容逐字节一致)
+ahead/behind = 0 0
+```
+
+分支里的 `8d410f9` 是 `b8e60a8` 改写后的版本：原 message
+body 误写"实物 12 层板中主控为 4 层"，实际是主控板 4 铜层；只改 message，树未动
+（`git diff --stat backup/pre-msgfix HEAD` 为空）。
+
+凭据坑（推之前连挂两次）：全局 `credential.helper` 指向
+`C:/Program\ Files/Git/mingw64/bin/git-credential-manager.exe`，该文件不存在（GCM 实际在
+`ucrt64/bin`）；而直接写带空格的绝对路径会让 git 的 shell 把它拆成 `C:/Program:`。
+可用组合是**把 `ucrt64/bin` 加进 `PATH` + `-c credential.helper=manager`**，凭据由
+Windows 凭据管理器里的 `git:https://github.com` 提供。
