@@ -1118,7 +1118,8 @@ body 误写"实物 12 层板中主控为 4 层"，实际是主控板 4 铜层；
 `username=fe1iscurc0r`，`git push` 返回 `Everything up-to-date`、rc=0。凭据本身仍由
 Windows 凭据管理器里的 `git:https://github.com` 提供，没有落地任何明文令牌。
 
-2026-11-01 第三批（**尚未提交/推送**，等工作区确认）：
+2026-11-01 第三批（已提交为 `418f0a5` 并推 origin；本地/远端 tree 都是
+`7117875038630437ce33e3a7baf4427a6c4dd156`，ahead/behind = 0 0）：
 
 ```
 tools/pads_asc_decal.py                        N  decal/parttype/part 解析（283 行）
@@ -1131,6 +1132,17 @@ dist/kicad/PSDR_2.6.1_spike_TX-Q_DRIVER_P.kicad_pcb  N  单网样例（C252/U4�
 dist/kicad/drc_PSDR_2.6.1_spike_TX-Q_DRIVER_P.txt    N  样例 DRC：2 warning / 0 断点
 docs/WO-psdr-takeover.md                       M  §C-13 新增 + C-0/SKIP-4/SKIP-5/制板口径更正
 ```
+
+上游 PR #17 的正文写明「No footprints, hence no PCB. A board file is
+deliberately excluded.」，所以 PCB 没有并进那个 PR 的 diff；改在该 PR 下补了
+一条进度评论，指向 `418f0a5`，并列出板子的对账数字与三处缺口
+（铺铜/板框/丝印）：
+
+```
+https://github.com/MichaelRColton/PSDR/pull/17#issuecomment-6553367174
+```
+
+评论的正文存在仓库外 `PSDR-build-artifacts/pr17-comment.md`，与贴出去的内容一致。
 
 不提交的中间产物：上游 `468dc41` 的 2.6.1 原始 Gerber（对账基准）、本轮
 KiCad Gerber/钻孔导出与实验板，都在 `D:\my git\PSDR-build-artifacts\` 下；
