@@ -1,0 +1,24 @@
+** Drc report for PSDR_2.6.1_spike_TX-Q_DRIVER_P.kicad_pcb **
+** Created on 2026-11-01T01:11:04 **
+** Report includes: Errors, Warnings, Exclusions **
+
+** Found 2 DRC violations **
+[lib_footprint_issues]: 当前配置中不包含封装库 'PSDR'
+    Local override; warning
+    @(20.8280 mm, -60.1980 mm): Footprint C252
+[lib_footprint_issues]: 当前配置中不包含封装库 'PSDR'
+    Local override; warning
+    @(21.8440 mm, -59.4360 mm): Footprint U4
+
+** Found 0 unconnected pads **
+
+** Found 0 Footprint errors **
+
+** Ignored checks **
+    - Footprint has no courtyard defined
+    - Track endpoint not centered on via
+    - Tuning profile track geometries
+    - Footprint doesn't match symbol's footprint filters
+    - Footprint component type doesn't match footprint pads
+
+** End of Report **

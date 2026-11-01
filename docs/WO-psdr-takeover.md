@@ -233,11 +233,18 @@ RESULT: PASS
 而是 **PADS Logic / PADS Layout 二进制**（`Hardware/README.md` 原文：
 "Schematics and Board layout files are for Mentorgraphics PADS"；文件头
 `00 fe 0d 00` / `00 ff 26 20`），KiCad 10 的 Eagle 插件当然读不了，见 C-2。
-实际走的是另一条有数据的通道：
-`Hardware/BOMs/PSDR_2.6.1/psdr26.emn` + `.emp` 是 **PADS Layout 9.5 的 ASCII 导出**，
-里面有板框、孔表和 391 个器件的贴装坐标。从它生成 KiCad 板子，再用
-KiCad 自己的 plot 输出反解回来跟**原始 PADS Gerber** 对账，得到
-亚微米级偏差（C-5）。`.kicad_sch` 与 SolidWorks 壳体**如实标 SKIP**（C-8）。
+实际走的是两条有数据的通道：
+
+1. `Hardware/BOMs/PSDR_2.6.1/psdr26.emn` + `.emp` 是 **PADS Layout 9.5 的 ASCII 导出**，
+   里面有板框、孔表和 391 个器件的贴装坐标。从它生成 KiCad 板子，再用
+   KiCad 自己的 plot 输出反解回来跟**原始 PADS Gerber** 对账，得到
+   亚微米级偏差（C-5）。
+2. `.emn`/`.emp` 没有铜走线，也没有真实焊盘形状。这两样改从
+   `Hardware/PSDR.asc`（PADS Layout ASCII 全文，含 `*PARTDECAL*`/`*ROUTE*`）
+   提取，生成四层板后与 2.6.1 原始 Gerber 逐 flash、逐钻孔对账（C-13）。
+
+`.kicad_sch` 已由 C-12 生成（连通性模型，不是重画的图）；SolidWorks 壳体
+**如实标 SKIP**（C-8）。
 
 ### C-1 交付物清单（真实 `ls`）
 
@@ -247,6 +254,7 @@ $ ls -la dist/kicad/
 -rw-r--r-- 721924  PSDR_2.6.1.kicad_pcb         # 生成物
 -rw-r--r--   2297  PSDR_2.6.1.kicad_prl         # KiCad 打开时自动创建
 （无 .kicad_sch —— 见 C-8 SKIP-1）
+（这是当时的快照；.kicad_sch 见 §C-12，四层板与 DRC 报告见 §C-13）
 
 $ ls dist/gerber/          # 9 个板集，目录 + 同名 zip 各一份
 Keychain/  MultiTest2/  MultiTestBoard/  PSDR1/  PSDR25_Encoder_Board/
@@ -521,11 +529,14 @@ L41/L81 走 Mini-Circuits 直供（非 Digi-Key）。
 | SKIP-1 | `.kicad_sch` 图形化原理图 | **前置缺口已补齐，图形仍未生成**（原判据"唯一可读的 PDF 是 2014 旧版"已由 §C-10 推翻，此处是修正后的状态）。① 2.6.1 的 **10 页原理图 PDF** 与 **PADS Layout ASCII** 都在 `PSDR_Rebuild@468dc41`，本轮已复制进本分支（`Hardware/PSDR_2.6.1_Schematic_2016-07-31.pdf`、`Hardware/PSDR.asc`）；② 从 `.asc` 已提取**完整网表**：391 器件 / 278 网 / 1132 连接引脚 / 41 未连接（全部可解释为 NC、基准点、安装孔），四重校验见 §C-11；③ `Hardware/PSDR.sch` 仍是 PADS Logic 二进制，开源工具读不了，但**不再阻塞网表**。⇒ 现在缺的只是"按 2.6.1 版面画的 `.kicad_sch`"，连接关系已有权威来源。 |
 | SKIP-2 | `Hardware/Enclosure/` SolidWorks 壳体/装配 | `.SLDPRT`/`.SLDASM`，嘉立创EDA 无对应能力，工单也明确要求不要试图转换。 |
 | SKIP-3 | `.sch`/`.pcb` 源文件 | 工单称 Eagle，实测是 **PADS Logic / PADS Layout 二进制**（`Hardware/README.md`："Schematics and Board layout files are for Mentorgraphics PADS"；头 `00 fe 0d 00` / `00 ff 26 20`）。KiCad 10.0.6 的 Eagle 插件报 `XML 解析错误：'not well-formed'` 却 **exit 0**（假成功）——因为它不是 Eagle XML。要转这两个二进制必须先有 PADS Logic/Layout 本体，本机没有；**但 2.6.1 的 PADS Layout ASCII（`Hardware/PSDR.asc`）已在库里，二进制不再阻塞网表**，只影响"图形原理图"（§C-11）。 |
-| SKIP-4 | 铜走线 / 内层 / 网络 | `.emn` 无 `TRACE` 段 ⇒ 生成的 KiCad 板是 **2 个铜层（F.Cu/B.Cu）**，而真实板是 **4 层**（`In1_Cu`=L2 power、`In2_Cu`=L3，见 `dist/gerber/PSDR25_Main_Board/MANIFEST.txt`）。走线与电源层只能看原始 Gerber，不能看这块 KiCad 板。 |
-| SKIP-5 | 器件真实焊盘形状 | `.emp` 无 pad stack（C-5）。 |
+| SKIP-4 | 铜走线 / 内层 / 网络 | **已由 §C-13 解除**（2026-11-01）。`.emn` 无 `TRACE` 段，所以 C-5 的 `PSDR_2.6.1.kicad_pcb` 只有 2 个铜层；另生成的 `PSDR_2.6.1_pcb_spike_full.kicad_pcb` 从 `Hardware/PSDR.asc` 的 `*ROUTE*` 取铜，是 **4 层 / 5034 段走线 / 22 段弧 / 419 个过孔 / 278 网**，与 2.6.1 原始 Gerber 逐 flash、逐钻孔对过。仍未覆盖：**铺铜（12 条 POUROUT / 7 个网）、真实板框（现为 100×65 mm 占位矩形）、丝印**。 |
+| SKIP-5 | 器件真实焊盘形状 | **已由 §C-13 解除**（2026-11-01）。pad stack 改从 `Hardware/PSDR.asc` 的 `*PARTDECAL*` 读，1194 个焊盘全部来自 decal（圆/方/圆角矩形/椭圆、旋转角、钻孔）。KiCad 10 的内层铜连接限制见 §C-13 的 pad-type 表。 |
 
-**制板用哪套**：给嘉立创EDA 下单/生产请直接用 `dist/gerber/` 的规范化 Gerber（含
-真实 4 层铜）；`dist/kicad/` 只是可编辑的板框+贴装+孔位参考。
+**制板用哪套（2026-11-01 更正）**：生产必须用 **2.6.1 的原始 Gerber**，
+即上游 `468dc41` 的 `Hardware/Gerbers/PSDR261 Main Board/`（本分支没有复制进仓，
+本轮提取到仓外 `D:\my git\PSDR-build-artifacts\gerber261\` 作对账基准，见 §C-13）。
+`dist/gerber/` 是 **2.5** 主板的 Gerber，不是这块板；两块 KiCad 板都还不具备
+生产条件（无铺铜、板框是占位矩形）。`dist/kicad/` 只作可编辑参考。
 
 ### C-9 本轮新踩的坑（工单未覆盖）
 
@@ -676,8 +687,11 @@ U172 pin 4（NC）、U30 pin 6、J153 pin 6、EARPHONE pin 12。
 
 **同提交里还有 2.6.1 真正的 4 层 Gerber**：`Hardware/Gerbers/PSDR261 Main Board/`
 （钻孔 + GTO/GTS/GTL/G1/G2/GBL/GBS/GBO + fabnotes），`master` 上没有。
-任务 C 的 `dist/gerber/` 用的是 2.5 主板的原始 Gerber（§C-8 SKIP-4）；
-要出 2.6.1 生产包应改用它，这不在本工单的 C 阶段范围内，先记录。
+那批文件只存在于上游 `468dc41`，本分支**没有复制进仓**；本轮提取到仓外
+`D:\my git\PSDR-build-artifacts\gerber261\Hardware\Gerbers\PSDR261 Main Board\`，
+作为 §C-13 的对账基准（flash 与钻孔的位置真值）。任务 C 的 `dist/gerber/`
+用的是 2.5 主板的原始 Gerber；**要出 2.6.1 生产包必须回到上游 `468dc41`
+取这批 Gerber**，不用两块 KiCad 板。
 
 本轮 PDF 侧的工具（poppler 24.02、PyMuPDF 1.28.2）和中间脚本留在
 `D:\my git\PSDR-build-artifacts\sch_261\`、`sch_preview\`（不入仓）。
@@ -836,6 +850,183 @@ UUID 用 `uuid5(NAMESPACE_URL, "psdr261/…")` 派生，同一输入重跑输出
 
 ---
 
+### C-13 从 PADS Layout ASCII 生成四层 KiCad PCB，并与 2.6.1 原始 Gerber 对账（2026-11-01）
+
+**探针先跑通，再扩到全板。** 起点是方向 A 的最小闭环：一个 decal
+（`CAP_0603`，焊盘 0.889 × 0.762 mm = 35 × 30 mil）+ 一个信号网络
+（`TX-Q_DRIVER_P`：C252.2 → 3 段 B.Cu → 1 个过孔 → 2 段 F.Cu → U4.1）。
+闭环成立（样例 DRC 0 断点），同一套解析器直接扩到 `--all`。
+
+**结论**：`dist/kicad/PSDR_2.6.1_pcb_spike_full.kicad_pcb` 是
+**4 层 / 278 网 / 1194 焊盘 / 5034 段走线 / 22 段弧 / 419 过孔**。
+与 2.6.1 原始 Gerber 的对账有两个独立判据：
+
+1. **源侧全覆盖**：原始 Gerber 的每个 D03 flash 都能在 KiCad 同层 plot 的
+   0.1 mil 内找到对应 flash，最差 0.0066 mil（0.17 µm）；
+2. **数量可解释**：KiCad 侧每层 flash 数正好等于"焊盘在该层的出现次数 + 419 个过孔"，
+   六层逐一对平——多出来的每个 flash 都能指名道姓（包括唯一的例外：源里没有的
+   J170 兜底焊盘，见钻孔一节）。
+
+**生成与复现**（只依赖 Python 标准库，1196 行：decal 283 + route 261 +
+emitter 456 + compare 196）：
+
+```
+$ C:/Users/ASUS/python-sdk/python3.13.2/python.exe tools/pads_asc_pcb.py \
+      Hardware/PSDR.asc --all -o dist/kicad/PSDR_2.6.1_pcb_spike_full.kicad_pcb
+nets          278
+parts         391
+pads emitted  1194  (1132 carry a net, 62 do not)
+track segments 5034 written (189 zero-length dropped) of 5223 distinct of 9364  layers ['B.Cu', 'F.Cu', 'In1.Cu', 'In2.Cu']
+track arcs    22 distinct of 22
+vias          419 distinct of 1164
+outline       100.00 x 65.00 mm
+pad-net conflicts: 0 []
+wrote         dist/kicad/PSDR_2.6.1_pcb_spike_full.kicad_pcb
+```
+
+同一输入重跑，`cmp` 逐字节相同。第一版 UUID 用 `uuid4`，每次重跑都会改 UUID；
+现在按发射顺序用 `uuid5` 派生（与 §C-12 的原理图生成器一致）。
+
+**源文件的 7 条约定**（每条都对着 Gerber 或钻孔量过，不是猜的）：
+
+| # | 约定 | 证据 |
+|---|---|---|
+| 1 | 38100 ASCII 单位 = 1 mil | 板框 y 跨度 97,497,900 单位 = 2559.1 mil；decal 数值全是整数 mil |
+| 2 | `*ROUTE*` 记录的 LAYER/WIDTH 属于**从该点出发**的一段；层号 0/65 不是铜层，是"点落在源/目标焊盘里" | `GND C119.2→U121.99`：16 mil 记录在 8 mil 段之前，Gerber 的 16 mil 笔画也正好画在两点之间 |
+| 3 | 只有字面量 `STANDARDVIA` 是过孔标记，0x10000 标志位不是 | 按标志位判断会数出 1212 个过孔并凭空造出 48 个；按字面量是 419 个，与钻孔文件的 419 个 14 mil 孔、两面各 419 个 32 mil 圆 flash 完全对应 |
+| 4 | `CW`/`CCW` 记录是弧心，不是顶点 | 全文件 22 条，全在 `*ROUTE*`；按顶点读会把弧画成折线且端点错位 |
+| 5 | RF/OF 焊盘 = 以端子为中心、SIZE × FINLENGTH、从 decal 局部 +X 转 FINORI 度的矩形；R 是**圆** | C139 两个 35 × 30 mil 阻焊开窗的中心正好落在两个端子的 x 上；M3 的 224.41 mil 在 GTL 里是 `%ADD151C,0.22441*%` 圆，按方读会把 2.85 mm 圆外的走线吞掉 |
+| 6 | PADS Y 向上、KiCad 板 Y 向下 ⇒ 每个 y 取负；焊盘角度符号只有 45° 的器件能分辨 | CW1/CW2 的 275 mil 桨形焊盘在 2.6.1 Gerber 里是 -45°；用错符号时两块焊盘沿自身长轴只隔 2.15 mm |
+| 7 | decal 的 level -2 是器件所在面，level 0 是反面 | ANT/VNA-IN、VNA-OUT 是 B 面器件，但 pad 4/5 的铜只在 level 0，生成器必须把它们放到 F.Cu |
+
+**KiCad 10.0.6 的焊盘类型，实测五种写法**（先在 4 层测试板上试，再定方案）：
+
+| 写法 | 连到内层走线 | 各层铜 Gerber | 备注 |
+|---|---|---|---|
+| `smd` 单层 | ✅ | ✅ | 普通贴片 |
+| `smd` + `(layers "*.Cu" ...)` | ❌ | ✅ | 铜画对了，但连接图不认 |
+| `connect`（多层） | ❌ | ✅ | 同上 |
+| `smd` + `(padstack front_inner_back)` | ❌ | ✅ | 同上 |
+| `thru_hole` + `(drill 0)` | ✅ | ✅ | 不产生 Excellon 孔，但每个焊盘一条 `through_hole_pad_without_hole` DRC |
+
+全板只有 4 个焊盘（CW1.1/2、CW2.1/2，Morse 桨）需要"无钻孔、贯穿所有铜层"，
+用最后一种写法；DRC 里那 4 条 `through_hole_pad_without_hole` 就是它的代价，
+是 KiCad 10 的表达上限，不是源数据的问题。
+
+**对账一：flash**。KiCad 的 plot 与钻孔按
+
+```
+$ kicad-cli pcb export gerbers --no-protel-ext \
+      -l F.Cu,In1.Cu,In2.Cu,B.Cu,F.Mask,B.Mask -o <fab> <board>
+$ kicad-cli pcb export drill -o <fab> <board>
+$ python tools/kicad_gerber_compare.py --pads "<上游 468dc41 的 PSDR261 Main Board>" \
+      --fab <fab> --board PSDR_2.6.1_pcb_spike_full
+```
+
+输出（KiCad plot 的坐标 = PADS 坐标 − 1000 mil，两轴同号，无翻转）：
+
+```
+layer    pads file                src#  kicad#  dup  worst mil
+F_Cu     3 - top-art.GTL           659    1013    0     0.0066
+In1_Cu   4 - L2.p.G1               163     439    0     0.0046
+In2_Cu   5 - L3.G2                 132     439    0     0.0050
+B_Cu     6 - bot-art.GBL           602    1014    0     0.0066
+F_Mask   2 - top-sm.GTS            242     594    2     0.0066
+B_Mask   7 - bot-sm.GBS            185     595    2     0.0066
+```
+
+`dup` 是源文件里的完全重复 flash（PADS 在两层阻焊上各写了两个相同的 62 mil 开窗），
+所以判据定成"每个源 flash 都必须被 KiCad flash 覆盖"，允许 KiCad 侧重用同一个点；
+否则这两个重复会被误报成缺失。
+
+KiCad 侧的数目逐层可推：
+
+| 层 | KiCad flash | 组成 |
+|---|---|---|
+| F.Cu | 1013 | 574 个铜在 F.Cu 的 `smd` + 20 个 `thru_hole`（含 4 个 drill 0）+ 419 个过孔 |
+| B.Cu | 1014 | 575 + 20 + 419 |
+| In1.Cu / In2.Cu | 439 | 20 + 419 |
+| F.Mask | 594 | 574 + 20 |
+| B.Mask | 595 | 575 + 20 |
+
+`np_thru_hole` 的 25 个孔既不出铜（焊盘尺寸 = 钻孔尺寸，零环宽）也不出阻焊窗，
+与 PADS 一致；第一次生成时给了 `*.Mask`，KiCad 每面多出 25 个开窗，已改掉（见下）。
+
+**对账二：钻孔**（按直径分组，0.1 mil 容差）：
+
+```
+      mm   src# kicad#  missing  extra  worst mil
+   0.356    419    419        0      0     0.0457
+   0.850      2      2        0      0     0.0000
+   0.940      9      9        0      0     0.0000
+   0.950      4      4        0      0     0.0403
+   1.200     14     14        0      0     0.0372
+   2.032      2      2        0      0     0.0000
+   3.000      7      7        0      0     0.0608
+   3.200      4      3        1      0     0.0346
+```
+
+461 个源孔对上 460 个。缺的那 1 个 3.2 mm 孔在 (582.70, 2167.30) mil
+= (14.80, 55.05) mm（工具打印的 KiCad/Gerber 帧），根因在源文件自己：
+
+- J170 的 decal 把四个 3.2 mm 安装孔编号为 `PAD 20/21/22/23`，而它的端子是
+  `21/22/23/24`。于是 `PAD 20` 成了没有端子的孤儿，`T24` 落到 `PAD 0` 的
+  默认焊盘（2.3 × 1.5 mm）；
+- 生成器按"端子"发射，所以第 4 个安装孔的位置上是一个兜底 SMD 焊盘
+  （B.Cu/B.Paste/B.Mask），少了那个 3.2 mm 孔；
+- 源 Gerber 在四个角上都**没有铜也没有阻焊开窗**（安装孔是纯 NPTH），
+  所以源数据本身是矛盾的：钻孔文件有 4 个孔，decal 有 4 个孔焊盘，
+  只有 3 个被端子引用。
+
+**生产以钻孔文件为准**（4 个孔）。这里没有为单个器件加特例，如实记为已知缺口。
+
+**对账三：NPTH 的阻焊**。KiCad 第一次生成时给 `np_thru_hole` 带了 `*.Mask`，
+每面多 25 个阻焊开窗；PADS 的 GTS/GBS 在 25 个孔位上没有任何 stroke
+（最近的 stroke 边缘也在 23.62 mil 外）。改成 `(layers "*.Cu")` 后重测：
+两边都是 0/25，F.Mask 从 619 降到 594、B.Mask 从 620 降到 595，
+恰好等于"smd 焊盘 + 20 个 thru_hole"。
+
+**DRC**（`kicad-cli pcb drc --severity-all`，重跑结果稳定）：
+
+```
+199  lib_footprint_issues    封装库 'PSDR' 不在工程配置里（预期，封装数据内嵌在板上）
+ 52  clearance                最小实际 0.1174 mm，规则 0.2 mm
+ 38  hole_clearance           14 条是 0.0001 mm：J170 ×9、J153 ×5
+ 10  via_dangling
+  5  copper_edge_clearance    板框是占位矩形，边上的铜按真实板框算就会好
+  4  through_hole_pad_without_hole   4 个 drill 0 的 Morse 桨焊盘
+  1  track_dangling
+309 条违规 + 20 个 unconnected（全部 GND）
+```
+
+14 条 0.0001 mm 不是转换误差：J170/J153 的封装里，1.2 mm NPTH 孔与信号焊盘
+的边正好相切（焊盘半宽 1.15 + 孔半径 0.6 = 1.7501 mm = decal 间距），PADS
+允许，KiCad 的 0.25 mm 孔规则会报。20 个断点全部落在 GND 上，与"没有生成铺铜"
+一致：GND 在源设计里靠电源层/地平面连成整张网。
+
+**单网样例**：`dist/kicad/PSDR_2.6.1_spike_TX-Q_DRIVER_P.kicad_pcb`，
+只含 C252 与 U4 两个器件、5 段 8 mil 走线、1 个 0.8128/0.3556 mm 过孔，
+DRC 2 条 warning（封装库）0 断点——这就是"一个 decal + 一个网"的原始探针产物。
+
+**还缺什么**（都不在本次解析范围内）：
+
+1. **铺铜**：`*ROUTE*` 里有 12 条 `POUROUT`（GND ×3、+3V3 ×2、+3V3_CPU ×3、
+   +3V3_FLIP_FLOP、BOOST_LOOP、V_SUPPLY、+5V_BOOST，共 7 个网），它们是
+   多边形灌注，不是走线；没有它们，GND 少 20 个连接。文件里没有 `*POUR*` 段头，
+   POUROUT 记录夹在 `*ROUTE*` 里。
+2. **真实板框**：`LINES` 的 15/16/17/18 层合起来是 3937.0 × 2559.1 mil
+   = 100.0 × 65.0 mm 的包络，但由 258 段 OPEN/CIRCLE 组成（圆角、左侧三个
+   连接器缺口、右下切角）。生成器现在画的是包络矩形，Edge.Cuts 是占位。
+3. **丝印**：`*PARTDECAL*` 里有 REF/line 图元，本轮只取焊盘；整板的 GTO/GBO
+   没有生成，DSub/接口的丝印缺口对装配有影响。
+
+**判定**：方向 A 的探针目标达成——ASCII → KiCad 的焊盘、走线、过孔、弧全部
+可自动生成，flash 位置与原始 Gerber 在 0.17 µm 内一致（钻孔最差 1.5 µm），
+且每一层铜的数量都能对账。要把它变成"能生产的 KiCad 板"，还差铺铜、板框、
+丝印三件事；在那之前，生产包仍以上游 `468dc41` 的原始 Gerber 为准。
+
+---
+
 ## 任务 D · 提交归档
 
 待推清单（工单列的）与本轮实际状态：
@@ -926,3 +1117,21 @@ body 误写"实物 12 层板中主控为 4 层"，实际是主控板 4 铜层；
 `manager`。改完不带任何 `-c` 覆盖实测：`git credential fill` 取到
 `username=fe1iscurc0r`，`git push` 返回 `Everything up-to-date`、rc=0。凭据本身仍由
 Windows 凭据管理器里的 `git:https://github.com` 提供，没有落地任何明文令牌。
+
+2026-11-01 第三批（**尚未提交/推送**，等工作区确认）：
+
+```
+tools/pads_asc_decal.py                        N  decal/parttype/part 解析（283 行）
+tools/pads_asc_route.py                        N  ROUTE 段 → 走线/弧/过孔（261 行）
+tools/pads_asc_pcb.py                          N  全板 KiCad 10 发射器（456 行）
+tools/kicad_gerber_compare.py                  N  KiCad plot ↔ 2.6.1 原始 Gerber 对账（196 行）
+dist/kicad/PSDR_2.6.1_pcb_spike_full.kicad_pcb N  4 层 / 278 网 / 5034 段 / 22 弧 / 419 过孔
+dist/kicad/drc_PSDR_2.6.1_pcb_spike_full.txt   N  DRC 309 违规 + 20 unconnected
+dist/kicad/PSDR_2.6.1_spike_TX-Q_DRIVER_P.kicad_pcb  N  单网样例（C252/U4）
+dist/kicad/drc_PSDR_2.6.1_spike_TX-Q_DRIVER_P.txt    N  样例 DRC：2 warning / 0 断点
+docs/WO-psdr-takeover.md                       M  §C-13 新增 + C-0/SKIP-4/SKIP-5/制板口径更正
+```
+
+不提交的中间产物：上游 `468dc41` 的 2.6.1 原始 Gerber（对账基准）、本轮
+KiCad Gerber/钻孔导出与实验板，都在 `D:\my git\PSDR-build-artifacts\` 下；
+`dist/kicad/` 里上一轮的探针板与测试板已删除，只留下上面两块。
