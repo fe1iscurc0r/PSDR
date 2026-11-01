@@ -1927,7 +1927,7 @@ $ git ls-remote upstream 'refs/heads/workorders/*'
 |---|---|---|
 | M0 建线（2026-11-01） | 推工单提交；打分叉 tag；建 `next`；写 `README.fork.md` | `origin/next` 与 tag 存在，tree 对账一致 |
 | M1 转换闭环（2–4 周） | ~~1.4 mm 丝印三角~~（§C-17）、~~一条命令复现 + SHA256 清单~~（§C-18）、~~EDA 两处零铜铺铜~~（§C-15 补充：keepIsland 假设被证伪，真因是转换器丢优先级 + EDA `order` 小者优先；现场 12/12 已达成，复现工具 `tools/eda_epro2_pour_source.py` 已进仓库） | 重跑 md5 不变（达成）；EDA 12/12 有填充（达成）；剩：走一次完整"转换→补丁→导入"实测（#31） |
-| M2 主线成型（1–2 个月） | 把 F7 构建线并入 `next`（目录隔离 `Source_F7/`），验证 F4/F7 构建与 KiCad 产物 | 两条固件线在同一主线可复现（达成，见 §E-7：两个 `make` 全 rc=0，产物与合并前逐字节相同）；冲突有记录（达成）；KiCad 产物在新主线上重跑复现链（达成，库内默认路径）；剩：`4dd2fca` 待批准推送 |
+| M2 主线成型（1–2 个月） | 把 F7 构建线并入 `next`（目录隔离 `Source_F7/`），验证 F4/F7 构建与 KiCad 产物 | 两条固件线在同一主线可复现（达成，见 §E-7：两个 `make` 全 rc=0，产物与合并前逐字节相同）；冲突有记录（达成）；KiCad 产物在新主线上重跑复现链（达成，库内默认路径）；推送（达成，见 §E-8：`origin/next` = `1347d66`，tree 对账一致） |
 | M3 硬件验证（硬件到位后） | RF bring-up、#6/#8/#9 | 每项有实测数据；无实物则 SKIP |
 | M4 可制造/整机 | 以上游 `468dc41` Gerber 为生产基线 | 制造与整机验证记录 |
 
@@ -2022,12 +2022,14 @@ EDA 侧（§C-15 补充）：宿主从 3.2.203 升到 **4.1.60** 后，
 > 出来的那份工程逐值相同。还缺的是「从转换开始跑一遍完整链并量到 12/12」这一步，
 > 记在 §E-7 之后未完成任务里。
 
-### E-7 M2 执行记录：F7 构建线并入 next（2026-11-02，本地未推送）
+### E-7 M2 执行记录：F7 构建线并入 next（2026-11-02）
 
 **先量代价，再决定怎么并。** 在 merge base `2c1530d`（2016-05-07，比 fork base `45acd0f` 老）上
-比两条线对 `Source/` 的改动：F7 那条线改了 **503** 个文件，我们这条线改了 **6** 个，重叠 **3** 个
-（`src/hal.c`、`src/main.c`、`src/misc.c`）。`git merge-tree --write-tree 786c412 2e19ad0`
-复算合并结果：**10 条 CONFLICT、涉及 8 个路径**，另有 7 次 auto-merge。
+比两条线对 `Source/` 的改动（对 `9de9b93` 改名**之前**的 F7 尖，带 `-M` 重命名检测）：
+F7 那条线 **删 65 / 增 131 / 改 310**（另有 79 个树内改名，`--name-status` 共 585 行），
+我们这条线改了 **6** 个，重叠 **5** 个（`Makefile.linux`、`Firmware_Build_Notes.md`、
+`src/hal.c`、`src/main.c`、`src/misc.c`）。`git merge-tree --write-tree 786c412 2e19ad0`
+复算改名之后再并的结果：**10 条 CONFLICT、涉及 8 个路径**，另有 7 次 auto-merge。
 要紧的是 git 自己给出的三个 file-location 建议——它把我们这侧新增的
 `Source/Makefile.linux`、`Source/Firmware_Build_Notes.md`、`Source/src/uart_hal_stub.c`
 统统建议搬进 `Source_F7/`，再把 F4 那份 `Makefile.linux` 和 F7 那份判成 add/add。
@@ -2176,8 +2178,9 @@ $ sha256sum ../PSDR-build-artifacts/PSDR.bin Source/build_linux/PSDR.bin
 信息 `9de9b93` 和板外日志里，正文里连 `0x20050000` 都没出现过，这里补齐要点：
 
 - 基点：`PSDR_Rebuild` 的 `b9c0629`（不是 `master`），工作分支
-  `workorders/2026-11-01-psdr-f7-linux-build`；`Source/Makefile.linux` 按 `.cproject`
-  的 Debug 配置转写，默认 `-O0`，`OPT=` 可覆盖，产物目录 `build_linux_f7`。
+  `workorders/2026-11-01-psdr-f7-linux-build`；那份 Makefile 当时叫
+  `Source/Makefile.linux`（F7 分支上），M2 之后是 `Source_F7/Makefile.linux`。
+  按 `.cproject` 的 Debug 配置转写，默认 `-O0`，`OPT=` 可覆盖，产物目录 `build_linux_f7`。
 - 构建阻断 3 处（都是上游 Eclipse 配置里排除/漏掉的东西）：
   `stm32f7xx_hal_msp_template.c` 造成 MSP 符号重复定义 → 排除；
   `si5338.c`、`frequency_control.c` 缺 HAL 包含与 `handleI2C` 声明 → 补齐。
@@ -2189,5 +2192,37 @@ $ sha256sum ../PSDR-build-artifacts/PSDR.bin Source/build_linux/PSDR.bin
 - 上面这些现在都能在新主线上重跑：`make -f Makefile.linux -j` 与
   `python tools/anchor_check_f7.py`。
 
-**推送状态：`4dd2fca` 只在本地，`origin/next` 仍停在 `786c412`（回滚点）。**
-M0/M1 的推送是逐次批准的，这次合并的推送要单独问过才动。
+### E-8 M2 推送结果（2026-11-02 上午）
+
+批准之后推送（单命令级代理，未改 git 配置）：
+
+```
+$ git -c http.proxy=http://127.0.0.1:7890 push origin refs/heads/next
+   786c412..1347d66  next -> next
+push rc=0
+
+$ git -c http.proxy=http://127.0.0.1:7890 ls-remote origin refs/heads/next
+1347d6641c415c90345e881f94ad4ca9589a4882  refs/heads/next
+
+$ git rev-parse next^{tree} origin/next^{tree}
+8824739cee03a0d6e1817bb5ec714e527d8be816   (local)
+8824739cee03a0d6e1817bb5ec714e527d8be816   (remote，tree 相同 = 逐字节一致)
+$ git rev-list --left-right --count origin/next...next
+0 0
+
+$ git -c http.proxy=http://127.0.0.1:7890 ls-remote upstream refs/heads/next 'refs/tags/fork-base/*'
+（空：upstream 未被写入）
+```
+
+远端 `4dd2fca` 另用 GitHub API 复核过：能按该 sha 取到，`stats.additions = 3098506`
+与本地 `git show --stat` 一致。commit 对象是内容寻址的，远端给出同一个 sha 就等于
+给出同一对父提交——本地 `git cat-file -p 4dd2fca` 里那两行是
+`parent 786c412…` 和 `parent 2e19ad0…`，也就是它到远端仍是一次真合并，没被压扁。
+推送上去的两个提交是 `4dd2fca`（M2 合并）与 `1347d66`（§E-7 记录 +
+`tools/anchor_check_f7.py` + README/.gitignore）。回滚点仍是 `786c412`：
+`git push origin 786c412:refs/heads/next --force-with-lease` 即可退回，
+不涉及别人在这条分支上的工作。
+
+M2 退出标准全部达成，E-3 表里那一行可以收掉。剩下的独立事项：
+#31（要在 EDA 宿主上跑一次完整「转换→补丁→导入→量 12/12」）和
+#32（上游那 364 个构建产物要不要撤出版本控制）。
