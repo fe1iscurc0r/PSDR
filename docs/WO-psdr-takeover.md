@@ -1657,4 +1657,28 @@ $ git switch -c next 1d8e9ca
 
 ### E-5 M0 推送结果
 
-（`next` 与 tag 的首次推送结果见下一次记录提交。）
+`next` 与 tag 首次推送（同一单命令级代理）：
+
+```
+$ git push origin refs/heads/next refs/tags/fork-base/2026-10-30
+ * [new branch]      next -> next
+ * [new tag]         fork-base/2026-10-30 -> fork-base/2026-10-30
+push rc=0
+
+$ git rev-parse next^{tree} origin/next^{tree}
+b2882d46c84b1e55f6b397594b73ba7cfd46f457   (local)
+b2882d46c84b1e55f6b397594b73ba7cfd46f457   (remote，tree 相同 = 逐字节一致)
+ahead/behind = 0 0
+
+$ git ls-remote origin refs/heads/next 'refs/tags/fork-base/2026-10-30*'
+a524e06cec7d7ac2d0be530916062a2f61282ecf  refs/heads/next
+448528da85e0ca63144f0b03f15c8145d386d1d9  refs/tags/fork-base/2026-10-30
+45acd0f5958cab4af5755e3da541cc4d3c6e2f12  refs/tags/fork-base/2026-10-30^{}
+
+$ git ls-remote upstream 'refs/heads/next' 'refs/tags/fork-base/*'
+（空）
+```
+
+推上去的 M0 提交是 `a524e06`（README.fork.md + 本节），父提交 `1d8e9ca`；
+annotated tag 对象 `448528d` 剥开后指向上游 `45acd0f`。`master` 仍与上游
+一致，upstream 未被写入。记录本节结果的提交随后推到同一分支。
