@@ -1,0 +1,22 @@
+flash: source flash -> nearest KiCad flash
+layer    pads file                src#  kicad#  dup  worst mil
+F_Cu     3 - top-art.GTL           659    1013    0     0.0066
+In1_Cu   4 - L2.p.G1               163     439    0     0.0046
+In2_Cu   5 - L3.G2                 132     439    0     0.0050
+B_Cu     6 - bot-art.GBL           602    1013    0     0.0066
+F_Mask   2 - top-sm.GTS            242     594    2     0.0066
+B_Mask   7 - bot-sm.GBS            185     594    2     0.0066
+
+drill: per diameter
+      mm   src# kicad#  missing  extra  worst mil
+   0.356    419    419        0      0     0.0457
+   0.850      2      2        0      0     0.0000
+   0.940      9      9        0      0     0.0000
+   0.950      4      4        0      0     0.0403
+   1.200     14     14        0      0     0.0372
+   2.032      2      2        0      0     0.0000
+   3.000      7      7        0      0     0.0608
+   3.200      4      4        0      0     0.0346
+
+source hits 461, missing 0
+RESULT: every source flash is covered and all drill hits match

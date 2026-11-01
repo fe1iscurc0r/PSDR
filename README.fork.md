@@ -36,10 +36,12 @@ As of 2026-11-01:
   22 arcs, 419 vias, 12 zones, 67 outline segments).
 - **Reconciliation.** Every source flash is covered and all 461 drill hits
   match the original 2.6.1 Gerber/drill set. The board regenerates
-  byte-for-byte (md5 `157f000bc9caa4eb67492a9a751d8f91`).
-- **EDA import check.** JLCEDA Pro 3.2.203 read back 4 copper layers,
-  278 nets, 391 parts and 12 pour outlines; 10/12 pours fill after rebuild
-  (two known gaps below).
+  byte-for-byte (md5 `478a4fac8dc4745fe9bfd082826c9062`, sha256
+  `5029bd0265b34bef9176b7af2ca4d8ef4c3e3324c3ff868a1ecaea3f412288cc`
+  recorded in `dist/kicad/SHA256SUMS`).
+- **EDA import check.** JLCEDA Pro 4.1.60 read back 4 copper layers, 278 nets,
+  391 parts and 12 pour outlines; 12/12 pours fill after the precedence fix
+  described under known gaps (was 10/12 as imported).
 - **Tools.** `tools/` holds the parsers, the KiCad emitter and the
   Gerber/drill comparison script; they use only the Python standard library.
 
@@ -58,23 +60,38 @@ section is §C-16.
 - **795 KiCad DRC violations remain.** They are triaged in §C-16: none is a
   conversion geometry error; they are source-design violations or two known
   conversion differences (thermal spoke topology, zero-drill Morse paddles).
-- **Known conversion gaps:** two zones (`+3V3_FLIP_FLOP` on In1, `V_SUPPLY`
-  on F.Cu) rebuild with zero fill when imported into JLCEDA Pro due to a
-  `keepIsland` mismatch (§C-15). The silk gap is closed (§C-17): the GTO
-  triangle and the GBO serial patch are PADS `COPPER` records, now emitted as
-  inner-offset polygons, and the 10 mil silk band reconciles 100% GTO /
-  84.82% GBO (the rest is the stroke-font difference on four back-side texts).
+- **Known conversion gaps:** the two pours that came back empty in JLCEDA Pro
+  (`+3V3_FLIP_FLOP` on In1, `V_SUPPLY` on F.Cu) are a pour-precedence problem,
+  not a `keepIsland` one: EDA's `pourPriority` wins with the *smaller* number
+  (opposite of KiCad) and the importer numbers the 12 zones 1..12 in file
+  order. Setting the flag alone still gave 10/12; raising those two pours'
+  precedence gives **12/12 filled**, verified after save + document
+  close/reopen - but that edit lives in the EDA project only, and EDA's own
+  DRC then grows 507 → 520 (6 island "no connection" + 7 copper-region
+  clearances) under its default rules. Reproducing it from the repository
+  (parse the PADS pour priorities, emit KiCad `(priority N)`, map to EDA's
+  inverted scale) is still open; see §C-15 supplement.
+  `tools/eda_epro2_keep_island.py` stays as the offline `.epro2` patch.
+  The silk gap is closed (§C-17): the GTO triangle and the GBO serial patch are
+  PADS `COPPER` records, now emitted as inner-offset polygons, and the 10 mil
+  silk band reconciles 100% GTO / 84.82% GBO (the rest is the stroke-font
+  difference on four back-side texts).
 - **Not converted:** SolidWorks enclosures and the PADS binary sources.
 
 ## Reproduce
 
 ```bash
-python tools/pads_asc_pcb.py Hardware/PSDR.asc --all \
-    -o dist/kicad/PSDR_2.6.1_pcb_spike_full.kicad_pcb
-kicad-cli pcb drc --severity-all --refill-zones \
-    -o dist/kicad/drc_PSDR_2.6.1_pcb_spike_full.txt \
-    dist/kicad/PSDR_2.6.1_pcb_spike_full.kicad_pcb
+# board + DRC + Gerber/drill package + SHA256 manifest, in one command
+python tools/reproduce_kicad.py \
+    --pads-gerbers <upstream 468dc41>/Hardware/Gerbers/PSDR261\ Main\ Board
+# verify an existing tree against dist/kicad/SHA256SUMS without overwriting it
+python tools/reproduce_kicad.py --check
 ```
+
+The script wraps the individual steps (`tools/pads_asc_pcb.py`,
+`kicad-cli pcb drc`, `kicad-cli pcb export gerbers|drill`,
+`tools/kicad_gerber_compare.py`); §C-18 records what each manifest row covers
+and why the DRC report is not hashed.
 
 KiCad 10.0 is required for the board format and the CLI flags. Firmware
 build steps are in `docs/WO-psdr-takeover.md` §B and

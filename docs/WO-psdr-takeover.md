@@ -1179,8 +1179,8 @@ $ python tools/kicad_gerber_compare.py --pads <468dc41 原始 Gerber> \
 
 工单没要求这一步，属于接管后用户提出的"能不能放进嘉立创EDA"。结论先写：
 **能，但必须先在生成器和本地转换器上修三处缺陷**；修完后四层、278 网、
-12 个铺铜区、391 器件都能在 EDA 里读到。宿主的 EDA 是 **3.2.203（V3）**，
-低于本项目技能基线的 V4，属于已知限制。
+12 个铺铜区、391 器件都能在 EDA 里读到。当时宿主的 EDA 是 **3.2.203（V3）**，
+低于本项目技能基线的 V4，属于已知限制（M1 已升到 4.1.60，见本节末尾的版本更新）。
 
 **路线**：官方 `eda.sys_FileManager.importProjectByProjectFile` 只吃
 `File` 对象，页面内的 KiCad 转换 worker 会把失败对象 stringify 成
@@ -1293,6 +1293,112 @@ node tools/convert-node-server-patched.js --cmd conversion --params \
 `PSDR 2.6.1 (KiCad 4L)`（铺铜无网的过渡版）和旧的降级工程
 `PSDR 2.6.1 KiCad` 需要用户在 EDA 里手工删除——typed 接口没有删工程的 action。
 
+**版本更新（2026-11-01 M1）**：宿主已从 3.2.203 升到 **4.1.60**。官方直链
+`https://image.lceda.cn/files/lceda-pro-windows-x64-4.1.60.exe`（256,976,016 B，
+`Get-AuthenticodeSignature` = `Valid`，签名主体「深圳嘉立创科技集团股份有限公司」，
+签发者 GlobalSign EV CodeSigning）；单连接被 CDN 限到约 135 KB/s，改用 8 段
+byte-range 并行下载后聚合约 1.3 MB/s。Inno Setup 安装器（不是 NSIS，`/S` 无效），
+静默参数是 `//SILENT //NORESTART //SUPPRESSMSGBOXES`；`resources/app/version.txt`
+由 `3.2.203.4bde4f6b` 变为 `4.1.60.198f38ab.e6f060`。`Documents/LCEDA-Pro/` 未被
+触碰；**通道 A 的 connector 扩展升级后仍在线**（1.15.0），`hostCompatibility`
+由 `block` 转 `ok`，通道 B 的 mcp-bridge 需要用户重新导入才在线。
+
+#### C-15 补充（M1，2026-11-01）：零铜铺铜的真因是 EDA 优先级语义反向，不是 keepIsland
+
+上一轮把原因写成"源 KiCad zone 的 `island_removal_mode 0`"，并计划把
+两个 POUR 的 `keepIsland` 改成 true 后重导。M1 先验证"改 KiCad 区设置"
+能否让转换器写出 keepIsland=true：**不能**。
+
+- 用同一块板做两组对照，只把 12 个 zone 的 `(island_removal_mode 0)`
+  改成 `1`（12 处），分别跑本地转换器
+  （`convert-node-server-patched.js --cmd conversion`）：
+  ```
+  PSDR_full_zip2.epro2（mode 0）: 12 个 POUR keepIsland 全 false
+  PSDR_island1.epro2（mode 1）: 12 个 POUR keepIsland 全 false
+  ```
+- 转换器源码里没有读 KiCad `island_removal_mode` 的分支；它只在解析
+  PADS 的 `PLANEFLAGS` 时设置 `keepIsland`，KiCad 走默认 false。
+  所以生成器改这个字段对 EDA 导入没有作用，改了反而会改变 KiCad 自己的
+  填充（多保留孤岛）。
+- 第一步先修**转换产物**（后面实测发现单靠它不够，见下条）：新增
+  `tools/eda_epro2_keep_island.py`，把指定网（默认
+  `+3V3_FLIP_FLOP` / `V_SUPPLY`，也可 `--all`）的 POUR `keepIsland`
+  改成 true，其余记录逐字节复制。离线回读补丁后的 epro2：
+  ```
+  +3V3_FLIP_FLOP layer=15 keepIsland=True patched
+  V_SUPPLY        layer=1  keepIsland=True patched
+  其余 10 个 POUR 保持 False
+  ```
+- **现场验证（EDA 4.1.60，工程 `2fec79e6…`，PCB `cf6546e2…`，2026-11-01）**：
+  1. 基线回读：12 个 POUR 全部 `preserveSilos=false`，`pouredCount=10`，
+     缺 `ie9349`（`+3V3_FLIP_FLOP`，In1/层 15）与 `ie9355`（`V_SUPPLY`，F.Cu/层 1）。
+  2. 逐个置 `preserveSilos=true`：请求属性回读一致（`requestedMismatches: []`），
+     但 EDA 顺带把 `pourPriority` 6→7、12→13（工具按 `verified:false` +
+     `sideEffects` 如实报告）。层内相对顺序没变：In1 是
+     `ie9344=1 / ie9346=3 / ie9349=7`；F.Cu 原本最高是 `ie9353=10`。
+  3. `pcb_pour_manage action=rebuild all=true`：原生返回 12 个对象，
+     但只有 10 个有填充，`ie9349`/`ie9355` **仍然零铜皮**；再用通道 A 的
+     `easyeda pcb poured-list` 独立回读，同样 10/12。
+     ⇒ **单靠 keepIsland 解决不了**，上一轮的判断被证伪。（`preserveSilos=true`
+     是否是必要条件没有单独拆开测：置 true 后仍 10/12，是在 true 的前提下
+     改优先级才出铜。）
+  4. 稳定性坑：EDA 的 `fillGeometryDigest` 在同一条操作链里会来回变——中途一次
+     读到 5 个区的 digest 变化（`fillCount` 全不变），整条链走完后再读，只剩
+     `ie9354` 由 `a3b878d9e2cda50a` 变成 `0c55a03042b16b26`，其余 9 个回到最初
+     的值。⇒ **digest 不能当改动前后的判据**，只有 `fillCount` 稳定。
+  5. 真因定位（离线几何 + 源侧证据）：**EDA 的 `pourPriority` 是"数值小者优先"，
+     与 KiCad（大者优先）相反**。拿 `pcb pour list` 的 12 个边界多边形用
+     shapely 求同层交叠：
+
+     ```
+     ie9349 +3V3_FLIP_FLOP In1  prio  7  被编号更大的邻区覆盖 0.0% / 被更小的覆盖 115.2%   ← 零填充
+     ie9355 V_SUPPLY       F.Cu prio 13  被编号更大的邻区覆盖 0.0% / 被更小的覆盖 186.5%   ← 零填充
+     ie9347 +3V3_CPU       F.Cu prio  4  被编号更大的邻区覆盖 100.0%                        ← 有 1 块填充
+     ie9348 +3V3_CPU       F.Cu prio  5  被编号更大的邻区覆盖 100.0%                        ← 有 26 块填充
+     ie9350 +5V_BOOST      F.Cu prio  7  被编号更大的邻区覆盖 100.0%                        ← 有 19 块填充
+     ```
+
+     有填充的恰好是编号小的，零填充的恰好是编号最大的两个。转换器把 12 个
+     zone 按导入顺序编 1..12，于是最后两个区被整片判给了别网 —— 这也解释了
+     为什么 `preserveSilos=true` 没用：被覆盖后连孤岛都不存在。
+  6. 源侧反证（不是"本来就没铜"）：PADS 每个铺铜都有自己的 HATOUT 铜皮，
+     `+3V3_FLIP_FLOP` 有 7 块、`V_SUPPLY` 有 2 块；POUROUT 记录尾部形如
+     `-1 0.000000 <n>`（`+3V3 1`、`+3V3_CPU 2`、`BOOST_LOOP 2`、`V_SUPPLY 1`、
+     `+5V_BOOST 6`、`GND 7`），`+3V3_FLIP_FLOP` 与 GND 大面一样没有尾部字段。
+  7. KiCad 侧 12 个 zone **都没有写 `(priority N)`**（全 0），所以 KiCad 自己
+     填得出这两块（`pcbnew` 重填充实测 `+3V3_FLIP_FLOP` 26.197 mm²/1 块、
+     `V_SUPPLY` 26.750 mm²/1 块），一进 EDA 就归零。
+  8. **现场实验已完成（EDA 4.1.60），12/12 达成**：
+     - 请求 `ie9349.pourPriority = 0` → EDA 归一化成 **4**（工具如实报
+       `requestedMismatches: expected 0 / actual 4`）→ 单独 rebuild
+       → `ie9349` 出 **7 块铜皮**（digest `fnv1a64:5aa6cf3470b372e4`），
+       与源 `POR69553698` 的 7 条 HATOUT 数量一致。
+     - 请求 `ie9355.pourPriority = 1` → EDA 给 **3** → 单独 rebuild
+       → **4 块铜皮**（源 `POR27151804` 是 2 条 HATOUT；EDA 的分解与源不等价，
+       未逐块核过）。
+     - `easyeda pcb poured-list` 独立回读 **12/12**；`pcb save` →
+       `document.close` → `document.open` 重开后再读**仍是 12/12**（持久化成立）；
+       其余 10 个区的 `fillCount` 与基线逐个相同
+       （1/16/6/1/26/19/11/26/296/360）。
+     - **代价（必须记）**：EDA 自带 DRC 从 507 涨到 **520**，新增两类
+       `Copper Region(Filled)` ——
+       `Connection Error / No Connection` **6 条**（即 `+3V3_FLIP_FLOP` 的孤岛铜）
+       和 `Copper Region(Filled) to Copper Region(Filled) Clearance Error`
+       **7 条**（改 `ie9349` 后 4 条、再改 `ie9355` 后 7 条）。EDA 跑的是默认
+       规则（0.6 mm 一档，不是源设计的 8 mil），所以这些告警不等同于源的电气
+       错误，但岛铜的净间距要按源规则复核后才敢说"干净"。
+     - 桥接过程：两次 per-pour `rebuild` 超时进 `timed-out` 隔离，都按
+       `bridge_recover_client action=recover` → 全新客户端 `readback` 解除
+       （`recoveryId 8a94a59d…`、`3c079efc…`；最终
+       `readbackVerified:true`、`writesRemainBlocked:false`）。写入其实都已
+       提交（通道 A 回读证实）；在用的 mcp-bridge 是 2.4.0（本地缓存包 2.3.4）。
+- **当前状态**：M1 出口条件 **"EDA 12/12 有填充" 达成**，但这份修复是**现场
+  手工写入**（两个 POUR 的 `pourPriority` + `preserveSilos`），仓库里还不能
+  复现。要变成可复现的转换，需要任务 #31：读 PADS POUROUT 的优先级 → 写 KiCad
+  `(priority N)` → 按 EDA 的反向语义换算映射，并用源规则复核岛铜间距；同时
+  EDA DRC 的 520 条与岛铜状态要一并记录。制造基线不变，仍是上游 `468dc41`
+  的原始 Gerber（§C-16）。
+
 ---
 
 ### C-16 收尾：J170 安装孔修复、铺铜边界定量与 795 条 DRC 分类（2026-11-01）
@@ -1398,8 +1504,13 @@ md5(板) = 157f000bc9caa4eb67492a9a751d8f91
 - ~~丝印：GTO 上约 1.4 mm 的实心三角标记来源未定位~~ —— **§C-17 已闭合**
   （PADS `COPPER` 记录，连同背面 800×190 mil 的序列号白块一起补上）；
 - 嘉立创EDA：`+3V3_FLIP_FLOP`（In1）和 `V_SUPPLY`（F.Cu）两个铺铜重建后
-  0 铜皮，根因是 KiCad `island_removal_mode 0` 与 PADS `keepIsland=true`
-  不一致，未改，见 §C-15；
+  0 铜皮。**原先写的"根因是 KiCad `island_removal_mode 0` 与 PADS
+  `keepIsland=true` 不一致"已在 M1 现场被证伪**：把这两个 POUR 的
+  `preserveSilos/keepIsland` 置 true 后整体重建仍 10/12；真因是 EDA 的
+  `pourPriority` 语义与 KiCad 相反（小者优先）加上转换器按导入顺序编号。
+  M1 已在 EDA 4.1.60 里现场改优先级做到 **12/12 有填充、持久化回读通过**，
+  代价是 EDA 自带 DRC 507→520（岛铜 `No Connection` 6 条 + 铜区间距 7 条），
+  且这份改法只存在于工程内、仓库暂不可复现 → 复现化另立任务（§C-15 补充）；
 - DRC 795 条按上表保留，生产仍以 `468dc41` 的原始 Gerber 为准。
 
 **复现**：
@@ -1496,8 +1607,51 @@ $ kicad-cli pcb drc --severity-all --refill-zones -o dist/kicad/drc_...txt dist/
   序号整体 +2 而变化——UUID 是 `uuid5` over 发射序号的确定性值，不是
   `uuid4`。
 
-**判定**：丝印缺口闭合；M1 剩下的两项是 EDA 两处零铜铺铜（§C-15）和
-一条命令复现 + SHA256 清单。
+**判定**：丝印缺口闭合；本节当时剩下的两项（EDA 两处零铜铺铜、一条命令复现
++ SHA256 清单）分别见 §C-15 补充与 §C-18。
+
+---
+
+### C-18 M1：一条命令复现 + SHA256 清单（2026-11-01）
+
+`tools/reproduce_kicad.py` 把此前散在 §C-14/§C-16 的手工步骤收成一条命令：
+
+```
+$ python tools/reproduce_kicad.py --pads-gerbers <468dc41 的 PSDR261 Main Board>
+$ python tools/reproduce_kicad.py --check          # 只验证，不覆盖工作副本
+```
+
+它依次执行：生成板 → `kicad-cli pcb drc --severity-all --refill-zones` →
+导出 8 个 Gerber + Excellon 到 `dist/kicad/fab/` → （给了
+`--pads-gerbers` 时）跑 `kicad_gerber_compare.py` → 写
+`dist/kicad/SHA256SUMS`。`fab/` 是派生件，已加进 `.gitignore`，不入库；
+板、对账报告与清单留在 `dist/kicad/`。
+
+清单规则（文件头也写了）：
+
+- **exact**：板文件按原样 sha256。生成器确定性已在 §C-17 证实，清单里记
+  `5029bd02…288cc`。
+- **normalized**：KiCad 的 Gerber/钻孔带 `%TF.CreationDate`、`G04 Created
+  by KiCad … date …`、钻孔日期头和 `%TF.ProjectId`，每次运行都变；哈希前
+  只删这几行，其余内容逐字节参与。8 个 Gerber + 1 个钻孔共 9 行。
+- **DRC 报告不进清单**：KiCad 的 `silk_overlap` 同一输入两次运行会报出
+  不同的配对顺序（计数与类别稳定），哈希不稳定；报告仍按 §C-16 入库。
+
+验证：
+
+```
+$ python tools/reproduce_kicad.py --pads-gerbers ...   # 跑两次，第一次的清单先拷到仓外
+$ cmp <第一次的 SHA256SUMS> dist/kicad/SHA256SUMS
+# 无输出；两次生成的清单逐字节相同
+$ python tools/reproduce_kicad.py --check
+OK   PSDR_2.6.1_pcb_spike_full.kicad_pcb
+OK   fab/PSDR_2.6.1_pcb_spike_full-B_Cu.gbr
+...（10 个文件）
+all files match the manifest
+```
+
+同时重跑的结果仍是 **795 条 DRC / 0 断点**、`0 个源 flash 未覆盖、
+461/461 个钻孔对上`（`dist/kicad/gerber_compare.txt`）。
 
 ---
 
@@ -1714,7 +1868,7 @@ $ git ls-remote upstream 'refs/heads/workorders/*'
 | 里程碑 | 内容 | 退出标准 |
 |---|---|---|
 | M0 建线（2026-11-01） | 推工单提交；打分叉 tag；建 `next`；写 `README.fork.md` | `origin/next` 与 tag 存在，tree 对账一致 |
-| M1 转换闭环（2–4 周） | ~~1.4 mm 丝印三角~~（§C-17 已闭合，2026-11-01）、EDA 两处零铜铺铜、一条命令复现 + SHA256 清单 | 重跑 md5 不变；EDA 12/12 有填充 |
+| M1 转换闭环（2–4 周） | ~~1.4 mm 丝印三角~~（§C-17）、~~一条命令复现 + SHA256 清单~~（§C-18，2026-11-01）、EDA 两处零铜铺铜：keepIsland 假设已被现场实测证伪，真因指向铺铜优先级语义，见 §C-15 补充 | 重跑 md5 不变（已达成）；EDA 12/12 有填充（**未达成**，根因待确认） |
 | M2 主线成型（1–2 个月） | 把 F7 构建线并入 `next`，验证 F4/F7 构建与 KiCad 产物 | 两条固件线在同一主线可复现；冲突有记录 |
 | M3 硬件验证（硬件到位后） | RF bring-up、#6/#8/#9 | 每项有实测数据；无实物则 SKIP |
 | M4 可制造/整机 | 以上游 `468dc41` Gerber 为生产基线 | 制造与整机验证记录 |
