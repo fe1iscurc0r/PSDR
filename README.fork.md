@@ -62,16 +62,17 @@ section is §C-16.
   conversion differences (thermal spoke topology, zero-drill Morse paddles).
 - **Known conversion gaps:** the two pours that came back empty in JLCEDA Pro
   (`+3V3_FLIP_FLOP` on In1, `V_SUPPLY` on F.Cu) are a pour-precedence problem,
-  not a `keepIsland` one: EDA's `pourPriority` wins with the *smaller* number
-  (opposite of KiCad) and the importer numbers the 12 zones 1..12 in file
-  order. Setting the flag alone still gave 10/12; raising those two pours'
-  precedence gives **12/12 filled**, verified after save + document
-  close/reopen - but that edit lives in the EDA project only, and EDA's own
-  DRC then grows 507 → 520 (6 island "no connection" + 7 copper-region
-  clearances) under its default rules. Reproducing it from the repository
-  (parse the PADS pour priorities, emit KiCad `(priority N)`, map to EDA's
-  inverted scale) is still open; see §C-15 supplement.
-  `tools/eda_epro2_keep_island.py` stays as the offline `.epro2` patch.
+  not a `keepIsland` one: EDA fills overlapping pours with the *smaller*
+  `order` winning (opposite of KiCad) and the importer numbers the 12 zones
+  1..12 in file order, dropping the PADS priority. Setting the island flag
+  alone still gave 10/12; restoring the source precedence gives **12/12
+  filled**, verified after save + document close/reopen. EDA's own DRC then
+  goes 507 → 513 and the six extras are all island copper of
+  `+3V3_FLIP_FLOP`, which the source pour also has as 7 separate HATOUT
+  regions. `tools/eda_epro2_pour_source.py` writes the source-derived
+  `order`/`keepIsland` into a converted `.epro2` and now matches EDA's own
+  PADS-route output on all 12 pours; one full
+  convert → patch → import run is still unmeasured. See §C-15 supplement.
   The silk gap is closed (§C-17): the GTO triangle and the GBO serial patch are
   PADS `COPPER` records, now emitted as inner-offset polygons, and the 10 mil
   silk band reconciles 100% GTO / 84.82% GBO (the rest is the stroke-font

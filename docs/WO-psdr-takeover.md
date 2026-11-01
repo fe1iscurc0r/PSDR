@@ -1345,7 +1345,8 @@ byte-range 并行下载后聚合约 1.3 MB/s。Inno Setup 安装器（不是 NSI
   PADS 的 `PLANEFLAGS` 时设置 `keepIsland`，KiCad 走默认 false。
   所以生成器改这个字段对 EDA 导入没有作用，改了反而会改变 KiCad 自己的
   填充（多保留孤岛）。
-- 第一步先修**转换产物**（后面实测发现单靠它不够，见下条）：新增
+- 第一步先修**转换产物**（后面实测发现单靠它不够，见下条；该脚本已被下面第 9
+  条的源驱动补丁取代并删除）：新增
   `tools/eda_epro2_keep_island.py`，把指定网（默认
   `+3V3_FLIP_FLOP` / `V_SUPPLY`，也可 `--all`）的 POUR `keepIsland`
   改成 true，其余记录逐字节复制。离线回读补丁后的 epro2：
@@ -1405,24 +1406,54 @@ byte-range 并行下载后聚合约 1.3 MB/s。Inno Setup 安装器（不是 NSI
        `document.close` → `document.open` 重开后再读**仍是 12/12**（持久化成立）；
        其余 10 个区的 `fillCount` 与基线逐个相同
        （1/16/6/1/26/19/11/26/296/360）。
-     - **代价（必须记）**：EDA 自带 DRC 从 507 涨到 **520**，新增两类
-       `Copper Region(Filled)` ——
-       `Connection Error / No Connection` **6 条**（即 `+3V3_FLIP_FLOP` 的孤岛铜）
-       和 `Copper Region(Filled) to Copper Region(Filled) Clearance Error`
-       **7 条**（改 `ie9349` 后 4 条、再改 `ie9355` 后 7 条）。EDA 跑的是默认
-       规则（0.6 mm 一档，不是源设计的 8 mil），所以这些告警不等同于源的电气
-       错误，但岛铜的净间距要按源规则复核后才敢说"干净"。
-     - 桥接过程：两次 per-pour `rebuild` 超时进 `timed-out` 隔离，都按
-       `bridge_recover_client action=recover` → 全新客户端 `readback` 解除
-       （`recoveryId 8a94a59d…`、`3c079efc…`；最终
-       `readbackVerified:true`、`writesRemainBlocked:false`）。写入其实都已
-       提交（通道 A 回读证实）；在用的 mcp-bridge 是 2.4.0（本地缓存包 2.3.4）。
-- **当前状态**：M1 出口条件 **"EDA 12/12 有填充" 达成**，但这份修复是**现场
-  手工写入**（两个 POUR 的 `pourPriority` + `preserveSilos`），仓库里还不能
-  复现。要变成可复现的转换，需要任务 #31：读 PADS POUROUT 的优先级 → 写 KiCad
-  `(priority N)` → 按 EDA 的反向语义换算映射，并用源规则复核岛铜间距；同时
-  EDA DRC 的 520 条与岛铜状态要一并记录。制造基线不变，仍是上游 `468dc41`
-  的原始 Gerber（§C-16）。
+     - **代价（现场稳定后复测）**：EDA 自带 DRC 从 507 涨到 **513**，只多一类：
+       `Copper Region(Filled) / Connection Error / No Connection` **6 条**，全是
+       `+3V3_FLIP_FLOP` 在 In1 的孤岛铜（7 块中 1 块连上、6 块悬空）。源里这个
+       铺铜本来就是 7 条独立 HATOUT，所以孤岛是源形态，不是新造的短路。
+       中途一次读数里还出现过 7 条
+       `Copper Region(Filled) to Copper Region(Filled) Clearance Error`，等这条
+       操作链走完、宿主重启后再读已归零 —— EDA 的 DRC 在重建未 settle 时会漂，
+       报数以"重开文档后复测"为准（与 §C-16 里 KiCad DRC 报项顺序不稳定同类）。
+       EDA 跑的是它自己的默认规则（0.6 mm 一档，不是源的 8 mil），岛铜净间距
+       仍要按源规则复核。
+     - 桥接稳定性：`modify`/`rebuild` 多次超时进 `timed-out` 隔离；一次
+       `rebuild all` 把客户端心跳打挂（`hostRestartRequired: true`），按
+       `bridge_recover_client action=recover` → 重启宿主 → 全新客户端
+       `readback` 走完恢复。那次超时的全量重建其实**已提交**（重启重开后通道 A
+       回读仍 12/12）。恢复记录 `8a94a59d…`、`3c079efc…`、`79fdd1fe…`；
+       在用的 mcp-bridge 是 2.4.0（本地缓存包 2.3.4）——"写一次掉一次"要当
+       常态：**每次写入后先回读再决定，绝不重放写入**。
+  9. **可复现的修法已进仓库**：`tools/eda_epro2_pour_source.py` 直接读
+     `Hardware/PSDR.asc` 里每个 `POUROUT` 的优先级（尾部最后一个数，无尾部=0）
+     与 `PLANEFLAGS` 的保留孤岛位，按 (网络, 层, 多边形面积) 配对写进转换后的
+     `.epro2`。验收基准用 EDA 自己的 PADS 路线（它本就把这些数抄进 `order`）：
+     12 条 `(net, layer, order, keepIsland)` **逐条相同**，且整个 `.epru` 只有
+     那 12 行 POUR 变化。
+
+     ```
+     net              layer  文件原 order   源 order
+     +3V3                15           1            1
+     +3V3                 1           2            5
+     +3V3_CPU            15           3            2
+     +3V3_CPU             1           4            3
+     +3V3_CPU             1           5            6
+     +3V3_FLIP_FLOP      15           6            0   ← 现场零铜的那个
+     +5V_BOOST            1           7            6
+     BOOST_LOOP           1           8            2
+     GND                 16           9            0
+     GND                  1          10            7
+     GND                  2          11            0
+     V_SUPPLY             1          12            1   ← 现场零铜的那个
+     逐条相同: True    改变的记录行数 12，全部是 POUR: True
+     ```
+
+     原先只翻 `keepIsland` 的 `tools/eda_epro2_keep_island.py` 已删除：它的
+     诊断被上面第 3 条证伪，留着会误导。
+- **当前状态**：M1 出口条件 **"EDA 12/12 有填充" 达成**并已保存；仓库侧的
+  复现路径（`转换 → eda_epro2_pour_source.py → 导入`）属性已对平 PADS 路线
+  基准，但**还没有走一次完整导入来实测 12/12**（要在 EDA 新建一次导入，
+  且桥接不稳）——这一段如实记为未完成，见任务 #31。制造基线不变，仍是上游
+  `468dc41` 的原始 Gerber（§C-16）。
 
 ---
 
@@ -1534,8 +1565,10 @@ md5(板) = 157f000bc9caa4eb67492a9a751d8f91
   `preserveSilos/keepIsland` 置 true 后整体重建仍 10/12；真因是 EDA 的
   `pourPriority` 语义与 KiCad 相反（小者优先）加上转换器按导入顺序编号。
   M1 已在 EDA 4.1.60 里现场改优先级做到 **12/12 有填充、持久化回读通过**，
-  代价是 EDA 自带 DRC 507→520（岛铜 `No Connection` 6 条 + 铜区间距 7 条），
-  且这份改法只存在于工程内、仓库暂不可复现 → 复现化另立任务（§C-15 补充）；
+  代价是 EDA 自带 DRC 507→513（`+3V3_FLIP_FLOP` 的 6 块孤岛铜悬空，源里本就是
+  7 条独立 HATOUT）；复现路径已进仓库
+  （`tools/eda_epro2_pour_source.py`，属性逐条对平 EDA 自己的 PADS 路线），
+  但完整"转换→打补丁→导入→实测 12/12"仍待走一次（§C-15 补充、任务 #31）；
 - DRC 795 条按上表保留，生产仍以 `468dc41` 的原始 Gerber 为准。
 
 **复现**：
@@ -1893,7 +1926,7 @@ $ git ls-remote upstream 'refs/heads/workorders/*'
 | 里程碑 | 内容 | 退出标准 |
 |---|---|---|
 | M0 建线（2026-11-01） | 推工单提交；打分叉 tag；建 `next`；写 `README.fork.md` | `origin/next` 与 tag 存在，tree 对账一致 |
-| M1 转换闭环（2–4 周） | ~~1.4 mm 丝印三角~~（§C-17）、~~一条命令复现 + SHA256 清单~~（§C-18，2026-11-01）、EDA 两处零铜铺铜：keepIsland 假设已被现场实测证伪，真因指向铺铜优先级语义，见 §C-15 补充 | 重跑 md5 不变（已达成）；EDA 12/12 有填充（**未达成**，根因待确认） |
+| M1 转换闭环（2–4 周） | ~~1.4 mm 丝印三角~~（§C-17）、~~一条命令复现 + SHA256 清单~~（§C-18）、~~EDA 两处零铜铺铜~~（§C-15 补充：keepIsland 假设被证伪，真因是转换器丢优先级 + EDA `order` 小者优先；现场 12/12 已达成，复现工具 `tools/eda_epro2_pour_source.py` 已进仓库） | 重跑 md5 不变（达成）；EDA 12/12 有填充（达成）；剩：走一次完整"转换→补丁→导入"实测（#31） |
 | M2 主线成型（1–2 个月） | 把 F7 构建线并入 `next`，验证 F4/F7 构建与 KiCad 产物 | 两条固件线在同一主线可复现；冲突有记录 |
 | M3 硬件验证（硬件到位后） | RF bring-up、#6/#8/#9 | 每项有实测数据；无实物则 SKIP |
 | M4 可制造/整机 | 以上游 `468dc41` Gerber 为生产基线 | 制造与整机验证记录 |
