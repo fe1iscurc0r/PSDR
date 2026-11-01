@@ -1,6 +1,7 @@
 # 施工记录 · PSDR 接手工单（2026-10-30）
 
 分支：`workorders/2026-10-30-psdr-takeover-linux-build-kicad`
+主线：`next`（2026-11-01 起，独立 fork 线，见 §E）
 执行机：天选7P（Windows 11 26300）+ WSL2 Ubuntu 24.04（构建用）
 
 > **当前状态：任务 A 通过验收；任务 B 通过（GC=1 与 GC=0 各一次完整构建，0 error、
@@ -1586,3 +1587,74 @@ $ git ls-remote upstream 'refs/heads/workorders/*'
 §C-15 记录了 KiCad → 嘉立创EDA Pro 导入的三处根因（铜层编号、网络名反斜杠、
 铺铜网络解析）；EDA 侧回读 4 铜层、278 网、391 器件、12 个铺铜边界与 67 段板框，
 铺铜重建 12/12（10 个有填充、2 个 0 填充记为差异）。
+
+---
+
+## 任务 E · 独立主线 `next`（2026-11-01）
+
+### E-1 决定与依据
+
+上游维护者 Jeff Benson 在 issue #7 明确邀请 fork 继续推进（2026-09-11 评论：
+*"...please feel free to fork and help keep the project moving forward."*，
+`https://github.com/MichaelRColton/PSDR/issues/7#issuecomment-5634997217`），
+`LICENSE.md` 已是 MIT（Copyright (c) 2026 PSDR）。用户据此确认：
+
+- 不再把“上游合入”当作前置条件；fork 作为独立开发线，`next` 为主线；
+- 上游 `master` 是可选参考源，PR #17 保持 open，但不再阻塞任何工作；
+- 仍然不推 upstream、不开新 issue；需要上游反馈时只用现有线程。
+
+依据核对（2026-11-01）：`master` / `origin/master` / `upstream/master` 都是
+`45acd0f`；上游 `PSDR_F7` 仍是 `ab2c8fd`、`PSDR_Rebuild` 仍是 `b9c0629`。
+
+### E-2 分支拓扑
+
+| ref | 作用 | 规则 |
+|---|---|---|
+| `master` | 上游镜像 | 只 fast-forward，不落自己的提交 |
+| tag `fork-base/2026-10-30` | 临界转节点（annotated tag → `45acd0f`） | 标出分叉点，不动 |
+| `next` | 我们的创作主线 | 从 `1d8e9ca` 起；所有工作最终汇入；不 force-push |
+| `workorders/*` | 专题分支 | 完成后并入 `next`，保留历史 |
+| `upstream-pr/*` | 只服务上游 PR | 不作主线来源 |
+
+`fork-base/2026-10-30` 指向 clone 时的上游 `master`。F7 构建分支的基点是
+`PSDR_Rebuild` 的 `b9c0629`，不是 `master`；并入 `next` 是一次真正的合并，
+安排在 M2，不能当快进处理。
+
+### E-3 里程碑
+
+| 里程碑 | 内容 | 退出标准 |
+|---|---|---|
+| M0 建线（2026-11-01） | 推工单提交；打分叉 tag；建 `next`；写 `README.fork.md` | `origin/next` 与 tag 存在，tree 对账一致 |
+| M1 转换闭环（2–4 周） | 1.4 mm 丝印三角、EDA 两处零铜铺铜、一条命令复现 + SHA256 清单 | 重跑 md5 不变；EDA 12/12 有填充 |
+| M2 主线成型（1–2 个月） | 把 F7 构建线并入 `next`，验证 F4/F7 构建与 KiCad 产物 | 两条固件线在同一主线可复现；冲突有记录 |
+| M3 硬件验证（硬件到位后） | RF bring-up、#6/#8/#9 | 每项有实测数据；无实物则 SKIP |
+| M4 可制造/整机 | 以上游 `468dc41` Gerber 为生产基线 | 制造与整机验证记录 |
+
+### E-4 M0 执行记录（2026-11-01）
+
+工单分支先推送（单命令级代理，未改配置）：
+
+```
+$ git push origin HEAD:refs/heads/workorders/2026-10-30-psdr-takeover-linux-build-kicad
+   108810b..1d8e9ca  HEAD -> workorders/2026-10-30-psdr-takeover-linux-build-kicad
+push rc=0
+
+$ git rev-parse HEAD^{tree} origin/<branch>^{tree}
+afd777a5604ecaa1ad9fcf63dd5e824a53d86134   (local)
+afd777a5604ecaa1ad9fcf63dd5e824a53d86134   (remote，tree 相同 = 逐字节一致)
+ahead/behind = 0 0
+```
+
+分叉点与主线：
+
+```
+$ git tag -a fork-base/2026-10-30 45acd0f -m "Fork baseline: upstream master 45acd0f, ..."
+$ git switch -c next 1d8e9ca
+```
+
+`README.fork.md` 写明独立 fork、MIT 归属（保留上游 `LICENSE.md`）、分支表、
+已交付内容、未验证项与复现命令。
+
+### E-5 M0 推送结果
+
+（`next` 与 tag 的首次推送结果见下一次记录提交。）
