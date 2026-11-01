@@ -2,6 +2,7 @@
 
 #include <stdbool.h>
 #include "si5338.h"
+#include "stm32f7xx_hal.h"
 #include "stm32f7xx_hal_rcc_ex.h"
 #include "diag/Trace.h"
 #include "stm32f7xx_hal_i2c.h"

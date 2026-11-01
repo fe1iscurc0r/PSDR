@@ -1,5 +1,10 @@
 #include "si5338.h"
 
+#include "stm32f7xx_hal.h"
+
+/* Defined in frequency_control.c; the CubeMX-rewrite merge lost the
+   declaration that previously arrived through i2c.h. */
+extern I2C_HandleTypeDef handleI2C;
 
 #define NUM_REGS_MAX 350
 #define SI5338_ADDRESS 0x70
