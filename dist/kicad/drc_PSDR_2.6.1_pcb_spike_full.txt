@@ -1,5 +1,5 @@
 ** Drc report for PSDR_2.6.1_pcb_spike_full.kicad_pcb **
-** Created on 2026-11-01T18:47:47 **
+** Created on 2026-11-01T19:34:41 **
 ** Report includes: Errors, Warnings, Exclusions **
 
 ** Found 795 DRC violations **
@@ -23,74 +23,66 @@
     Local override; error
     @(23.5458 mm, -59.1312 mm): Track [GND] on B.Cu, length 0.9662 mm
     @(23.8050 mm, -57.5900 mm): Pad 7 [<no net>] of U253 on B.Cu
-[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2042 mm)
+[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2144 mm)
     Rule: <电路板配置> 中的 "孔" 约束; error
-    @(76.9366 mm, -36.6776 mm): Track [SDIO_DAT1] on F.Cu, length 1.7601 mm
-    @(77.0000 mm, -35.4600 mm): NPTH pad of J170
-[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1638 mm)
-    Local override; error
-    @(25.1050 mm, -61.7900 mm): Pad 4 [$$$15926] of U253 on B.Cu
-    @(24.9428 mm, -63.1190 mm): Track [+3V3] on B.Cu, length 0.6825 mm
-[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1544 mm)
-    Local override; error
-    @(61.1458 mm, -47.8108 mm): Track [NRST] on F.Cu, length 1.3045 mm
-    @(60.6458 mm, -48.5428 mm): Pad 15 [LIPO_V] of U121 on F.Cu
-[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1507 mm)
-    Local override; error
-    @(66.2940 mm, -34.4678 mm): Track [USB_D+] on F.Cu, length 0.9167 mm
-    @(66.1458 mm, -33.0928 mm): Pad 72 [JTMS/SWDIO] of U121 on F.Cu
-[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1438 mm)
-    Local override; error
-    @(67.6458 mm, -33.0928 mm): Pad 75 [+3V3_CPU] of U121 on F.Cu
-    @(69.5198 mm, -32.4358 mm): Track [SDIO_DAT1] on F.Cu, length 3.8076 mm
+    @(77.3684 mm, -37.0840 mm): Track [SDIO_DAT0] on F.Cu, length 0.6096 mm
+    @(77.0000 mm, -38.0000 mm): NPTH pad of J170
 [clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1497 mm)
     Local override; error
     @(58.5470 mm, -47.2186 mm): Track [TRX_SWITCH] on F.Cu, length 0.8468 mm
     @(58.6458 mm, -48.5428 mm): Pad 19 [GND] of U121 on F.Cu
-[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2393 mm)
+[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1640 mm)
+    Local override; error
+    @(34.7700 mm, -12.5360 mm): Pad 25 [GND] of U287 on B.Cu
+    @(34.5948 mm, -11.7856 mm): Track [FILTER_IN_P] on B.Cu, length 0.4593 mm
+[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1640 mm)
+    Local override; error
+    @(30.5700 mm, -16.7360 mm): Pad 8 [GND] of U287 on B.Cu
+    @(30.1444 mm, -16.2360 mm): Track [FILTER_OUT_N] on B.Cu, length 0.6030 mm
+[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2098 mm)
     Rule: <电路板配置> 中的 "孔" 约束; error
-    @(81.7910 mm, -53.2638 mm): Track [ENC_SW] on F.Cu, length 1.5044 mm
-    @(81.5241 mm, -52.2000 mm): NPTH pad of J153
-[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1466 mm)
-    Local override; error
-    @(70.0918 mm, -44.8178 mm): Track [ENC_SW] on F.Cu, length 0.3046 mm
-    @(69.3708 mm, -44.3178 mm): Pad 95 [CHARGE_SOURCE] of U121 on F.Cu
-[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1517 mm)
-    Local override; error
-    @(70.3072 mm, -44.6024 mm): Track [ENC_SW] on F.Cu, length 4.0386 mm
-    @(69.3708 mm, -44.3178 mm): Pad 95 [CHARGE_SOURCE] of U121 on F.Cu
+    @(43.3578 mm, -1.9812 mm): Track [USB_ID] on B.Cu, length 6.9328 mm
+    @(44.9580 mm, -2.5400 mm): NPTH pad of RST
+[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2055 mm)
+    Rule: <电路板配置> 中的 "孔" 约束; error
+    @(81.7372 mm, -53.6702 mm): Track [ENC_B] on F.Cu, length 2.1736 mm
+    @(81.5241 mm, -54.7400 mm): NPTH pad of J153
+[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2112 mm)
+    Rule: <电路板配置> 中的 "孔" 约束; error
+    @(81.3054 mm, -41.4528 mm): Track [SDIO_DAT3] on F.Cu, length 4.6736 mm
+    @(77.0000 mm, -40.5400 mm): NPTH pad of J170
 [clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1506 mm)
     Local override; error
     @(63.6458 mm, -32.3662 mm): Track [GPS_POWER] on F.Cu, length 0.8355 mm
     @(64.1458 mm, -33.0928 mm): Pad 68 [USB_VBUS] of U121 on F.Cu
-[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1590 mm)
+[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1808 mm)
     Local override; error
-    @(55.7022 mm, -41.2750 mm): Track [MIC_FILTER_OUT] on F.Cu, length 1.4747 mm
-    @(53.9208 mm, -41.8178 mm): Pad 36 [TX_RF_SWITCH_A] of U121 on F.Cu
-[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2285 mm)
+    @(69.3708 mm, -37.8178 mm): Pad 82 [CHARGE_STATUS2] of U121 on F.Cu
+    @(70.6628 mm, -37.7952 mm): Track [SDIO_CMD] on F.Cu, length 0.7391 mm
+[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2100 mm)
     Rule: <电路板配置> 中的 "孔" 约束; error
-    @(79.1591 mm, -46.0375 mm): Track [+3V3_CPU] on F.Cu, length 2.8702 mm
-    @(81.5241 mm, -47.1200 mm): NPTH pad of J153
-[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2285 mm)
-    Rule: <电路板配置> 中的 "孔" 约束; error
-    @(82.0293 mm, -46.0375 mm): Track [+3V3_CPU] on F.Cu, length 2.8702 mm
-    @(81.5241 mm, -47.1200 mm): NPTH pad of J153
-[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1960 mm)
+    @(44.6532 mm, -3.2766 mm): Track [$$$9819] on In1.Cu, length 1.4986 mm
+    @(44.9580 mm, -2.5400 mm): NPTH pad of RST
+[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1460 mm)
     Local override; error
-    @(56.6458 mm, -48.5428 mm): Pad 23 [BOOT1] of U121 on F.Cu
-    @(57.1458 mm, -47.7520 mm): Track [AMP_SWITCH_A] on F.Cu, length 0.3592 mm
+    @(26.2890 mm, -50.3428 mm): Track [+3V3_CPU] on F.Cu, length 0.7903 mm
+    @(25.0350 mm, -50.2840 mm): Pad 9 [OP_GAIN_A_WP] of U15 on F.Cu
+[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1477 mm)
+    Local override; error
+    @(53.9208 mm, -40.8178 mm): Pad 38 [FLIP-FLOP_POWER] of U121 on F.Cu
+    @(56.0324 mm, -39.9288 mm): Track [GPS_PPS] on F.Cu, length 1.9643 mm
 [clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1902 mm)
     Local override; error
     @(65.4304 mm, -31.7754 mm): Via [GPS_POWER] on F.Cu - B.Cu
     @(65.6458 mm, -33.0928 mm): Pad 71 [USB_D+] of U121 on F.Cu
-[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1875 mm)
-    Local override; error
-    @(62.4586 mm, -31.7754 mm): Via [TX_FROM_GPS] on F.Cu - B.Cu
-    @(62.6458 mm, -33.0928 mm): Pad 65 [SDIO_DAT0] of U121 on F.Cu
 [clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1947 mm)
     Local override; error
     @(68.0466 mm, -38.1254 mm): Via [CHARGE_STATUS2] on F.Cu - B.Cu
     @(69.3708 mm, -38.3178 mm): Pad 83 [SDIO_CMD] of U121 on F.Cu
+[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1875 mm)
+    Local override; error
+    @(62.4586 mm, -31.7754 mm): Via [TX_FROM_GPS] on F.Cu - B.Cu
+    @(62.6458 mm, -33.0928 mm): Pad 65 [SDIO_DAT0] of U121 on F.Cu
 [clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1945 mm)
     Local override; error
     @(57.6458 mm, -48.5428 mm): Pad 21 [+3V3] of U121 on F.Cu
@@ -99,30 +91,30 @@
     Local override; error
     @(47.2280 mm, -45.3230 mm): Pad 10 [+3V3_CPU] of U86 on F.Cu
     @(47.5234 mm, -46.6090 mm): Via [GND] on F.Cu - B.Cu
-[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1477 mm)
-    Local override; error
-    @(53.9208 mm, -40.8178 mm): Pad 38 [FLIP-FLOP_POWER] of U121 on F.Cu
-    @(56.0324 mm, -39.9288 mm): Track [GPS_PPS] on F.Cu, length 1.9643 mm
 [clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1866 mm)
     Local override; error
     @(46.7280 mm, -48.9204 mm): Track [DAC1] on F.Cu, length 0.3592 mm
     @(47.2280 mm, -49.6730 mm): Pad 1 [DAC1_TO_RF] of U86 on F.Cu
+[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1960 mm)
+    Local override; error
+    @(56.6458 mm, -48.5428 mm): Pad 23 [BOOT1] of U121 on F.Cu
+    @(57.1458 mm, -47.7520 mm): Track [AMP_SWITCH_A] on F.Cu, length 0.3592 mm
 [clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1438 mm)
     Local override; error
     @(55.4736 mm, -47.4980 mm): Track [AMP_SWITCH_A] on F.Cu, length 1.3291 mm
     @(55.6458 mm, -48.5428 mm): Pad 25 [RX-I_FILTERED] of U121 on F.Cu
-[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1460 mm)
-    Local override; error
-    @(26.2890 mm, -50.3428 mm): Track [+3V3_CPU] on F.Cu, length 0.7903 mm
-    @(25.0350 mm, -50.2840 mm): Pad 9 [OP_GAIN_A_WP] of U15 on F.Cu
+[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2285 mm)
+    Rule: <电路板配置> 中的 "孔" 约束; error
+    @(82.0293 mm, -46.0375 mm): Track [+3V3_CPU] on F.Cu, length 2.8702 mm
+    @(81.5241 mm, -47.1200 mm): NPTH pad of J153
+[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2285 mm)
+    Rule: <电路板配置> 中的 "孔" 约束; error
+    @(79.1591 mm, -46.0375 mm): Track [+3V3_CPU] on F.Cu, length 2.8702 mm
+    @(81.5241 mm, -47.1200 mm): NPTH pad of J153
 [clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1283 mm)
     Local override; error
     @(40.0177 mm, -23.0759 mm): Track [$$$32286] on B.Cu, length 6.7172 mm
     @(44.1325 mm, -17.6860 mm): Pad 4 [FILTER_OUT_N] of U211 on B.Cu
-[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1573 mm)
-    Local override; error
-    @(46.7280 mm, -49.6730 mm): Pad 2 [DAC1] of U86 on F.Cu
-    @(47.2280 mm, -50.3842 mm): Track [DAC1_TO_RF] on F.Cu, length 0.2581 mm
 [clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1578 mm)
     Local override; error
     @(46.7280 mm, -49.6730 mm): Pad 2 [DAC1] of U86 on F.Cu
@@ -131,6 +123,10 @@
     Local override; error
     @(44.3738 mm, -44.9834 mm): Track [DAC1_TO_SPEAKER] on F.Cu, length 1.2537 mm
     @(45.2280 mm, -45.3230 mm): Pad 6 [DAC_MUX] of U86 on F.Cu
+[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1573 mm)
+    Local override; error
+    @(46.7280 mm, -49.6730 mm): Pad 2 [DAC1] of U86 on F.Cu
+    @(47.2280 mm, -50.3842 mm): Track [DAC1_TO_RF] on F.Cu, length 0.2581 mm
 [clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1866 mm)
     Local override; error
     @(46.2280 mm, -48.9204 mm): Track [DAC1_TO_SPEAKER] on F.Cu, length 0.3592 mm
@@ -143,14 +139,14 @@
     Rule: <电路板配置> 中的 "孔" 约束; error
     @(43.3070 mm, -1.9304 mm): Track [$$$9819] on In1.Cu, length 1.9038 mm
     @(44.9580 mm, -2.5400 mm): NPTH pad of RST
-[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2100 mm)
-    Rule: <电路板配置> 中的 "孔" 约束; error
-    @(44.6532 mm, -3.2766 mm): Track [$$$9819] on In1.Cu, length 1.4986 mm
-    @(44.9580 mm, -2.5400 mm): NPTH pad of RST
 [clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1231 mm)
     Local override; error
     @(8.2760 mm, -30.6520 mm): Pad 7 [GND] of U314 on B.Cu
     @(9.3218 mm, -30.4800 mm): Track [$$$1611] on B.Cu, length 0.6760 mm
+[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1590 mm)
+    Local override; error
+    @(55.7022 mm, -41.2750 mm): Track [MIC_FILTER_OUT] on F.Cu, length 1.4747 mm
+    @(53.9208 mm, -41.8178 mm): Pad 36 [TX_RF_SWITCH_A] of U121 on F.Cu
 [hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2098 mm)
     Rule: <电路板配置> 中的 "孔" 约束; error
     @(44.9834 mm, -1.5240 mm): Track [$$$11833] on In1.Cu, length 6.5017 mm
@@ -175,21 +171,13 @@
     Rule: <电路板配置> 中的 "孔" 约束; error
     @(78.7908 mm, -41.0464 mm): Track [SDIO_DAT2] on F.Cu, length 2.0116 mm
     @(77.0000 mm, -40.5400 mm): NPTH pad of J170
-[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2144 mm)
-    Rule: <电路板配置> 中的 "孔" 约束; error
-    @(77.3684 mm, -39.6240 mm): Track [SDIO_DAT2] on F.Cu, length 1.9812 mm
-    @(77.0000 mm, -40.5400 mm): NPTH pad of J170
-[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1808 mm)
-    Local override; error
-    @(69.3708 mm, -37.8178 mm): Pad 82 [CHARGE_STATUS2] of U121 on F.Cu
-    @(70.6628 mm, -37.7952 mm): Track [SDIO_CMD] on F.Cu, length 0.7391 mm
-[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2112 mm)
-    Rule: <电路板配置> 中的 "孔" 约束; error
-    @(81.3054 mm, -41.4528 mm): Track [SDIO_DAT3] on F.Cu, length 4.6736 mm
-    @(77.0000 mm, -40.5400 mm): NPTH pad of J170
 [hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2042 mm)
     Rule: <电路板配置> 中的 "孔" 约束; error
     @(76.6318 mm, -41.4528 mm): Track [SDIO_DAT3] on F.Cu, length 7.2620 mm
+    @(77.0000 mm, -40.5400 mm): NPTH pad of J170
+[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2144 mm)
+    Rule: <电路板配置> 中的 "孔" 约束; error
+    @(77.3684 mm, -39.6240 mm): Track [SDIO_DAT2] on F.Cu, length 1.9812 mm
     @(77.0000 mm, -40.5400 mm): NPTH pad of J170
 [hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2201 mm)
     Rule: <电路板配置> 中的 "孔" 约束; error
@@ -203,34 +191,38 @@
     Rule: <电路板配置> 中的 "孔" 约束; error
     @(82.7278 mm, -42.3440 mm): Track [LIPO] on B.Cu, length 8.0750 mm
     @(81.5241 mm, -47.1200 mm): NPTH pad of J153
-[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2055 mm)
-    Rule: <电路板配置> 中的 "孔" 约束; error
-    @(81.7372 mm, -53.6702 mm): Track [ENC_B] on F.Cu, length 2.1736 mm
-    @(81.5241 mm, -54.7400 mm): NPTH pad of J153
 [clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1443 mm)
     Local override; error
     @(48.0470 mm, -52.6390 mm): Pad 1 [$$$14690] of U85 on F.Cu
     @(48.2906 mm, -53.6702 mm): Track [$$$14589] on F.Cu, length 0.5747 mm
-[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2098 mm)
+[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2393 mm)
     Rule: <电路板配置> 中的 "孔" 约束; error
-    @(43.3578 mm, -1.9812 mm): Track [USB_ID] on B.Cu, length 6.9328 mm
-    @(44.9580 mm, -2.5400 mm): NPTH pad of RST
+    @(81.7910 mm, -53.2638 mm): Track [ENC_SW] on F.Cu, length 1.5044 mm
+    @(81.5241 mm, -52.2000 mm): NPTH pad of J153
 [hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2182 mm)
     Rule: <电路板配置> 中的 "孔" 约束; error
     @(72.8472 mm, -55.0926 mm): Track [V_SUPPLY] on In1.Cu, length 10.4530 mm
     @(76.0000 mm, -55.0500 mm): NPTH pad of J170
-[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1788 mm)
-    Local override; error
-    @(65.2881 mm, -47.6351 mm): Track [VBAT_BKP] on F.Cu, length 0.2012 mm
-    @(65.6458 mm, -48.5428 mm): Pad 5 [AMP_SWITCH_B] of U121 on F.Cu
 [clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1780 mm)
     Local override; error
     @(65.6458 mm, -48.5428 mm): Pad 5 [AMP_SWITCH_B] of U121 on F.Cu
     @(66.5428 mm, -46.3804 mm): Track [VBAT_BKP] on F.Cu, length 1.7744 mm
+[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1466 mm)
+    Local override; error
+    @(70.0918 mm, -44.8178 mm): Track [ENC_SW] on F.Cu, length 0.3046 mm
+    @(69.3708 mm, -44.3178 mm): Pad 95 [CHARGE_SOURCE] of U121 on F.Cu
+[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1788 mm)
+    Local override; error
+    @(65.2881 mm, -47.6351 mm): Track [VBAT_BKP] on F.Cu, length 0.2012 mm
+    @(65.6458 mm, -48.5428 mm): Pad 5 [AMP_SWITCH_B] of U121 on F.Cu
 [clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1589 mm)
     Local override; error
     @(64.6458 mm, -48.5428 mm): Pad 7 [LCD_LED] of U121 on F.Cu
     @(65.1458 mm, -49.2812 mm): Track [VBAT_BKP] on F.Cu, length 1.0703 mm
+[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1517 mm)
+    Local override; error
+    @(70.3072 mm, -44.6024 mm): Track [ENC_SW] on F.Cu, length 4.0386 mm
+    @(69.3708 mm, -44.3178 mm): Pad 95 [CHARGE_SOURCE] of U121 on F.Cu
 [clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1283 mm)
     Local override; error
     @(45.4025 mm, -18.3261 mm): Track [$$$5480] on B.Cu, length 1.0237 mm
@@ -239,14 +231,6 @@
     Local override; error
     @(30.5700 mm, -16.7360 mm): Pad 8 [GND] of U287 on B.Cu
     @(29.7180 mm, -16.6624 mm): Track [FILTER_OUT_N] on B.Cu, length 0.6030 mm
-[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1640 mm)
-    Local override; error
-    @(30.5700 mm, -16.7360 mm): Pad 8 [GND] of U287 on B.Cu
-    @(30.1444 mm, -16.2360 mm): Track [FILTER_OUT_N] on B.Cu, length 0.6030 mm
-[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1640 mm)
-    Local override; error
-    @(34.7700 mm, -12.5360 mm): Pad 25 [GND] of U287 on B.Cu
-    @(34.5948 mm, -11.7856 mm): Track [FILTER_IN_P] on B.Cu, length 0.4593 mm
 [clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1449 mm)
     Local override; error
     @(70.0894 mm, -43.3178 mm): Track [LCD_DC/RS] on F.Cu, length 0.8109 mm
@@ -271,6 +255,14 @@
     Rule: <电路板配置> 中的 "孔" 约束; error
     @(45.1612 mm, -1.2954 mm): Track [+5V] on B.Cu, length 0.7184 mm
     @(44.9580 mm, -2.5400 mm): NPTH pad of RST
+[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1507 mm)
+    Local override; error
+    @(66.2940 mm, -34.4678 mm): Track [USB_D+] on F.Cu, length 0.9167 mm
+    @(66.1458 mm, -33.0928 mm): Pad 72 [JTMS/SWDIO] of U121 on F.Cu
+[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2456 mm)
+    Rule: <电路板配置> 中的 "孔" 约束; error
+    @(76.7588 mm, -37.0840 mm): Track [SDIO_DAT0] on F.Cu, length 0.9339 mm
+    @(77.0000 mm, -38.0000 mm): NPTH pad of J170
 [hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2256 mm)
     Rule: <电路板配置> 中的 "孔" 约束; error
     @(77.9272 mm, -39.0144 mm): Track [SDIO_DAT0] on F.Cu, length 1.3716 mm
@@ -279,50 +271,70 @@
     Rule: <电路板配置> 中的 "孔" 约束; error
     @(77.9272 mm, -37.6428 mm): Track [SDIO_DAT0] on F.Cu, length 0.7903 mm
     @(77.0000 mm, -38.0000 mm): NPTH pad of J170
-[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2456 mm)
-    Rule: <电路板配置> 中的 "孔" 约束; error
-    @(76.7588 mm, -37.0840 mm): Track [SDIO_DAT0] on F.Cu, length 0.9339 mm
-    @(77.0000 mm, -38.0000 mm): NPTH pad of J170
-[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2144 mm)
-    Rule: <电路板配置> 中的 "孔" 约束; error
-    @(77.3684 mm, -37.0840 mm): Track [SDIO_DAT0] on F.Cu, length 0.6096 mm
-    @(77.0000 mm, -38.0000 mm): NPTH pad of J170
+[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1544 mm)
+    Local override; error
+    @(61.1458 mm, -47.8108 mm): Track [NRST] on F.Cu, length 1.3045 mm
+    @(60.6458 mm, -48.5428 mm): Pad 15 [LIPO_V] of U121 on F.Cu
 [clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1247 mm)
     Local override; error
     @(25.0698 mm, -47.8790 mm): Track [+3V3] on B.Cu, length 0.8695 mm
     @(25.1050 mm, -46.5500 mm): Pad 4 [$$$15845] of U260 on B.Cu
+[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1638 mm)
+    Local override; error
+    @(25.1050 mm, -61.7900 mm): Pad 4 [$$$15926] of U253 on B.Cu
+    @(24.9428 mm, -63.1190 mm): Track [+3V3] on B.Cu, length 0.6825 mm
+[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1438 mm)
+    Local override; error
+    @(67.6458 mm, -33.0928 mm): Pad 75 [+3V3_CPU] of U121 on F.Cu
+    @(69.5198 mm, -32.4358 mm): Track [SDIO_DAT1] on F.Cu, length 3.8076 mm
+[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2042 mm)
+    Rule: <电路板配置> 中的 "孔" 约束; error
+    @(76.9366 mm, -36.6776 mm): Track [SDIO_DAT1] on F.Cu, length 1.7601 mm
+    @(77.0000 mm, -35.4600 mm): NPTH pad of J170
 [clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1768 mm)
     Local override; error
     @(39.8980 mm, -42.3110 mm): Pad 1 [$$$5395] of U241 on B.Cu
     @(39.2230 mm, -41.6360 mm): Pad 24 [+3V3_CPU] of U241 on B.Cu
 [clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1768 mm)
     Local override; error
-    @(42.3980 mm, -42.3110 mm): Pad 6 [GND] of U241 on B.Cu
     @(43.0730 mm, -41.6360 mm): Pad 7 [+3V3_CPU] of U241 on B.Cu
+    @(42.3980 mm, -42.3110 mm): Pad 6 [GND] of U241 on B.Cu
 [clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1768 mm)
     Local override; error
     @(43.0730 mm, -39.1360 mm): Pad 12 [I2C_SCL] of U241 on B.Cu
     @(42.3980 mm, -38.4610 mm): Pad 13 [<no net>] of U241 on B.Cu
 [clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1768 mm)
     Local override; error
-    @(39.8980 mm, -38.4610 mm): Pad 18 [FILTER_CAL] of U241 on B.Cu
     @(39.2230 mm, -39.1360 mm): Pad 19 [I2C_SDA] of U241 on B.Cu
+    @(39.8980 mm, -38.4610 mm): Pad 18 [FILTER_CAL] of U241 on B.Cu
+[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.0001 mm)
+    Rule: <电路板配置> 中的 "孔" 约束; error
+    @(79.7740 mm, -54.7400 mm): Pad 2 [ENC_A] of J153 on F.Cu
+    @(81.5241 mm, -54.7400 mm): NPTH pad of J153
 [hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.0001 mm)
     Rule: <电路板配置> 中的 "孔" 约束; error
     @(78.7501 mm, -27.8400 mm): Pad 1 [+3V3_CPU] of J170 on B.Cu
     @(77.0000 mm, -27.8400 mm): NPTH pad of J170
 [hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.0001 mm)
     Rule: <电路板配置> 中的 "孔" 约束; error
-    @(83.2742 mm, -57.2800 mm): Pad 1 [ENC_B] of J153 on F.Cu
-    @(81.5241 mm, -57.2800 mm): NPTH pad of J153
+    @(75.2499 mm, -30.3800 mm): Pad 2 [GND] of J170 on B.Cu
+    @(77.0000 mm, -30.3800 mm): NPTH pad of J170
 [hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.0001 mm)
     Rule: <电路板配置> 中的 "孔" 约束; error
-    @(78.7501 mm, -32.9200 mm): Pad 3 [LCD_CS] of J170 on B.Cu
-    @(77.0000 mm, -32.9200 mm): NPTH pad of J170
+    @(83.2742 mm, -52.2000 mm): Pad 3 [ENC_SW] of J153 on F.Cu
+    @(81.5241 mm, -52.2000 mm): NPTH pad of J153
 [hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.0001 mm)
     Rule: <电路板配置> 中的 "孔" 约束; error
     @(78.7501 mm, -38.0000 mm): Pad 5 [LCD_DC/RS] of J170 on B.Cu
     @(77.0000 mm, -38.0000 mm): NPTH pad of J170
+[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.0001 mm)
+    Rule: <电路板配置> 中的 "孔" 约束; error
+    @(83.2742 mm, -47.1200 mm): Pad 5 [GND] of J153 on F.Cu
+    @(81.5241 mm, -47.1200 mm): NPTH pad of J153
+[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.0001 mm)
+    Rule: <电路板配置> 中的 "孔" 约束; error
+    @(83.2742 mm, -57.2800 mm): Pad 1 [ENC_B] of J153 on F.Cu
+    @(81.5241 mm, -57.2800 mm): NPTH pad of J153
 [hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.0001 mm)
     Rule: <电路板配置> 中的 "孔" 约束; error
     @(75.2499 mm, -40.5400 mm): Pad 6 [LCD_MOSI] of J170 on B.Cu
@@ -341,28 +353,16 @@
     @(77.0000 mm, -48.1600 mm): NPTH pad of J170
 [hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.0001 mm)
     Rule: <电路板配置> 中的 "孔" 约束; error
-    @(79.7740 mm, -54.7400 mm): Pad 2 [ENC_A] of J153 on F.Cu
-    @(81.5241 mm, -54.7400 mm): NPTH pad of J153
-[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.0001 mm)
-    Rule: <电路板配置> 中的 "孔" 约束; error
-    @(83.2742 mm, -52.2000 mm): Pad 3 [ENC_SW] of J153 on F.Cu
-    @(81.5241 mm, -52.2000 mm): NPTH pad of J153
-[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.0001 mm)
-    Rule: <电路板配置> 中的 "孔" 约束; error
-    @(75.2499 mm, -30.3800 mm): Pad 2 [GND] of J170 on B.Cu
-    @(77.0000 mm, -30.3800 mm): NPTH pad of J170
-[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.0001 mm)
-    Rule: <电路板配置> 中的 "孔" 约束; error
     @(79.7740 mm, -49.6600 mm): Pad 4 [LIPO] of J153 on F.Cu
     @(81.5241 mm, -49.6600 mm): NPTH pad of J153
 [hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.0001 mm)
     Rule: <电路板配置> 中的 "孔" 约束; error
-    @(75.2499 mm, -35.4600 mm): Pad 4 [LCD_RESET] of J170 on B.Cu
-    @(77.0000 mm, -35.4600 mm): NPTH pad of J170
+    @(78.7501 mm, -32.9200 mm): Pad 3 [LCD_CS] of J170 on B.Cu
+    @(77.0000 mm, -32.9200 mm): NPTH pad of J170
 [hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.0001 mm)
     Rule: <电路板配置> 中的 "孔" 约束; error
-    @(83.2742 mm, -47.1200 mm): Pad 5 [GND] of J153 on F.Cu
-    @(81.5241 mm, -47.1200 mm): NPTH pad of J153
+    @(75.2499 mm, -35.4600 mm): Pad 4 [LCD_RESET] of J170 on B.Cu
+    @(77.0000 mm, -35.4600 mm): NPTH pad of J170
 [copper_edge_clearance]: 电路板边缘间距违规 (<电路板配置> 中的 "板边" 约束 间距 0.5000 mm; 实际 0.0000 mm)
     Rule: <电路板配置> 中的 "板边" 约束; error
     @(93.3196 mm, -24.0792 mm): Segment on Edge.Cuts
@@ -1390,612 +1390,168 @@
     @(77.0000 mm, -38.0000 mm): Footprint J170
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(28.9560 mm, -18.5420 mm): Segment on F.Silkscreen
-    @(25.4000 mm, -16.7640 mm): PCB text 'LO2P' on F.Silkscreen
+    @(59.1820 mm, -56.6420 mm): PCB text 'C107' on F.Silkscreen
+    @(61.7220 mm, -56.6420 mm): PCB text 'C108' on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(28.9560 mm, -18.5420 mm): Segment on F.Silkscreen
-    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
+    @(52.3240 mm, -54.6100 mm): PCB text 'VSPLY' on F.Silkscreen
+    @(59.1820 mm, -56.6420 mm): PCB text 'C107' on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(28.8188 mm, -18.5877 mm): Segment on F.Silkscreen
-    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
+    @(56.6420 mm, -56.6420 mm): PCB text 'C106' on F.Silkscreen
+    @(59.1820 mm, -56.6420 mm): PCB text 'C107' on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
-    @(28.7731 mm, -18.6334 mm): Segment on F.Silkscreen
+    @(52.3240 mm, -54.6100 mm): PCB text 'VSPLY' on F.Silkscreen
+    @(56.6420 mm, -56.6420 mm): PCB text 'C106' on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(28.7274 mm, -18.6792 mm): Segment on F.Silkscreen
-    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
+    @(56.6420 mm, -56.6420 mm): PCB text 'C106' on F.Silkscreen
+    @(61.7220 mm, -56.6420 mm): PCB text 'C108' on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(28.7274 mm, -18.7249 mm): Segment on F.Silkscreen
-    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
+    @(52.3240 mm, -54.6100 mm): PCB text 'VSPLY' on F.Silkscreen
+    @(61.7220 mm, -56.6420 mm): PCB text 'C108' on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
-    @(28.7274 mm, -18.7706 mm): Segment on F.Silkscreen
+    @(56.6420 mm, -61.2140 mm): PCB text 'C103' on F.Silkscreen
+    @(59.1820 mm, -61.2140 mm): PCB text 'C104' on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(28.6817 mm, -18.8163 mm): Segment on F.Silkscreen
-    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
+    @(59.4440 mm, -62.4840 mm): Segment of C104 on F.Silkscreen
+    @(56.6420 mm, -61.2140 mm): PCB text 'C103' on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(28.6817 mm, -18.8620 mm): Segment on F.Silkscreen
-    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
+    @(59.4440 mm, -62.4840 mm): Segment of C104 on F.Silkscreen
+    @(59.1820 mm, -61.2140 mm): PCB text 'C104' on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(28.6817 mm, -18.9992 mm): Segment on F.Silkscreen
-    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
+    @(56.3880 mm, -53.3400 mm): PCB text 'C111' on F.Silkscreen
+    @(61.7220 mm, -56.6420 mm): PCB text 'C108' on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
-    @(28.6817 mm, -19.0449 mm): Segment on F.Silkscreen
+    @(52.3240 mm, -54.6100 mm): PCB text 'VSPLY' on F.Silkscreen
+    @(56.3880 mm, -53.3400 mm): PCB text 'C111' on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(28.6817 mm, -19.0906 mm): Segment on F.Silkscreen
-    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
+    @(56.3880 mm, -53.3400 mm): PCB text 'C111' on F.Silkscreen
+    @(59.1820 mm, -56.6420 mm): PCB text 'C107' on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(28.6817 mm, -19.1364 mm): Segment on F.Silkscreen
-    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
+    @(53.0860 mm, -61.2140 mm): PCB text 'C83' on F.Silkscreen
+    @(56.9040 mm, -62.4840 mm): Segment of C103 on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
-    @(28.6817 mm, -19.1821 mm): Segment on F.Silkscreen
+    @(56.6420 mm, -61.2140 mm): PCB text 'C103' on F.Silkscreen
+    @(56.9040 mm, -62.4840 mm): Segment of C103 on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(28.6817 mm, -19.2278 mm): Segment on F.Silkscreen
-    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
+    @(53.0860 mm, -61.2140 mm): PCB text 'C83' on F.Silkscreen
+    @(56.6420 mm, -61.2140 mm): PCB text 'C103' on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(28.6817 mm, -19.2735 mm): Segment on F.Silkscreen
-    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
+    @(56.6420 mm, -56.6420 mm): PCB text 'C106' on F.Silkscreen
+    @(50.8000 mm, -56.3880 mm): PCB text 'U85' on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(28.6817 mm, -19.3192 mm): Segment on F.Silkscreen
-    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
+    @(53.0860 mm, -61.2140 mm): PCB text 'C83' on F.Silkscreen
+    @(50.8000 mm, -60.1980 mm): PCB text 'L84' on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(28.6817 mm, -18.9078 mm): Segment on F.Silkscreen
-    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
+    @(61.7220 mm, -61.2140 mm): PCB text 'L105' on F.Silkscreen
+    @(56.6420 mm, -61.2140 mm): PCB text 'C103' on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(28.6817 mm, -18.9535 mm): Segment on F.Silkscreen
-    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
+    @(62.0014 mm, -62.4840 mm): Segment of L105 on F.Silkscreen
+    @(56.6420 mm, -61.2140 mm): PCB text 'C103' on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(28.6817 mm, -19.5936 mm): Segment on F.Silkscreen
-    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
+    @(61.7220 mm, -61.2140 mm): PCB text 'L105' on F.Silkscreen
+    @(62.0014 mm, -62.4840 mm): Segment of L105 on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(28.6817 mm, -19.6393 mm): Segment on F.Silkscreen
-    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
+    @(61.7220 mm, -61.2140 mm): PCB text 'L105' on F.Silkscreen
+    @(59.1820 mm, -61.2140 mm): PCB text 'C104' on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(28.6817 mm, -19.6850 mm): Segment on F.Silkscreen
-    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
+    @(62.0014 mm, -62.4840 mm): Segment of L105 on F.Silkscreen
+    @(59.1820 mm, -61.2140 mm): PCB text 'C104' on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(28.6817 mm, -19.7307 mm): Segment on F.Silkscreen
-    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
+    @(56.3880 mm, -53.3400 mm): PCB text 'C111' on F.Silkscreen
+    @(63.5000 mm, -53.3400 mm): PCB text 'R113' on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(28.6817 mm, -19.7764 mm): Segment on F.Silkscreen
-    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
+    @(60.4520 mm, -53.3400 mm): PCB text 'R112' on F.Silkscreen
+    @(58.6740 mm, -50.2920 mm): PCB text 'R117' on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
-    @(28.6817 mm, -19.8222 mm): Segment on F.Silkscreen
+    @(58.6740 mm, -50.2920 mm): PCB text 'R117' on F.Silkscreen
+    @(62.9920 mm, -51.0794 mm): Segment of C118 on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
-    @(28.6817 mm, -19.3650 mm): Segment on F.Silkscreen
+    @(58.6740 mm, -50.2920 mm): PCB text 'R117' on F.Silkscreen
+    @(61.7220 mm, -51.8160 mm): PCB text '3V3D' on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
-    @(28.6817 mm, -19.4107 mm): Segment on F.Silkscreen
+    @(61.7220 mm, -51.8160 mm): PCB text '3V3D' on F.Silkscreen
+    @(56.3880 mm, -53.3400 mm): PCB text 'C111' on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
-    @(28.6817 mm, -19.4564 mm): Segment on F.Silkscreen
+    @(61.9760 mm, -54.8386 mm): Segment of R112 on F.Silkscreen
+    @(63.5000 mm, -53.3400 mm): PCB text 'R113' on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(28.6817 mm, -19.5021 mm): Segment on F.Silkscreen
-    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
+    @(64.5160 mm, -50.2920 mm): PCB text 'C118' on F.Silkscreen
+    @(61.7220 mm, -51.8160 mm): PCB text '3V3D' on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(28.6817 mm, -19.5478 mm): Segment on F.Silkscreen
-    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
-    @(25.4000 mm, -16.7640 mm): PCB text 'LO2P' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(38.6080 mm, -16.7640 mm): PCB text 'LO1P' on F.Silkscreen
-    @(37.8460 mm, -18.0340 mm): PCB text 'LO1N' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(38.6080 mm, -16.7640 mm): PCB text 'LO1P' on F.Silkscreen
-    @(41.9100 mm, -17.2720 mm): PCB text 'R97' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(43.3520 mm, -13.3880 mm): Segment of D100 on F.Silkscreen
-    @(41.9100 mm, -17.2720 mm): PCB text 'R97' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(43.3520 mm, -10.1380 mm): Segment of D100 on F.Silkscreen
-    @(41.9100 mm, -17.2720 mm): PCB text 'R97' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(44.7040 mm, -10.6680 mm): PCB text 'D100' on F.Silkscreen
-    @(47.7520 mm, -10.6680 mm): PCB text 'D101' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(41.9920 mm, -10.1380 mm): Segment of D100 on F.Silkscreen
-    @(44.7040 mm, -10.6680 mm): PCB text 'D100' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(43.3520 mm, -10.1380 mm): Segment of D100 on F.Silkscreen
-    @(44.7040 mm, -10.6680 mm): PCB text 'D100' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(41.9920 mm, -13.3880 mm): Segment of D100 on F.Silkscreen
-    @(44.7040 mm, -10.6680 mm): PCB text 'D100' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(44.7040 mm, -10.6680 mm): PCB text 'D100' on F.Silkscreen
-    @(43.3155 mm, -10.4880 mm): Segment of D100 on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(41.9920 mm, -13.3880 mm): Segment of D100 on F.Silkscreen
-    @(47.7520 mm, -10.6680 mm): PCB text 'D101' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(47.7520 mm, -10.6680 mm): PCB text 'D101' on F.Silkscreen
-    @(43.3155 mm, -10.4880 mm): Segment of D100 on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(41.9920 mm, -10.1380 mm): Segment of D100 on F.Silkscreen
-    @(47.7520 mm, -10.6680 mm): PCB text 'D101' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(44.7040 mm, -10.6680 mm): PCB text 'D100' on F.Silkscreen
-    @(41.1480 mm, -9.0170 mm): Segment of L81 on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(44.7040 mm, -10.6680 mm): PCB text 'D100' on F.Silkscreen
-    @(35.5600 mm, -9.0170 mm): Segment of L81 on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(31.2420 mm, -12.1920 mm): PCB text 'R75' on F.Silkscreen
-    @(32.7660 mm, -12.1920 mm): PCB text 'R76' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(32.0040 mm, -8.3820 mm): PCB text 'L81' on F.Silkscreen
-    @(34.2900 mm, -10.9220 mm): PCB text 'C80' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(34.7980 mm, -10.1600 mm): Segment on F.Silkscreen
-    @(34.2900 mm, -10.9220 mm): PCB text 'C80' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(32.0040 mm, -8.3820 mm): PCB text 'L81' on F.Silkscreen
-    @(34.7980 mm, -10.1600 mm): Segment on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(30.4800 mm, -10.6680 mm): PCB text 'R79' on F.Silkscreen
-    @(34.2900 mm, -10.9220 mm): PCB text 'C80' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(32.0040 mm, -8.3820 mm): PCB text 'L81' on F.Silkscreen
-    @(30.4800 mm, -10.6680 mm): PCB text 'R79' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(32.0040 mm, -8.3820 mm): PCB text 'L81' on F.Silkscreen
-    @(34.2900 mm, -13.7160 mm): PCB text 'R77' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(30.4800 mm, -10.6680 mm): PCB text 'R79' on F.Silkscreen
-    @(34.2900 mm, -13.7160 mm): PCB text 'R77' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(34.7980 mm, -10.1600 mm): Segment on F.Silkscreen
-    @(29.7180 mm, -10.9220 mm): PCB text 'C78' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(30.4800 mm, -10.6680 mm): PCB text 'R79' on F.Silkscreen
-    @(32.7660 mm, -12.1920 mm): PCB text 'R76' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(30.4800 mm, -10.6680 mm): PCB text 'R79' on F.Silkscreen
-    @(31.2420 mm, -12.1920 mm): PCB text 'R75' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(34.2900 mm, -13.7160 mm): PCB text 'R77' on F.Silkscreen
-    @(31.2420 mm, -12.1920 mm): PCB text 'R75' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(34.2900 mm, -13.7160 mm): PCB text 'R77' on F.Silkscreen
-    @(32.7660 mm, -12.1920 mm): PCB text 'R76' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(34.7980 mm, -16.5100 mm): Segment on F.Silkscreen
-    @(31.2420 mm, -12.1920 mm): PCB text 'R75' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(30.4800 mm, -10.6680 mm): PCB text 'R79' on F.Silkscreen
-    @(34.7980 mm, -16.5100 mm): Segment on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(34.7980 mm, -16.5100 mm): Segment on F.Silkscreen
-    @(32.7660 mm, -12.1920 mm): PCB text 'R76' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(32.0040 mm, -8.3820 mm): PCB text 'L81' on F.Silkscreen
-    @(31.2420 mm, -12.1920 mm): PCB text 'R75' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(61.7220 mm, -51.8160 mm): PCB text '3V3D' on F.Silkscreen
     @(66.8020 mm, -53.3400 mm): PCB text 'U114' on F.Silkscreen
-    @(67.4958 mm, -47.4678 mm): Segment of U121 on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(64.5160 mm, -50.2920 mm): PCB text 'C118' on F.Silkscreen
+    @(66.8020 mm, -53.3400 mm): PCB text 'U114' on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
     @(66.8020 mm, -53.3400 mm): PCB text 'U114' on F.Silkscreen
     @(67.6458 mm, -47.1678 mm): Segment of U121 on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(66.8020 mm, -53.3400 mm): PCB text 'U114' on F.Silkscreen
+    @(67.4958 mm, -47.4678 mm): Segment of U121 on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(73.1520 mm, -44.4500 mm): PCB text 'C120' on F.Silkscreen
+    @(71.3740 mm, -55.8800 mm): PCB text 'C115' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
     @(73.1520 mm, -44.4500 mm): PCB text 'C120' on F.Silkscreen
     @(73.4314 mm, -46.9900 mm): Segment of C120 on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(69.5960 mm, -26.6700 mm): PCB text 'C125' on F.Silkscreen
-    @(71.1200 mm, -32.5120 mm): PCB text 'R122' on F.Silkscreen
+    @(64.5160 mm, -50.2920 mm): PCB text 'C118' on F.Silkscreen
+    @(70.8660 mm, -48.7680 mm): PCB text 'C119' on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(69.5960 mm, -26.6700 mm): PCB text 'C125' on F.Silkscreen
-    @(64.2620 mm, -27.6860 mm): PCB text 'GPSR' on F.Silkscreen
+    @(75.5000 mm, -62.0000 mm): Circle of M1 on F.Silkscreen
+    @(71.1200 mm, -57.9120 mm): PCB text 'L109' on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(69.5960 mm, -26.6700 mm): PCB text 'C125' on F.Silkscreen
-    @(63.2460 mm, -26.9240 mm): PCB text 'R133' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(69.5960 mm, -26.6700 mm): PCB text 'C125' on F.Silkscreen
-    @(64.5160 mm, -25.6540 mm): PCB text 'MIC' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(63.2460 mm, -26.9240 mm): PCB text 'R133' on F.Silkscreen
-    @(64.2620 mm, -27.6860 mm): PCB text 'GPSR' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(60.7060 mm, -24.1300 mm): PCB text 'C134' on F.Silkscreen
-    @(64.5160 mm, -25.6540 mm): PCB text 'MIC' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(60.7060 mm, -24.1300 mm): PCB text 'C134' on F.Silkscreen
-    @(65.5320 mm, -24.9174 mm): Segment of C129 on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(64.2620 mm, -27.6860 mm): PCB text 'GPSR' on F.Silkscreen
-    @(59.1820 mm, -28.9560 mm): PCB text 'R130' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(66.8020 mm, -29.7434 mm): Segment of C125 on F.Silkscreen
-    @(64.2620 mm, -27.6860 mm): PCB text 'GPSR' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(69.5960 mm, -26.6700 mm): PCB text 'C125' on F.Silkscreen
-    @(68.0720 mm, -30.7086 mm): Segment of C123 on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(38.6080 mm, -56.8960 mm): PCB text 'D44' on F.Silkscreen
-    @(37.5920 mm, -55.6260 mm): PCB text '5VBST' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(43.1720 mm, -55.8800 mm): Segment of C89 on F.Silkscreen
-    @(37.5920 mm, -55.6260 mm): PCB text '5VBST' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(47.4220 mm, -52.5640 mm): Circle of U85 on F.Silkscreen
-    @(52.8320 mm, -53.3400 mm): PCB text 'C110' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(50.5460 mm, -50.5460 mm): PCB text 'R116' on F.Silkscreen
-    @(42.4180 mm, -48.7680 mm): PCB text 'R90' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(42.4180 mm, -48.7680 mm): PCB text 'R90' on F.Silkscreen
-    @(44.4500 mm, -51.3080 mm): Segment on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(38.6080 mm, -56.8960 mm): PCB text 'D44' on F.Silkscreen
-    @(37.5920 mm, -51.8160 mm): PCB text 'RXQ' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(37.8460 mm, -34.0360 mm): PCB text 'U58' on F.Silkscreen
-    @(42.4180 mm, -34.2900 mm): PCB text 'C59' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(38.6080 mm, -31.4960 mm): PCB text 'C62' on F.Silkscreen
-    @(42.4180 mm, -31.4960 mm): PCB text 'R63' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(34.2900 mm, -29.9720 mm): PCB text 'R64' on F.Silkscreen
-    @(38.6080 mm, -31.4960 mm): PCB text 'C62' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(38.6080 mm, -29.9720 mm): PCB text 'R66' on F.Silkscreen
-    @(38.1000 mm, -30.2260 mm): PCB text 'C65' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(34.2900 mm, -29.9720 mm): PCB text 'R64' on F.Silkscreen
-    @(38.1000 mm, -30.2260 mm): PCB text 'C65' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(38.1000 mm, -30.2260 mm): PCB text 'C65' on F.Silkscreen
-    @(42.4180 mm, -31.4960 mm): PCB text 'R63' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(45.2120 mm, -30.4800 mm): PCB text 'DAC2' on F.Silkscreen
-    @(49.0220 mm, -29.4640 mm): PCB text '1PPS' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(49.2760 mm, -44.1960 mm): PCB text 'C88' on F.Silkscreen
-    @(47.2440 mm, -40.8940 mm): PCB text 'SDA' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(44.1960 mm, -37.8460 mm): PCB text 'SCL' on F.Silkscreen
-    @(46.9900 mm, -34.2900 mm): PCB text 'C95' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(47.4780 mm, -46.3730 mm): Segment of U86 on F.Silkscreen
-    @(41.6560 mm, -45.4660 mm): PCB text 'R94' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(41.6560 mm, -45.4660 mm): PCB text 'R94' on F.Silkscreen
-    @(44.4500 mm, -51.3080 mm): Segment on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(45.2120 mm, -43.1800 mm): PCB text 'U86' on F.Silkscreen
-    @(41.6560 mm, -45.4660 mm): PCB text 'R94' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(44.9780 mm, -46.3730 mm): Segment of U86 on F.Silkscreen
-    @(41.6560 mm, -45.4660 mm): PCB text 'R94' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(44.9780 mm, -46.3730 mm): Segment of U86 on F.Silkscreen
-    @(45.2120 mm, -43.1800 mm): PCB text 'U86' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(45.2120 mm, -43.1800 mm): PCB text 'U86' on F.Silkscreen
-    @(44.4500 mm, -51.3080 mm): Segment on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(40.3860 mm, -48.0060 mm): PCB text 'C89' on F.Silkscreen
-    @(41.6560 mm, -46.9900 mm): PCB text 'R92' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(41.6560 mm, -45.4660 mm): PCB text 'R94' on F.Silkscreen
-    @(43.9420 mm, -48.7680 mm): PCB text 'C91' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(45.2120 mm, -43.1800 mm): PCB text 'U86' on F.Silkscreen
-    @(43.9420 mm, -48.7680 mm): PCB text 'C91' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(49.7840 mm, -13.7160 mm): PCB text 'C142' on F.Silkscreen
-    @(51.0540 mm, -18.7960 mm): PCB text 'L141' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(57.4040 mm, -18.0340 mm): PCB text 'C143' on F.Silkscreen
-    @(46.7360 mm, -17.0180 mm): PCB text 'GPSTX' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(57.4040 mm, -18.0340 mm): PCB text 'C143' on F.Silkscreen
-    @(50.8000 mm, -17.7800 mm): Segment on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(50.8000 mm, -17.7800 mm): Segment on F.Silkscreen
-    @(46.7360 mm, -17.0180 mm): PCB text 'GPSTX' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(46.7360 mm, -17.0180 mm): PCB text 'GPSTX' on F.Silkscreen
-    @(51.0540 mm, -18.7960 mm): PCB text 'L141' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(47.7520 mm, -14.2240 mm): PCB text 'R99' on F.Silkscreen
-    @(49.7840 mm, -13.7160 mm): PCB text 'C142' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(46.7360 mm, -17.0180 mm): PCB text 'GPSTX' on F.Silkscreen
-    @(49.7840 mm, -13.7160 mm): PCB text 'C142' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(45.4406 mm, -15.2400 mm): Segment of R98 on F.Silkscreen
-    @(44.9580 mm, -14.2240 mm): PCB text 'R98' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(47.7520 mm, -14.2240 mm): PCB text 'R99' on F.Silkscreen
-    @(44.9580 mm, -14.2240 mm): PCB text 'R98' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(48.2346 mm, -15.2400 mm): Segment of R99 on F.Silkscreen
-    @(44.9580 mm, -14.2240 mm): PCB text 'R98' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(49.7840 mm, -13.7160 mm): PCB text 'C142' on F.Silkscreen
-    @(44.9580 mm, -14.2240 mm): PCB text 'R98' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(47.7520 mm, -14.2240 mm): PCB text 'R99' on F.Silkscreen
-    @(48.2346 mm, -15.2400 mm): Segment of R99 on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(52.0000 mm, -3.0000 mm): Circle of M3 on F.Silkscreen
-    @(48.5140 mm, -4.5720 mm): PCB text 'BOOT' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(48.5140 mm, -1.2700 mm): PCB text 'RST' on F.Silkscreen
-    @(48.5140 mm, -4.5720 mm): PCB text 'BOOT' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(48.5140 mm, -1.2700 mm): PCB text 'RST' on F.Silkscreen
-    @(52.0000 mm, -3.0000 mm): Circle of M3 on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(55.1434 mm, -10.1600 mm): Segment of C149 on F.Silkscreen
-    @(55.6260 mm, -8.8900 mm): PCB text 'C149' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(51.3080 mm, -10.4140 mm): PCB text 'C148' on F.Silkscreen
-    @(55.6260 mm, -8.8900 mm): PCB text 'C149' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(60.4520 mm, -9.9060 mm): PCB text 'R146' on F.Silkscreen
-    @(55.6260 mm, -8.8900 mm): PCB text 'C149' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(60.4520 mm, -9.9060 mm): PCB text 'R146' on F.Silkscreen
-    @(51.0540 mm, -6.3500 mm): PCB text 'R150' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(60.4520 mm, -9.9060 mm): PCB text 'R146' on F.Silkscreen
-    @(56.8380 mm, -8.3120 mm): Segment of C151 on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(51.3080 mm, -31.4960 mm): PCB text 'C96' on F.Silkscreen
-    @(49.0220 mm, -29.4640 mm): PCB text '1PPS' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(55.8800 mm, -20.8280 mm): PCB text 'C137' on F.Silkscreen
-    @(55.8800 mm, -22.3520 mm): PCB text 'C135' on F.Silkscreen
+    @(75.6920 mm, -50.8000 mm): PCB text 'LIPO' on F.Silkscreen
+    @(80.2641 mm, -50.6760 mm): Segment of J153 on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
     @(48.2600 mm, -22.6060 mm): PCB text 'DAC1' on F.Silkscreen
     @(52.3240 mm, -22.6060 mm): PCB text 'R128' on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(61.7220 mm, -25.9080 mm): PCB text 'C132' on F.Silkscreen
-    @(52.3240 mm, -22.6060 mm): PCB text 'R128' on F.Silkscreen
+    @(45.2120 mm, -30.4800 mm): PCB text 'DAC2' on F.Silkscreen
+    @(49.0220 mm, -29.4640 mm): PCB text '1PPS' on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(55.8800 mm, -22.3520 mm): PCB text 'C135' on F.Silkscreen
-    @(52.3240 mm, -22.6060 mm): PCB text 'R128' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(57.4040 mm, -18.0340 mm): PCB text 'C143' on F.Silkscreen
-    @(55.3720 mm, -18.3134 mm): Segment of L141 on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(47.7520 mm, -10.6680 mm): PCB text 'D101' on F.Silkscreen
-    @(50.8000 mm, -10.4140 mm): PCB text 'D102' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(45.0400 mm, -10.1380 mm): Segment of D101 on F.Silkscreen
-    @(47.7520 mm, -10.6680 mm): PCB text 'D101' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(46.4000 mm, -10.1380 mm): Segment of D101 on F.Silkscreen
-    @(47.7520 mm, -10.6680 mm): PCB text 'D101' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(45.0400 mm, -10.1380 mm): Segment of D101 on F.Silkscreen
-    @(50.8000 mm, -10.4140 mm): PCB text 'D102' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(50.8000 mm, -10.4140 mm): PCB text 'D102' on F.Silkscreen
-    @(48.0880 mm, -10.1380 mm): Segment of D102 on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(48.0880 mm, -13.3880 mm): Segment of D102 on F.Silkscreen
-    @(50.8000 mm, -10.4140 mm): PCB text 'D102' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(45.0400 mm, -13.3880 mm): Segment of D101 on F.Silkscreen
-    @(47.7520 mm, -10.6680 mm): PCB text 'D101' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(47.7520 mm, -10.6680 mm): PCB text 'D101' on F.Silkscreen
-    @(46.3635 mm, -10.4880 mm): Segment of D101 on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(45.0400 mm, -13.3880 mm): Segment of D101 on F.Silkscreen
-    @(50.8000 mm, -10.4140 mm): PCB text 'D102' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(55.8800 mm, -28.9560 mm): PCB text 'C129' on F.Silkscreen
-    @(55.3720 mm, -30.4800 mm): Segment on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(61.7220 mm, -25.9080 mm): PCB text 'C132' on F.Silkscreen
-    @(55.8800 mm, -22.3520 mm): PCB text 'C135' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(56.8960 mm, -25.6540 mm): PCB text 'U131' on F.Silkscreen
-    @(52.3240 mm, -22.6060 mm): PCB text 'R128' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(56.8960 mm, -25.6540 mm): PCB text 'U131' on F.Silkscreen
-    @(61.7220 mm, -25.9080 mm): PCB text 'C132' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(56.8960 mm, -25.6540 mm): PCB text 'U131' on F.Silkscreen
-    @(55.8800 mm, -22.3520 mm): PCB text 'C135' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(56.8960 mm, -25.6540 mm): PCB text 'U131' on F.Silkscreen
-    @(55.8800 mm, -20.8280 mm): PCB text 'C137' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(61.2140 mm, -17.5260 mm): PCB text 'R145' on F.Silkscreen
-    @(59.1820 mm, -22.3520 mm): PCB text 'R136' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(59.1820 mm, -22.3520 mm): PCB text 'R136' on F.Silkscreen
-    @(55.8800 mm, -22.3520 mm): PCB text 'C135' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(55.8800 mm, -20.8280 mm): PCB text 'C137' on F.Silkscreen
-    @(59.1820 mm, -22.3520 mm): PCB text 'R136' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(59.1820 mm, -20.8280 mm): PCB text 'C139' on F.Silkscreen
-    @(59.1820 mm, -22.3520 mm): PCB text 'R136' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(61.2140 mm, -17.5260 mm): PCB text 'R145' on F.Silkscreen
-    @(55.8800 mm, -22.3520 mm): PCB text 'C135' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(61.2140 mm, -17.5260 mm): PCB text 'R145' on F.Silkscreen
-    @(55.8800 mm, -20.8280 mm): PCB text 'C137' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(61.2140 mm, -17.5260 mm): PCB text 'R145' on F.Silkscreen
-    @(59.1820 mm, -20.8280 mm): PCB text 'C139' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(61.2140 mm, -17.5260 mm): PCB text 'R145' on F.Silkscreen
-    @(59.9440 mm, -18.7960 mm): PCB text 'R144' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(61.2140 mm, -17.5260 mm): PCB text 'R145' on F.Silkscreen
-    @(63.7540 mm, -20.3200 mm): Segment on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(56.8960 mm, -25.6540 mm): PCB text 'U131' on F.Silkscreen
-    @(63.7540 mm, -20.3200 mm): Segment on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(63.2460 mm, -26.9240 mm): PCB text 'R133' on F.Silkscreen
-    @(64.5160 mm, -25.6540 mm): PCB text 'MIC' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(63.7540 mm, -30.4800 mm): Segment on F.Silkscreen
-    @(63.2460 mm, -26.9240 mm): PCB text 'R133' on F.Silkscreen
+    @(49.0220 mm, -29.4640 mm): PCB text '1PPS' on F.Silkscreen
+    @(51.3080 mm, -31.4960 mm): PCB text 'C96' on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
     @(64.0080 mm, -30.7340 mm): PCB text 'C123' on F.Silkscreen
@@ -2010,36 +1566,320 @@
     @(59.1820 mm, -28.9560 mm): PCB text 'R130' on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(61.7220 mm, -25.9080 mm): PCB text 'C132' on F.Silkscreen
+    @(56.8960 mm, -25.6540 mm): PCB text 'U131' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(52.3240 mm, -22.6060 mm): PCB text 'R128' on F.Silkscreen
+    @(56.8960 mm, -25.6540 mm): PCB text 'U131' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(55.8800 mm, -22.3520 mm): PCB text 'C135' on F.Silkscreen
     @(59.1820 mm, -22.3520 mm): PCB text 'R136' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(59.1820 mm, -22.3520 mm): PCB text 'R136' on F.Silkscreen
+    @(61.2140 mm, -17.5260 mm): PCB text 'R145' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(55.8800 mm, -20.8280 mm): PCB text 'C137' on F.Silkscreen
+    @(59.1820 mm, -22.3520 mm): PCB text 'R136' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(55.8800 mm, -22.3520 mm): PCB text 'C135' on F.Silkscreen
+    @(61.2140 mm, -17.5260 mm): PCB text 'R145' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(55.8800 mm, -20.8280 mm): PCB text 'C137' on F.Silkscreen
+    @(61.2140 mm, -17.5260 mm): PCB text 'R145' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(55.8800 mm, -22.3520 mm): PCB text 'C135' on F.Silkscreen
+    @(61.7220 mm, -25.9080 mm): PCB text 'C132' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(59.1820 mm, -20.8280 mm): PCB text 'C139' on F.Silkscreen
+    @(59.1820 mm, -22.3520 mm): PCB text 'R136' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(55.8800 mm, -22.3520 mm): PCB text 'C135' on F.Silkscreen
+    @(55.8800 mm, -20.8280 mm): PCB text 'C137' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(59.1820 mm, -20.8280 mm): PCB text 'C139' on F.Silkscreen
+    @(55.8800 mm, -22.3520 mm): PCB text 'C135' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(57.4040 mm, -18.0340 mm): PCB text 'C143' on F.Silkscreen
+    @(55.3720 mm, -18.3134 mm): Segment of L141 on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(46.7360 mm, -17.0180 mm): PCB text 'GPSTX' on F.Silkscreen
+    @(57.4040 mm, -18.0340 mm): PCB text 'C143' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(52.3240 mm, -22.6060 mm): PCB text 'R128' on F.Silkscreen
+    @(61.7220 mm, -25.9080 mm): PCB text 'C132' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(52.3240 mm, -22.6060 mm): PCB text 'R128' on F.Silkscreen
+    @(55.8800 mm, -22.3520 mm): PCB text 'C135' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(59.9440 mm, -18.7960 mm): PCB text 'R144' on F.Silkscreen
+    @(61.2140 mm, -17.5260 mm): PCB text 'R145' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(55.8800 mm, -22.3520 mm): PCB text 'C135' on F.Silkscreen
+    @(56.8960 mm, -25.6540 mm): PCB text 'U131' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(59.1820 mm, -20.8280 mm): PCB text 'C139' on F.Silkscreen
+    @(55.8800 mm, -20.8280 mm): PCB text 'C137' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(59.1820 mm, -20.8280 mm): PCB text 'C139' on F.Silkscreen
+    @(61.2140 mm, -17.5260 mm): PCB text 'R145' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(63.7540 mm, -20.3200 mm): Segment on F.Silkscreen
+    @(61.2140 mm, -17.5260 mm): PCB text 'R145' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(55.8800 mm, -20.8280 mm): PCB text 'C137' on F.Silkscreen
+    @(56.8960 mm, -25.6540 mm): PCB text 'U131' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(63.7540 mm, -20.3200 mm): Segment on F.Silkscreen
+    @(56.8960 mm, -25.6540 mm): PCB text 'U131' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(71.1200 mm, -32.5120 mm): PCB text 'R122' on F.Silkscreen
+    @(69.5960 mm, -26.6700 mm): PCB text 'C125' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(68.0720 mm, -30.7086 mm): Segment of C123 on F.Silkscreen
+    @(69.5960 mm, -26.6700 mm): PCB text 'C125' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(64.2620 mm, -27.6860 mm): PCB text 'GPSR' on F.Silkscreen
+    @(59.1820 mm, -28.9560 mm): PCB text 'R130' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(63.7540 mm, -30.4800 mm): Segment on F.Silkscreen
+    @(63.2460 mm, -26.9240 mm): PCB text 'R133' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(63.2460 mm, -26.9240 mm): PCB text 'R133' on F.Silkscreen
+    @(64.2620 mm, -27.6860 mm): PCB text 'GPSR' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(63.2460 mm, -26.9240 mm): PCB text 'R133' on F.Silkscreen
+    @(64.5160 mm, -25.6540 mm): PCB text 'MIC' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
     @(63.2460 mm, -21.0820 mm): PCB text 'R140' on F.Silkscreen
+    @(59.1820 mm, -22.3520 mm): PCB text 'R136' on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
     @(63.2460 mm, -21.0820 mm): PCB text 'R140' on F.Silkscreen
     @(63.7540 mm, -25.6540 mm): Segment on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(59.1820 mm, -20.8280 mm): PCB text 'C139' on F.Silkscreen
     @(63.2460 mm, -21.0820 mm): PCB text 'R140' on F.Silkscreen
+    @(59.1820 mm, -20.8280 mm): PCB text 'C139' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(65.5320 mm, -24.9174 mm): Segment of C129 on F.Silkscreen
+    @(60.7060 mm, -24.1300 mm): PCB text 'C134' on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
     @(69.3674 mm, -22.6060 mm): Segment of C132 on F.Silkscreen
     @(63.2460 mm, -21.0820 mm): PCB text 'R140' on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(66.8020 mm, -29.7434 mm): Segment of C125 on F.Silkscreen
+    @(64.2620 mm, -27.6860 mm): PCB text 'GPSR' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(63.2460 mm, -26.9240 mm): PCB text 'R133' on F.Silkscreen
+    @(69.5960 mm, -26.6700 mm): PCB text 'C125' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(55.3720 mm, -30.4800 mm): Segment on F.Silkscreen
+    @(55.8800 mm, -28.9560 mm): PCB text 'C129' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(64.2620 mm, -27.6860 mm): PCB text 'GPSR' on F.Silkscreen
+    @(69.5960 mm, -26.6700 mm): PCB text 'C125' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(64.5160 mm, -25.6540 mm): PCB text 'MIC' on F.Silkscreen
+    @(69.5960 mm, -26.6700 mm): PCB text 'C125' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(64.0080 mm, -30.7340 mm): PCB text 'C123' on F.Silkscreen
+    @(55.8800 mm, -28.9560 mm): PCB text 'C129' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(55.3720 mm, -30.4800 mm): Segment on F.Silkscreen
+    @(64.0080 mm, -30.7340 mm): PCB text 'C123' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(64.5160 mm, -25.6540 mm): PCB text 'MIC' on F.Silkscreen
+    @(60.7060 mm, -24.1300 mm): PCB text 'C134' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(64.0080 mm, -30.7340 mm): PCB text 'C123' on F.Silkscreen
+    @(63.7540 mm, -30.4800 mm): Segment on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(60.7060 mm, -24.1300 mm): PCB text 'C134' on F.Silkscreen
+    @(61.7220 mm, -25.9080 mm): PCB text 'C132' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(75.4380 mm, -25.4000 mm): PCB text 'Q126' on F.Silkscreen
+    @(74.6760 mm, -29.2100 mm): PCB text 'R124' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(85.8520 mm, -13.2080 mm): PCB text 'GPS_ANTENNA' on F.Silkscreen
+    @(82.0420 mm, -12.9540 mm): PCB text 'GND' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(82.6120 mm, -17.7660 mm): Segment of GPS_ANTENNA on F.Silkscreen
+    @(74.4220 mm, -17.0180 mm): PCB text 'SPEAKER' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(82.6120 mm, -17.7660 mm): Segment of GPS_ANTENNA on F.Silkscreen
+    @(86.3600 mm, -23.3680 mm): PCB text 'MICROSD' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(86.3600 mm, -23.3680 mm): PCB text 'MICROSD' on F.Silkscreen
+    @(84.0120 mm, -17.7660 mm): Segment of GPS_ANTENNA on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(74.4220 mm, -17.0180 mm): PCB text 'SPEAKER' on F.Silkscreen
+    @(84.0120 mm, -17.7660 mm): Segment of GPS_ANTENNA on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(75.4380 mm, -25.4000 mm): PCB text 'Q126' on F.Silkscreen
+    @(81.1260 mm, -25.1460 mm): Segment of MICROSD on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(60.4520 mm, -9.9060 mm): PCB text 'R146' on F.Silkscreen
+    @(51.0540 mm, -6.3500 mm): PCB text 'R150' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(48.5140 mm, -4.5720 mm): PCB text 'BOOT' on F.Silkscreen
+    @(52.0000 mm, -3.0000 mm): Circle of M3 on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(45.0400 mm, -10.1380 mm): Segment of D101 on F.Silkscreen
+    @(47.7520 mm, -10.6680 mm): PCB text 'D101' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(47.7520 mm, -10.6680 mm): PCB text 'D101' on F.Silkscreen
+    @(46.4000 mm, -10.1380 mm): Segment of D101 on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(47.7520 mm, -10.6680 mm): PCB text 'D101' on F.Silkscreen
+    @(50.8000 mm, -10.4140 mm): PCB text 'D102' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(47.7520 mm, -10.6680 mm): PCB text 'D101' on F.Silkscreen
+    @(45.0400 mm, -13.3880 mm): Segment of D101 on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(47.7520 mm, -10.6680 mm): PCB text 'D101' on F.Silkscreen
+    @(46.3635 mm, -10.4880 mm): Segment of D101 on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(47.7520 mm, -10.6680 mm): PCB text 'D101' on F.Silkscreen
+    @(44.7040 mm, -10.6680 mm): PCB text 'D100' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(45.0400 mm, -10.1380 mm): Segment of D101 on F.Silkscreen
+    @(50.8000 mm, -10.4140 mm): PCB text 'D102' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(45.0400 mm, -13.3880 mm): Segment of D101 on F.Silkscreen
+    @(50.8000 mm, -10.4140 mm): PCB text 'D102' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(50.8000 mm, -10.4140 mm): PCB text 'D102' on F.Silkscreen
+    @(48.0880 mm, -10.1380 mm): Segment of D102 on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(48.0880 mm, -13.3880 mm): Segment of D102 on F.Silkscreen
+    @(50.8000 mm, -10.4140 mm): PCB text 'D102' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(37.8460 mm, -18.0340 mm): PCB text 'LO1N' on F.Silkscreen
+    @(38.6080 mm, -16.7640 mm): PCB text 'LO1P' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(49.7840 mm, -13.7160 mm): PCB text 'C142' on F.Silkscreen
+    @(51.0540 mm, -18.7960 mm): PCB text 'L141' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(50.8000 mm, -17.7800 mm): Segment on F.Silkscreen
+    @(57.4040 mm, -18.0340 mm): PCB text 'C143' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(46.7360 mm, -17.0180 mm): PCB text 'GPSTX' on F.Silkscreen
+    @(50.8000 mm, -17.7800 mm): Segment on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(46.7360 mm, -17.0180 mm): PCB text 'GPSTX' on F.Silkscreen
+    @(51.0540 mm, -18.7960 mm): PCB text 'L141' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(47.7520 mm, -14.2240 mm): PCB text 'R99' on F.Silkscreen
+    @(49.7840 mm, -13.7160 mm): PCB text 'C142' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(46.7360 mm, -17.0180 mm): PCB text 'GPSTX' on F.Silkscreen
+    @(49.7840 mm, -13.7160 mm): PCB text 'C142' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(44.9580 mm, -14.2240 mm): PCB text 'R98' on F.Silkscreen
+    @(45.4406 mm, -15.2400 mm): Segment of R98 on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(44.9580 mm, -14.2240 mm): PCB text 'R98' on F.Silkscreen
+    @(47.7520 mm, -14.2240 mm): PCB text 'R99' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(44.9580 mm, -14.2240 mm): PCB text 'R98' on F.Silkscreen
+    @(48.2346 mm, -15.2400 mm): Segment of R99 on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(44.9580 mm, -14.2240 mm): PCB text 'R98' on F.Silkscreen
+    @(49.7840 mm, -13.7160 mm): PCB text 'C142' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(47.7520 mm, -14.2240 mm): PCB text 'R99' on F.Silkscreen
+    @(48.2346 mm, -15.2400 mm): Segment of R99 on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(59.9440 mm, -18.7960 mm): PCB text 'R144' on F.Silkscreen
+    @(55.3720 mm, -12.1920 mm): PCB text 'C147' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(64.8820 mm, -5.4220 mm): Segment of SPEAKER on F.Silkscreen
+    @(62.9920 mm, -5.0800 mm): PCB text 'C152' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(64.8818 mm, -5.9218 mm): Arc of SPEAKER on F.Silkscreen
+    @(62.9920 mm, -5.0800 mm): PCB text 'C152' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
     @(57.9120 mm, -5.0800 mm): PCB text 'C151' on F.Silkscreen
     @(61.9180 mm, -5.9120 mm): Segment of C152 on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(62.9920 mm, -5.0800 mm): PCB text 'C152' on F.Silkscreen
-    @(64.8818 mm, -5.9218 mm): Arc of SPEAKER on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(62.9920 mm, -5.0800 mm): PCB text 'C152' on F.Silkscreen
-    @(64.8820 mm, -5.4220 mm): Segment of SPEAKER on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(62.7380 mm, -0.7620 mm): PCB text '-' on F.Silkscreen
     @(59.6900 mm, -0.7620 mm): PCB text 'CLK' on F.Silkscreen
+    @(62.7380 mm, -0.7620 mm): PCB text '-' on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
     @(64.7700 mm, -0.7620 mm): PCB text 'IO' on F.Silkscreen
@@ -2050,172 +1890,436 @@
     @(66.5480 mm, -0.7620 mm): PCB text 'NRST' on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(59.9440 mm, -18.7960 mm): PCB text 'R144' on F.Silkscreen
-    @(55.3720 mm, -12.1920 mm): PCB text 'C147' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(61.9760 mm, -12.9540 mm): PCB text 'EAR' on F.Silkscreen
     @(64.3820 mm, -15.9220 mm): Segment of SPEAKER on F.Silkscreen
+    @(61.9760 mm, -12.9540 mm): PCB text 'EAR' on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(38.6080 mm, -29.9720 mm): PCB text 'R66' on F.Silkscreen
-    @(42.4180 mm, -31.4960 mm): PCB text 'R63' on F.Silkscreen
+    @(55.6260 mm, -8.8900 mm): PCB text 'C149' on F.Silkscreen
+    @(51.3080 mm, -10.4140 mm): PCB text 'C148' on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(33.2740 mm, -27.9400 mm): PCB text 'CLKB' on F.Silkscreen
-    @(42.4180 mm, -31.4960 mm): PCB text 'R63' on F.Silkscreen
+    @(55.6260 mm, -8.8900 mm): PCB text 'C149' on F.Silkscreen
+    @(55.1434 mm, -10.1600 mm): Segment of C149 on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(34.2900 mm, -29.9720 mm): PCB text 'R64' on F.Silkscreen
-    @(42.4180 mm, -31.4960 mm): PCB text 'R63' on F.Silkscreen
+    @(55.6260 mm, -8.8900 mm): PCB text 'C149' on F.Silkscreen
+    @(60.4520 mm, -9.9060 mm): PCB text 'R146' on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(28.4480 mm, -31.4960 mm): PCB text 'C51' on F.Silkscreen
-    @(24.1300 mm, -29.9720 mm): PCB text 'R53' on F.Silkscreen
+    @(60.4520 mm, -9.9060 mm): PCB text 'R146' on F.Silkscreen
+    @(56.8380 mm, -8.3120 mm): Segment of C151 on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(32.2580 mm, -31.4960 mm): PCB text 'R52' on F.Silkscreen
-    @(28.4480 mm, -31.4960 mm): PCB text 'C51' on F.Silkscreen
+    @(52.0000 mm, -3.0000 mm): Circle of M3 on F.Silkscreen
+    @(48.5140 mm, -1.2700 mm): PCB text 'RST' on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(26.4160 mm, -31.4960 mm): PCB text 'R50' on F.Silkscreen
-    @(28.4480 mm, -31.4960 mm): PCB text 'C51' on F.Silkscreen
+    @(48.5140 mm, -4.5720 mm): PCB text 'BOOT' on F.Silkscreen
+    @(48.5140 mm, -1.2700 mm): PCB text 'RST' on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(26.4160 mm, -31.4960 mm): PCB text 'R50' on F.Silkscreen
-    @(24.1300 mm, -29.9720 mm): PCB text 'R53' on F.Silkscreen
+    @(57.9120 mm, -5.0800 mm): PCB text 'C151' on F.Silkscreen
+    @(62.9920 mm, -5.0800 mm): PCB text 'C152' on F.Silkscreen
 [silk_overlap]: Silkscreen clearance
     Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(26.9240 mm, -27.9400 mm): PCB text 'CLKA' on F.Silkscreen
-    @(32.7660 mm, -29.4640 mm): Segment on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(32.2580 mm, -31.4960 mm): PCB text 'R52' on F.Silkscreen
-    @(24.1300 mm, -29.9720 mm): PCB text 'R53' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(28.4480 mm, -29.9720 mm): PCB text 'R55' on F.Silkscreen
-    @(27.9400 mm, -29.9720 mm): PCB text 'C54' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(27.9400 mm, -29.9720 mm): PCB text 'C54' on F.Silkscreen
-    @(24.1300 mm, -29.9720 mm): PCB text 'R53' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(32.2580 mm, -31.4960 mm): PCB text 'R52' on F.Silkscreen
-    @(27.9400 mm, -29.9720 mm): PCB text 'C54' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(28.4480 mm, -29.9720 mm): PCB text 'R55' on F.Silkscreen
-    @(32.2580 mm, -31.4960 mm): PCB text 'R52' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(27.9400 mm, -29.9720 mm): PCB text 'C54' on F.Silkscreen
-    @(35.0520 mm, -31.4960 mm): PCB text 'C60' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(32.2580 mm, -31.4960 mm): PCB text 'R52' on F.Silkscreen
-    @(35.0520 mm, -31.4960 mm): PCB text 'C60' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(28.4480 mm, -29.9720 mm): PCB text 'R55' on F.Silkscreen
-    @(35.0520 mm, -31.4960 mm): PCB text 'C60' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(26.9240 mm, -27.9400 mm): PCB text 'CLKA' on F.Silkscreen
-    @(32.2580 mm, -31.4960 mm): PCB text 'R52' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(9.6520 mm, -28.7020 mm): PCB text 'R29' on F.Silkscreen
-    @(12.1920 mm, -31.4960 mm): PCB text 'C26' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(10.6680 mm, -30.7594 mm): Segment of R29 on F.Silkscreen
-    @(9.6520 mm, -28.7020 mm): PCB text 'R29' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(17.5260 mm, -32.7660 mm): PCB text 'C27' on F.Silkscreen
-    @(12.4460 mm, -34.7980 mm): PCB text 'R23' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(24.8920 mm, -34.7980 mm): PCB text 'C45' on F.Silkscreen
-    @(19.3040 mm, -31.4960 mm): PCB text 'PHSE' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(9.6520 mm, -28.7020 mm): PCB text 'R29' on F.Silkscreen
-    @(13.9020 mm, -29.8020 mm): Circle of U30 on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(8.0660 mm, -12.6410 mm): Segment of U37 on F.Silkscreen
-    @(8.8900 mm, -11.4300 mm): PCB text 'C38' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(8.0660 mm, -14.7910 mm): Segment of U37 on F.Silkscreen
-    @(8.8900 mm, -11.4300 mm): PCB text 'C38' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(8.8900 mm, -11.4300 mm): PCB text 'C38' on F.Silkscreen
-    @(5.5880 mm, -18.7960 mm): PCB text 'L34' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(6.2660 mm, -15.0160 mm): Circle of U37 on F.Silkscreen
-    @(5.5880 mm, -18.7960 mm): PCB text 'L34' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(4.8260 mm, -18.5420 mm): PCB text 'C33' on F.Silkscreen
-    @(5.5880 mm, -14.9860 mm): PCB text 'VUSB' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(5.5880 mm, -14.9860 mm): PCB text 'VUSB' on F.Silkscreen
-    @(5.3340 mm, -10.9220 mm): PCB text 'U37' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(5.5880 mm, -14.9860 mm): PCB text 'VUSB' on F.Silkscreen
-    @(5.4860 mm, -20.3690 mm): Segment of U32 on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(9.2460 mm, -20.3690 mm): Segment of U32 on F.Silkscreen
-    @(5.5880 mm, -14.9860 mm): PCB text 'VUSB' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(32.2580 mm, -34.2900 mm): PCB text 'C48' on F.Silkscreen
-    @(27.6860 mm, -34.0360 mm): PCB text 'U47' on F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: <电路板配置> 中的 "丝印" 约束; warning
-    @(32.2580 mm, -34.2900 mm): PCB text 'C48' on F.Silkscreen
-    @(35.0520 mm, -34.7980 mm): PCB text 'C56' on F.Silkscreen
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
     @(41.9100 mm, -17.2720 mm): PCB text 'R97' on F.Silkscreen
-    @(42.9260 mm, -16.3830 mm): Pad 2 [LED_WHITE] of R97 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(41.9100 mm, -17.2720 mm): PCB text 'R97' on F.Silkscreen
-    @(42.9260 mm, -15.1130 mm): Pad 1 [$$$16521] of R97 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(41.9100 mm, -17.2720 mm): PCB text 'R97' on F.Silkscreen
-    @(42.6720 mm, -12.6915 mm): Pad 1 [$$$16521] of D100 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(44.7040 mm, -10.6680 mm): PCB text 'D100' on F.Silkscreen
-    @(40.6400 mm, -10.7950 mm): Pad 2 [MIXER_LO1P] of C80 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(44.7040 mm, -10.6680 mm): PCB text 'D100' on F.Silkscreen
-    @(38.9890 mm, -10.6680 mm): Pad 2 [MIXER_LO1P] of R79 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(30.9880 mm, -6.6040 mm): PCB text 'L82' on F.Silkscreen
-    @(35.8140 mm, -7.6200 mm): Pad 1 [MIXER_LO1N] of L81 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
+    @(38.6080 mm, -16.7640 mm): PCB text 'LO1P' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
+    @(28.9560 mm, -18.5420 mm): Segment on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(28.9560 mm, -18.5420 mm): Segment on F.Silkscreen
+    @(25.4000 mm, -16.7640 mm): PCB text 'LO2P' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
+    @(28.8188 mm, -18.5877 mm): Segment on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
+    @(28.7731 mm, -18.6334 mm): Segment on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
+    @(28.7274 mm, -18.6792 mm): Segment on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
+    @(28.7274 mm, -18.7249 mm): Segment on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
+    @(28.7274 mm, -18.7706 mm): Segment on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
+    @(28.6817 mm, -18.8163 mm): Segment on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
+    @(28.6817 mm, -18.8620 mm): Segment on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
+    @(28.6817 mm, -18.9078 mm): Segment on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(30.4800 mm, -10.6680 mm): PCB text 'R79' on F.Silkscreen
+    @(32.0040 mm, -8.3820 mm): PCB text 'L81' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(30.4800 mm, -10.6680 mm): PCB text 'R79' on F.Silkscreen
+    @(34.2900 mm, -13.7160 mm): PCB text 'R77' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(29.7180 mm, -10.9220 mm): PCB text 'C78' on F.Silkscreen
+    @(34.7980 mm, -10.1600 mm): Segment on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(34.2900 mm, -10.9220 mm): PCB text 'C80' on F.Silkscreen
+    @(34.7980 mm, -10.1600 mm): Segment on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(34.2900 mm, -10.9220 mm): PCB text 'C80' on F.Silkscreen
+    @(32.0040 mm, -8.3820 mm): PCB text 'L81' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(34.7980 mm, -10.1600 mm): Segment on F.Silkscreen
+    @(32.0040 mm, -8.3820 mm): PCB text 'L81' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(34.2900 mm, -10.9220 mm): PCB text 'C80' on F.Silkscreen
+    @(30.4800 mm, -10.6680 mm): PCB text 'R79' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(29.7180 mm, -10.9220 mm): PCB text 'C78' on F.Silkscreen
+    @(26.9240 mm, -9.0170 mm): Segment of L41 on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(21.3360 mm, -9.0170 mm): Segment of L41 on F.Silkscreen
+    @(29.7180 mm, -10.9220 mm): PCB text 'C78' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(34.2900 mm, -13.7160 mm): PCB text 'R77' on F.Silkscreen
+    @(32.0040 mm, -8.3820 mm): PCB text 'L81' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
     @(32.7660 mm, -12.1920 mm): PCB text 'R76' on F.Silkscreen
-    @(36.0680 mm, -13.5890 mm): Pad 2 [$$$5934] of R74 on F.Cu
+    @(31.2420 mm, -12.1920 mm): PCB text 'R75' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(34.2900 mm, -13.7160 mm): PCB text 'R77' on F.Silkscreen
+    @(31.2420 mm, -12.1920 mm): PCB text 'R75' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(30.4800 mm, -10.6680 mm): PCB text 'R79' on F.Silkscreen
+    @(31.2420 mm, -12.1920 mm): PCB text 'R75' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(32.7660 mm, -12.1920 mm): PCB text 'R76' on F.Silkscreen
+    @(34.2900 mm, -13.7160 mm): PCB text 'R77' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(31.2420 mm, -12.1920 mm): PCB text 'R75' on F.Silkscreen
+    @(32.0040 mm, -8.3820 mm): PCB text 'L81' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(32.7660 mm, -12.1920 mm): PCB text 'R76' on F.Silkscreen
+    @(30.4800 mm, -10.6680 mm): PCB text 'R79' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(32.7660 mm, -12.1920 mm): PCB text 'R76' on F.Silkscreen
+    @(34.7980 mm, -16.5100 mm): Segment on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(34.7980 mm, -16.5100 mm): Segment on F.Silkscreen
+    @(31.2420 mm, -12.1920 mm): PCB text 'R75' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(34.7980 mm, -16.5100 mm): Segment on F.Silkscreen
+    @(30.4800 mm, -10.6680 mm): PCB text 'R79' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
+    @(28.6817 mm, -19.0906 mm): Segment on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
+    @(28.6817 mm, -19.1364 mm): Segment on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
+    @(28.6817 mm, -19.1821 mm): Segment on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
+    @(28.6817 mm, -19.2278 mm): Segment on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
+    @(28.6817 mm, -19.2735 mm): Segment on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
+    @(28.6817 mm, -19.3192 mm): Segment on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
+    @(28.6817 mm, -19.3650 mm): Segment on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
+    @(28.6817 mm, -19.4107 mm): Segment on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
+    @(28.6817 mm, -19.4564 mm): Segment on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
+    @(28.6817 mm, -19.5021 mm): Segment on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
+    @(28.6817 mm, -19.5478 mm): Segment on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
+    @(28.6817 mm, -19.5936 mm): Segment on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
+    @(28.6817 mm, -19.6393 mm): Segment on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
+    @(28.6817 mm, -19.6850 mm): Segment on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
+    @(28.6817 mm, -19.7307 mm): Segment on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
+    @(28.6817 mm, -19.7764 mm): Segment on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
+    @(28.6817 mm, -19.8222 mm): Segment on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(24.8920 mm, -21.5900 mm): PCB text 'C73' on F.Silkscreen
+    @(25.4000 mm, -20.8280 mm): Segment on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
+    @(25.4000 mm, -16.7640 mm): PCB text 'LO2P' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
+    @(28.6817 mm, -18.9992 mm): Segment on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
+    @(28.6817 mm, -19.0449 mm): Segment on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(24.1300 mm, -18.0340 mm): PCB text 'LO2N' on F.Silkscreen
+    @(28.6817 mm, -18.9535 mm): Segment on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(21.8440 mm, -23.1140 mm): PCB text 'R68' on F.Silkscreen
+    @(23.3680 mm, -23.1140 mm): PCB text 'R69' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(25.4000 mm, -27.1780 mm): Segment on F.Silkscreen
+    @(21.8440 mm, -23.1140 mm): PCB text 'R68' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(25.4000 mm, -27.1780 mm): Segment on F.Silkscreen
+    @(23.3680 mm, -23.1140 mm): PCB text 'R69' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(24.8920 mm, -24.3840 mm): PCB text 'R70' on F.Silkscreen
+    @(23.3680 mm, -23.1140 mm): PCB text 'R69' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(24.8920 mm, -24.3840 mm): PCB text 'R70' on F.Silkscreen
+    @(21.8440 mm, -23.1140 mm): PCB text 'R68' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(24.8920 mm, -24.3840 mm): PCB text 'R70' on F.Silkscreen
+    @(20.8280 mm, -21.3360 mm): PCB text 'R72' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(44.7040 mm, -10.6680 mm): PCB text 'D100' on F.Silkscreen
+    @(35.5600 mm, -9.0170 mm): Segment of L81 on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(44.7040 mm, -10.6680 mm): PCB text 'D100' on F.Silkscreen
+    @(41.1480 mm, -9.0170 mm): Segment of L81 on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(41.9920 mm, -13.3880 mm): Segment of D100 on F.Silkscreen
+    @(44.7040 mm, -10.6680 mm): PCB text 'D100' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(43.3155 mm, -10.4880 mm): Segment of D100 on F.Silkscreen
+    @(44.7040 mm, -10.6680 mm): PCB text 'D100' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(41.9920 mm, -10.1380 mm): Segment of D100 on F.Silkscreen
+    @(44.7040 mm, -10.6680 mm): PCB text 'D100' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(41.9920 mm, -13.3880 mm): Segment of D100 on F.Silkscreen
+    @(47.7520 mm, -10.6680 mm): PCB text 'D101' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(47.7520 mm, -10.6680 mm): PCB text 'D101' on F.Silkscreen
+    @(43.3155 mm, -10.4880 mm): Segment of D100 on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: <电路板配置> 中的 "丝印" 约束; warning
+    @(41.9920 mm, -10.1380 mm): Segment of D100 on F.Silkscreen
+    @(47.7520 mm, -10.6680 mm): PCB text 'D101' on F.Silkscreen
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
-    @(32.7660 mm, -12.1920 mm): PCB text 'R76' on F.Silkscreen
-    @(36.0680 mm, -12.0650 mm): Pad 1 [$$$31769] of C78 on F.Cu
+    @(51.8160 mm, -58.1660 mm): PCB text '3V3A' on F.Silkscreen
+    @(57.4040 mm, -58.9026 mm): Pad 1 [+3V3_CPU] of C106 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(59.1820 mm, -56.6420 mm): PCB text 'C107' on F.Silkscreen
+    @(57.4040 mm, -56.9214 mm): Pad 2 [GND] of C106 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(56.6420 mm, -61.2140 mm): PCB text 'C103' on F.Silkscreen
+    @(59.9440 mm, -63.4746 mm): Pad 2 [GND] of C104 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(59.1820 mm, -61.2140 mm): PCB text 'C104' on F.Silkscreen
+    @(59.9440 mm, -63.4746 mm): Pad 2 [GND] of C104 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(56.6420 mm, -61.2140 mm): PCB text 'C103' on F.Silkscreen
+    @(59.9440 mm, -61.4934 mm): Pad 1 [+3V3] of C104 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(59.1820 mm, -61.2140 mm): PCB text 'C104' on F.Silkscreen
+    @(59.9440 mm, -61.4934 mm): Pad 1 [+3V3] of C104 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(61.7220 mm, -56.6420 mm): PCB text 'C108' on F.Silkscreen
+    @(57.4040 mm, -56.9214 mm): Pad 2 [GND] of C106 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(53.0860 mm, -61.2140 mm): PCB text 'C83' on F.Silkscreen
+    @(57.4040 mm, -61.4934 mm): Pad 1 [+3V3] of C103 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(53.0860 mm, -61.2140 mm): PCB text 'C83' on F.Silkscreen
+    @(57.4040 mm, -63.4746 mm): Pad 2 [GND] of C103 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(51.8160 mm, -58.1660 mm): PCB text '3V3A' on F.Silkscreen
+    @(53.5940 mm, -59.9440 mm): Pad 1 [+3V3] of 3V3A on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(56.6420 mm, -61.2140 mm): PCB text 'C103' on F.Silkscreen
+    @(57.4040 mm, -61.4934 mm): Pad 1 [+3V3] of C103 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(56.6420 mm, -61.2140 mm): PCB text 'C103' on F.Silkscreen
+    @(57.4040 mm, -63.4746 mm): Pad 2 [GND] of C103 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(53.0860 mm, -61.2140 mm): PCB text 'C83' on F.Silkscreen
+    @(53.8226 mm, -63.2460 mm): Pad 2 [GND] of C83 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(52.3240 mm, -54.6100 mm): PCB text 'VSPLY' on F.Silkscreen
+    @(57.4040 mm, -56.9214 mm): Pad 2 [GND] of C106 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(56.6420 mm, -61.2140 mm): PCB text 'C103' on F.Silkscreen
+    @(62.4840 mm, -63.4746 mm): Pad 2 [+3V3_CPU] of L105 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(56.6420 mm, -61.2140 mm): PCB text 'C103' on F.Silkscreen
+    @(62.4840 mm, -61.4934 mm): Pad 1 [+3V3] of L105 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(59.1820 mm, -61.2140 mm): PCB text 'C104' on F.Silkscreen
+    @(62.4840 mm, -61.4934 mm): Pad 1 [+3V3] of L105 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(61.7220 mm, -61.2140 mm): PCB text 'L105' on F.Silkscreen
+    @(62.4840 mm, -61.4934 mm): Pad 1 [+3V3] of L105 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(61.7220 mm, -61.2140 mm): PCB text 'L105' on F.Silkscreen
+    @(62.4840 mm, -63.4746 mm): Pad 2 [+3V3_CPU] of L105 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(59.1820 mm, -61.2140 mm): PCB text 'C104' on F.Silkscreen
+    @(62.4840 mm, -63.4746 mm): Pad 2 [+3V3_CPU] of L105 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(61.7220 mm, -56.6420 mm): PCB text 'C108' on F.Silkscreen
+    @(61.3410 mm, -55.1180 mm): Pad 2 [GND] of R112 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(56.3880 mm, -53.3400 mm): PCB text 'C111' on F.Silkscreen
+    @(61.3410 mm, -55.1180 mm): Pad 2 [GND] of R112 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(58.6740 mm, -50.2920 mm): PCB text 'R117' on F.Silkscreen
+    @(60.9600 mm, -52.4510 mm): Pad 1 [+3V3_CPU] of 3V3D on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(58.6740 mm, -50.2920 mm): PCB text 'R117' on F.Silkscreen
+    @(62.3570 mm, -50.8000 mm): Pad 1 [+3V3_CPU] of C118 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(61.7220 mm, -56.6420 mm): PCB text 'C108' on F.Silkscreen
+    @(59.9440 mm, -56.9214 mm): Pad 2 [GND] of C107 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(59.1820 mm, -61.2140 mm): PCB text 'C104' on F.Silkscreen
+    @(65.2140 mm, -61.4680 mm): Pad 1 [+3V3_CPU] of L109 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(61.7220 mm, -61.2140 mm): PCB text 'L105' on F.Silkscreen
+    @(65.2140 mm, -61.4680 mm): Pad 1 [+3V3_CPU] of L109 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(60.4520 mm, -53.3400 mm): PCB text 'R112' on F.Silkscreen
+    @(57.7850 mm, -52.5780 mm): Pad 2 [GND] of C111 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(60.4520 mm, -53.3400 mm): PCB text 'R112' on F.Silkscreen
+    @(56.5150 mm, -52.5780 mm): Pad 1 [+3V3] of C111 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(60.4520 mm, -53.3400 mm): PCB text 'R112' on F.Silkscreen
+    @(54.9910 mm, -52.5780 mm): Pad 1 [+3V3] of C110 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(58.6740 mm, -50.2920 mm): PCB text 'R117' on F.Silkscreen
+    @(63.6270 mm, -50.8000 mm): Pad 2 [GND] of C118 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(63.5000 mm, -53.3400 mm): PCB text 'R113' on F.Silkscreen
+    @(62.6110 mm, -55.1180 mm): Pad 1 [$$$24763] of R112 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(63.5000 mm, -53.3400 mm): PCB text 'R113' on F.Silkscreen
+    @(62.4840 mm, -56.9214 mm): Pad 2 [GND] of C108 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(63.5000 mm, -53.3400 mm): PCB text 'R113' on F.Silkscreen
+    @(62.4840 mm, -58.9026 mm): Pad 1 [+3V3_CPU] of C108 on F.Cu
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
     @(66.8020 mm, -53.3400 mm): PCB text 'U114' on F.Silkscreen
@@ -2224,14 +2328,6 @@
     Local override; warning
     @(66.8020 mm, -53.3400 mm): PCB text 'U114' on F.Silkscreen
     @(67.6458 mm, -48.5428 mm): Pad 1 [5V_REG_ENABLE] of U121 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(70.6120 mm, -40.8940 mm): PCB text 'U121' on F.Silkscreen
-    @(69.3708 mm, -46.3178 mm): Pad 99 [GND] of U121 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(70.6120 mm, -40.8940 mm): PCB text 'U121' on F.Silkscreen
-    @(69.3708 mm, -45.8178 mm): Pad 98 [ENC_A] of U121 on F.Cu
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
     @(73.1520 mm, -44.4500 mm): PCB text 'C120' on F.Silkscreen
@@ -2251,11 +2347,11 @@
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
     @(70.6120 mm, -40.8940 mm): PCB text 'U121' on F.Silkscreen
-    @(69.3708 mm, -41.3178 mm): Pad 89 [LCD_SCK] of U121 on F.Cu
+    @(69.3708 mm, -42.3178 mm): Pad 91 [LCD_MOSI] of U121 on F.Cu
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
     @(70.6120 mm, -40.8940 mm): PCB text 'U121' on F.Silkscreen
-    @(69.3708 mm, -42.3178 mm): Pad 91 [LCD_MOSI] of U121 on F.Cu
+    @(69.3708 mm, -41.3178 mm): Pad 89 [LCD_SCK] of U121 on F.Cu
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
     @(70.6120 mm, -40.8940 mm): PCB text 'U121' on F.Silkscreen
@@ -2278,228 +2374,16 @@
     @(69.3708 mm, -45.3178 mm): Pad 97 [ENC_B] of U121 on F.Cu
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
-    @(60.7060 mm, -24.1300 mm): PCB text 'C134' on F.Silkscreen
-    @(64.8970 mm, -24.6380 mm): Pad 1 [$$$5711] of C129 on F.Cu
+    @(70.6120 mm, -40.8940 mm): PCB text 'U121' on F.Silkscreen
+    @(69.3708 mm, -46.3178 mm): Pad 99 [GND] of U121 on F.Cu
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
-    @(60.7060 mm, -24.1300 mm): PCB text 'C134' on F.Silkscreen
-    @(66.1670 mm, -24.6380 mm): Pad 2 [MIC_FILTER_OUT] of C129 on F.Cu
+    @(70.6120 mm, -40.8940 mm): PCB text 'U121' on F.Silkscreen
+    @(69.3708 mm, -45.8178 mm): Pad 98 [ENC_A] of U121 on F.Cu
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
-    @(64.2620 mm, -27.6860 mm): PCB text 'GPSR' on F.Silkscreen
-    @(64.5160 mm, -29.5910 mm): Pad 1 [GPS_RESET] of GPSR on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(64.2620 mm, -27.6860 mm): PCB text 'GPSR' on F.Silkscreen
-    @(66.1670 mm, -29.4640 mm): Pad 1 [$$$23761] of C125 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(64.2620 mm, -27.6860 mm): PCB text 'GPSR' on F.Silkscreen
-    @(67.4370 mm, -29.4640 mm): Pad 2 [GND] of C125 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(69.5960 mm, -26.6700 mm): PCB text 'C125' on F.Silkscreen
-    @(68.7070 mm, -30.9880 mm): Pad 1 [+3V3_CPU] of C123 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(71.1200 mm, -32.5120 mm): PCB text 'R122' on F.Silkscreen
-    @(67.6458 mm, -33.0928 mm): Pad 75 [+3V3_CPU] of U121 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(71.1200 mm, -32.5120 mm): PCB text 'R122' on F.Silkscreen
-    @(67.1458 mm, -33.0928 mm): Pad 74 [GND] of U121 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(71.1200 mm, -32.5120 mm): PCB text 'R122' on F.Silkscreen
-    @(65.6458 mm, -33.0928 mm): Pad 71 [USB_D+] of U121 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(71.1200 mm, -32.5120 mm): PCB text 'R122' on F.Silkscreen
-    @(66.1458 mm, -33.0928 mm): Pad 72 [JTMS/SWDIO] of U121 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(69.5960 mm, -26.6700 mm): PCB text 'C125' on F.Silkscreen
-    @(67.4370 mm, -30.9880 mm): Pad 2 [GND] of C123 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(71.1200 mm, -32.5120 mm): PCB text 'R122' on F.Silkscreen
-    @(68.7070 mm, -30.9880 mm): Pad 1 [+3V3_CPU] of C123 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(37.5920 mm, -55.6260 mm): PCB text '5VBST' on F.Silkscreen
-    @(42.6720 mm, -56.8706 mm): Pad 1 [+5V_BOOST] of C89 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(37.5920 mm, -55.6260 mm): PCB text '5VBST' on F.Silkscreen
-    @(44.7040 mm, -57.0230 mm): Pad 2 [+5V_BOOST] of R90 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(52.8320 mm, -53.3400 mm): PCB text 'C110' on F.Silkscreen
-    @(48.6970 mm, -52.6390 mm): Pad 2 [$$$14589] of U85 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(52.8320 mm, -53.3400 mm): PCB text 'C110' on F.Silkscreen
-    @(49.3470 mm, -52.6390 mm): Pad 3 [5V_REG_ENABLE] of U85 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(52.8320 mm, -53.3400 mm): PCB text 'C110' on F.Silkscreen
-    @(48.0470 mm, -52.6390 mm): Pad 1 [$$$14690] of U85 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(50.5460 mm, -50.5460 mm): PCB text 'R116' on F.Silkscreen
-    @(47.2280 mm, -49.6730 mm): Pad 1 [DAC1_TO_RF] of U86 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(50.5460 mm, -50.5460 mm): PCB text 'R116' on F.Silkscreen
-    @(46.7280 mm, -49.6730 mm): Pad 2 [DAC1] of U86 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(50.5460 mm, -50.5460 mm): PCB text 'R116' on F.Silkscreen
-    @(46.2280 mm, -49.6730 mm): Pad 3 [DAC1_TO_SPEAKER] of U86 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(42.4180 mm, -48.7680 mm): PCB text 'R90' on F.Silkscreen
-    @(46.2280 mm, -49.6730 mm): Pad 3 [DAC1_TO_SPEAKER] of U86 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(42.4180 mm, -48.7680 mm): PCB text 'R90' on F.Silkscreen
-    @(46.7280 mm, -49.6730 mm): Pad 2 [DAC1] of U86 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(50.5460 mm, -50.5460 mm): PCB text 'R116' on F.Silkscreen
-    @(45.7280 mm, -49.6730 mm): Pad 4 [GND] of U86 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(50.5460 mm, -50.5460 mm): PCB text 'R116' on F.Silkscreen
-    @(45.2280 mm, -49.6730 mm): Pad 5 [GND] of U86 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(42.4180 mm, -48.7680 mm): PCB text 'R90' on F.Silkscreen
-    @(45.7280 mm, -49.6730 mm): Pad 4 [GND] of U86 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(42.4180 mm, -48.7680 mm): PCB text 'R90' on F.Silkscreen
-    @(45.2280 mm, -49.6730 mm): Pad 5 [GND] of U86 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(37.5920 mm, -51.8160 mm): PCB text 'RXQ' on F.Silkscreen
-    @(38.3540 mm, -53.7210 mm): Pad 1 [RX-Q_FILTERED] of RXQ on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(37.5920 mm, -51.8160 mm): PCB text 'RXQ' on F.Silkscreen
-    @(41.7830 mm, -52.5780 mm): Pad 2 [GND] of C93 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(37.5920 mm, -58.9280 mm): PCB text 'C43' on F.Silkscreen
-    @(39.1160 mm, -60.2720 mm): Pad 2 [+5V_BOOST] of C43 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(37.5920 mm, -58.9280 mm): PCB text 'C43' on F.Silkscreen
-    @(39.1160 mm, -63.1720 mm): Pad 1 [GND] of C43 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(45.2120 mm, -30.4800 mm): PCB text 'DAC2' on F.Silkscreen
-    @(46.6090 mm, -32.3850 mm): Pad 1 [DAC2_TO_SPEAKER] of DAC2 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(50.0380 mm, -48.2600 mm): PCB text 'C87' on F.Silkscreen
-    @(51.8160 mm, -47.3710 mm): Pad 2 [GND] of C87 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(50.0380 mm, -48.2600 mm): PCB text 'C87' on F.Silkscreen
-    @(51.8160 mm, -46.1010 mm): Pad 1 [+3V3_CPU] of C87 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(47.2440 mm, -40.8940 mm): PCB text 'SDA' on F.Silkscreen
-    @(48.9712 mm, -42.5704 mm): Pad 1 [I2C_SDA] of SDA on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(46.9900 mm, -34.2900 mm): PCB text 'C95' on F.Silkscreen
-    @(46.9646 mm, -38.4048 mm): Pad 1 [I2C_SCL] of SCL on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(44.1960 mm, -37.8460 mm): PCB text 'SCL' on F.Silkscreen
-    @(46.9646 mm, -38.4048 mm): Pad 1 [I2C_SCL] of SCL on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(39.1160 mm, -41.4020 mm): PCB text 'RXI' on F.Silkscreen
-    @(39.8780 mm, -43.1800 mm): Pad 1 [RX-I_FILTERED] of RXI on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(41.6560 mm, -45.4660 mm): PCB text 'R94' on F.Silkscreen
-    @(45.7280 mm, -45.3230 mm): Pad 7 [DAC2_TO_SPEAKER] of U86 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(45.2120 mm, -43.1800 mm): PCB text 'U86' on F.Silkscreen
-    @(45.2280 mm, -45.3230 mm): Pad 6 [DAC_MUX] of U86 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(49.7840 mm, -13.7160 mm): PCB text 'C142' on F.Silkscreen
-    @(48.0060 mm, -19.0500 mm): PTH pad 1 [$$$5480] of E_FILT_IF_N
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(46.7360 mm, -17.0180 mm): PCB text 'GPSTX' on F.Silkscreen
-    @(48.0060 mm, -19.0500 mm): PTH pad 1 [$$$5480] of E_FILT_IF_N
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(51.0540 mm, -18.7960 mm): PCB text 'L141' on F.Silkscreen
-    @(48.0060 mm, -19.0500 mm): PTH pad 1 [$$$5480] of E_FILT_IF_N
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(44.9580 mm, -14.2240 mm): PCB text 'R98' on F.Silkscreen
-    @(45.7200 mm, -15.8750 mm): Pad 2 [LED_2] of R98 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(44.9580 mm, -14.2240 mm): PCB text 'R98' on F.Silkscreen
-    @(48.5140 mm, -15.8750 mm): Pad 2 [LED_3] of R99 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(47.7520 mm, -14.2240 mm): PCB text 'R99' on F.Silkscreen
-    @(48.5140 mm, -15.8750 mm): Pad 2 [LED_3] of R99 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(44.9580 mm, -14.2240 mm): PCB text 'R98' on F.Silkscreen
-    @(48.5140 mm, -14.6050 mm): Pad 1 [$$$26619] of R99 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(47.7520 mm, -14.2240 mm): PCB text 'R99' on F.Silkscreen
-    @(51.3820 mm, -15.7480 mm): Pad 1 [GND] of C142 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(48.5140 mm, -4.5720 mm): PCB text 'BOOT' on F.Silkscreen
-    @(52.0000 mm, -3.0000 mm): PTH pad 1 [GND] of M3
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(51.0540 mm, -6.3500 mm): PCB text 'R150' on F.Silkscreen
-    @(51.9430 mm, -8.1280 mm): Pad 1 [$$$11833] of R150 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(51.0540 mm, -6.3500 mm): PCB text 'R150' on F.Silkscreen
-    @(53.2130 mm, -8.1280 mm): Pad 2 [GND] of R150 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(51.0540 mm, -6.3500 mm): PCB text 'R150' on F.Silkscreen
-    @(54.9380 mm, -7.1120 mm): Pad 2 [$$$11833] of C151 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(51.3080 mm, -10.4140 mm): PCB text 'C148' on F.Silkscreen
-    @(54.8640 mm, -10.7950 mm): Pad 1 [$$$14035] of C149 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(55.6260 mm, -8.8900 mm): PCB text 'C149' on F.Silkscreen
-    @(54.8640 mm, -9.5250 mm): Pad 2 [GND] of C149 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(60.4520 mm, -9.9060 mm): PCB text 'R146' on F.Silkscreen
-    @(54.9380 mm, -7.1120 mm): Pad 2 [$$$11833] of C151 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(48.5140 mm, -1.2700 mm): PCB text 'RST' on F.Silkscreen
-    @(52.0000 mm, -3.0000 mm): PTH pad 1 [GND] of M3
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(47.2440 mm, -20.5740 mm): PCB text 'GPSRX' on F.Silkscreen
-    @(51.8922 mm, -20.9550 mm): Pad 1 [RX_TO_GPS] of GPSRX on F.Cu
+    @(71.1200 mm, -57.9120 mm): PCB text 'L109' on F.Silkscreen
+    @(75.5000 mm, -62.0000 mm): PTH pad 1 [GND] of M1
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
     @(48.2600 mm, -22.6060 mm): PCB text 'DAC1' on F.Silkscreen
@@ -2510,8 +2394,12 @@
     @(53.2130 mm, -24.3840 mm): Pad 1 [$$$26276] of R128 on F.Cu
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
-    @(52.3240 mm, -22.6060 mm): PCB text 'R128' on F.Silkscreen
-    @(54.4830 mm, -24.3840 mm): Pad 2 [GND] of R128 on F.Cu
+    @(49.0220 mm, -29.4640 mm): PCB text '1PPS' on F.Silkscreen
+    @(52.5780 mm, -29.9720 mm): Pad 1 [GPS_PPS] of 1PPS on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(51.3080 mm, -31.4960 mm): PCB text 'C96' on F.Silkscreen
+    @(52.5780 mm, -29.9720 mm): Pad 1 [GPS_PPS] of 1PPS on F.Cu
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
     @(57.4040 mm, -18.0340 mm): PCB text 'C143' on F.Silkscreen
@@ -2534,56 +2422,12 @@
     @(54.3814 mm, -18.7960 mm): Pad 2 [$$$14035] of L141 on F.Cu
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
-    @(49.7840 mm, -13.7160 mm): PCB text 'C142' on F.Silkscreen
-    @(48.5140 mm, -14.6050 mm): Pad 1 [$$$26619] of R99 on F.Cu
+    @(47.2440 mm, -20.5740 mm): PCB text 'GPSRX' on F.Silkscreen
+    @(51.8922 mm, -20.9550 mm): Pad 1 [RX_TO_GPS] of GPSRX on F.Cu
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
-    @(49.7840 mm, -13.7160 mm): PCB text 'C142' on F.Silkscreen
-    @(48.5140 mm, -15.8750 mm): Pad 2 [LED_3] of R99 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(51.3080 mm, -10.4140 mm): PCB text 'C148' on F.Silkscreen
-    @(52.3494 mm, -12.7000 mm): Pad 1 [GND] of C147 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(47.7520 mm, -14.2240 mm): PCB text 'R99' on F.Silkscreen
-    @(48.5140 mm, -14.6050 mm): Pad 1 [$$$26619] of R99 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(55.6260 mm, -8.8900 mm): PCB text 'C149' on F.Silkscreen
-    @(54.3306 mm, -12.7000 mm): Pad 2 [$$$14035] of C147 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(55.6260 mm, -8.8900 mm): PCB text 'C149' on F.Silkscreen
-    @(54.2820 mm, -15.7480 mm): Pad 2 [$$$14035] of C142 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(47.7520 mm, -10.6680 mm): PCB text 'D101' on F.Silkscreen
-    @(48.0060 mm, -8.8900 mm): PTH pad 1 [$$$5477] of E_FILT_IF_P
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(50.8000 mm, -10.4140 mm): PCB text 'D102' on F.Silkscreen
-    @(48.0060 mm, -8.8900 mm): PTH pad 1 [$$$5477] of E_FILT_IF_P
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(44.9580 mm, -14.2240 mm): PCB text 'R98' on F.Silkscreen
-    @(45.7200 mm, -14.6050 mm): Pad 1 [$$$10534] of R98 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(55.6260 mm, -8.8900 mm): PCB text 'C149' on F.Silkscreen
-    @(54.8640 mm, -10.7950 mm): Pad 1 [$$$14035] of C149 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(60.4520 mm, -9.9060 mm): PCB text 'R146' on F.Silkscreen
-    @(54.8640 mm, -9.5250 mm): Pad 2 [GND] of C149 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(49.0220 mm, -29.4640 mm): PCB text '1PPS' on F.Silkscreen
-    @(52.5780 mm, -29.9720 mm): Pad 1 [GPS_PPS] of 1PPS on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(51.3080 mm, -31.4960 mm): PCB text 'C96' on F.Silkscreen
-    @(52.5780 mm, -29.9720 mm): Pad 1 [GPS_PPS] of 1PPS on F.Cu
+    @(52.3240 mm, -22.6060 mm): PCB text 'R128' on F.Silkscreen
+    @(54.4830 mm, -24.3840 mm): Pad 2 [GND] of R128 on F.Cu
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
     @(59.9440 mm, -18.7960 mm): PCB text 'R144' on F.Silkscreen
@@ -2592,6 +2436,10 @@
     Local override; warning
     @(59.9440 mm, -18.7960 mm): PCB text 'R144' on F.Silkscreen
     @(61.4680 mm, -15.3670 mm): Pad 1 [\EARPHONE_INSERTED] of R144 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(71.1200 mm, -32.5120 mm): PCB text 'R122' on F.Silkscreen
+    @(68.7070 mm, -30.9880 mm): Pad 1 [+3V3_CPU] of C123 on F.Cu
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
     @(71.1200 mm, -32.5120 mm): PCB text 'R122' on F.Silkscreen
@@ -2630,16 +2478,160 @@
     @(67.5940 mm, -22.7940 mm): Pad 3 [$$$5502] of U131 on F.Cu
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
-    @(57.9120 mm, -5.0800 mm): PCB text 'C151' on F.Silkscreen
+    @(64.2620 mm, -27.6860 mm): PCB text 'GPSR' on F.Silkscreen
+    @(67.4370 mm, -29.4640 mm): Pad 2 [GND] of C125 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(69.5960 mm, -26.6700 mm): PCB text 'C125' on F.Silkscreen
+    @(67.4370 mm, -30.9880 mm): Pad 2 [GND] of C123 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(69.5960 mm, -26.6700 mm): PCB text 'C125' on F.Silkscreen
+    @(68.7070 mm, -30.9880 mm): Pad 1 [+3V3_CPU] of C123 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(71.1200 mm, -32.5120 mm): PCB text 'R122' on F.Silkscreen
+    @(67.6458 mm, -33.0928 mm): Pad 75 [+3V3_CPU] of U121 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(71.1200 mm, -32.5120 mm): PCB text 'R122' on F.Silkscreen
+    @(67.1458 mm, -33.0928 mm): Pad 74 [GND] of U121 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(71.1200 mm, -32.5120 mm): PCB text 'R122' on F.Silkscreen
+    @(65.6458 mm, -33.0928 mm): Pad 71 [USB_D+] of U121 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(71.1200 mm, -32.5120 mm): PCB text 'R122' on F.Silkscreen
+    @(66.1458 mm, -33.0928 mm): Pad 72 [JTMS/SWDIO] of U121 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(60.7060 mm, -24.1300 mm): PCB text 'C134' on F.Silkscreen
+    @(64.8970 mm, -24.6380 mm): Pad 1 [$$$5711] of C129 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(60.7060 mm, -24.1300 mm): PCB text 'C134' on F.Silkscreen
+    @(66.1670 mm, -24.6380 mm): Pad 2 [MIC_FILTER_OUT] of C129 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(64.2620 mm, -27.6860 mm): PCB text 'GPSR' on F.Silkscreen
+    @(64.5160 mm, -29.5910 mm): Pad 1 [GPS_RESET] of GPSR on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(64.2620 mm, -27.6860 mm): PCB text 'GPSR' on F.Silkscreen
+    @(66.1670 mm, -29.4640 mm): Pad 1 [$$$23761] of C125 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(60.7060 mm, -24.1300 mm): PCB text 'C134' on F.Silkscreen
+    @(63.0682 mm, -26.1620 mm): Pad 1 [MIC_FILTER_OUT] of MIC on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(59.1820 mm, -20.8280 mm): PCB text 'C139' on F.Silkscreen
+    @(64.9940 mm, -20.8940 mm): Pad 5 [+3V3] of U131 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(59.1820 mm, -20.8280 mm): PCB text 'C139' on F.Silkscreen
+    @(64.9940 mm, -22.7940 mm): Pad 4 [$$$5711] of U131 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(87.1982 mm, -15.0622 mm): PCB text 'CW1' on F.Silkscreen
+    @(90.5811 mm, -16.9953 mm): PTH pad 2 [PADDLE_THUMB_NO] of CW1
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(96.6979 mm, -25.8318 mm): PCB text 'CW2' on F.Silkscreen
+    @(97.0048 mm, -23.4189 mm): PTH pad 2 [PADDLE_INDEX_NO] of CW2
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(96.6979 mm, -25.8318 mm): PCB text 'CW2' on F.Silkscreen
+    @(95.4846 mm, -21.8987 mm): PTH pad 1 [PADDLE_INDEX_NC] of CW2
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(85.8520 mm, -13.2080 mm): PCB text 'GPS_ANTENNA' on F.Silkscreen
+    @(90.5811 mm, -16.9953 mm): PTH pad 2 [PADDLE_THUMB_NO] of CW1
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(86.3600 mm, -23.3680 mm): PCB text 'MICROSD' on F.Silkscreen
+    @(83.3120 mm, -23.5660 mm): Pad 2 [GND] of GPS_ANTENNA on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(74.4220 mm, -17.0180 mm): PCB text 'SPEAKER' on F.Silkscreen
+    @(83.3120 mm, -16.5660 mm): Pad 1 [$$$28367] of GPS_ANTENNA on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(51.0540 mm, -6.3500 mm): PCB text 'R150' on F.Silkscreen
+    @(54.9380 mm, -7.1120 mm): Pad 2 [$$$11833] of C151 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(48.5140 mm, -4.5720 mm): PCB text 'BOOT' on F.Silkscreen
+    @(52.0000 mm, -3.0000 mm): PTH pad 1 [GND] of M3
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(50.8000 mm, -10.4140 mm): PCB text 'D102' on F.Silkscreen
+    @(48.0060 mm, -8.8900 mm): PTH pad 1 [$$$5477] of E_FILT_IF_P
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(51.0540 mm, -6.3500 mm): PCB text 'R150' on F.Silkscreen
+    @(51.9430 mm, -8.1280 mm): Pad 1 [$$$11833] of R150 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(51.0540 mm, -6.3500 mm): PCB text 'R150' on F.Silkscreen
+    @(53.2130 mm, -8.1280 mm): Pad 2 [GND] of R150 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(47.7520 mm, -10.6680 mm): PCB text 'D101' on F.Silkscreen
+    @(48.0060 mm, -8.8900 mm): PTH pad 1 [$$$5477] of E_FILT_IF_P
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(49.7840 mm, -13.7160 mm): PCB text 'C142' on F.Silkscreen
+    @(48.0060 mm, -19.0500 mm): PTH pad 1 [$$$5480] of E_FILT_IF_N
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(46.7360 mm, -17.0180 mm): PCB text 'GPSTX' on F.Silkscreen
+    @(48.0060 mm, -19.0500 mm): PTH pad 1 [$$$5480] of E_FILT_IF_N
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(51.0540 mm, -18.7960 mm): PCB text 'L141' on F.Silkscreen
+    @(48.0060 mm, -19.0500 mm): PTH pad 1 [$$$5480] of E_FILT_IF_N
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(44.9580 mm, -14.2240 mm): PCB text 'R98' on F.Silkscreen
+    @(45.7200 mm, -14.6050 mm): Pad 1 [$$$10534] of R98 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(44.9580 mm, -14.2240 mm): PCB text 'R98' on F.Silkscreen
+    @(45.7200 mm, -15.8750 mm): Pad 2 [LED_2] of R98 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(44.9580 mm, -14.2240 mm): PCB text 'R98' on F.Silkscreen
+    @(48.5140 mm, -15.8750 mm): Pad 2 [LED_3] of R99 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(47.7520 mm, -14.2240 mm): PCB text 'R99' on F.Silkscreen
+    @(48.5140 mm, -15.8750 mm): Pad 2 [LED_3] of R99 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(44.9580 mm, -14.2240 mm): PCB text 'R98' on F.Silkscreen
+    @(48.5140 mm, -14.6050 mm): Pad 1 [$$$26619] of R99 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(47.7520 mm, -14.2240 mm): PCB text 'R99' on F.Silkscreen
+    @(48.5140 mm, -14.6050 mm): Pad 1 [$$$26619] of R99 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(47.7520 mm, -14.2240 mm): PCB text 'R99' on F.Silkscreen
+    @(51.3820 mm, -15.7480 mm): Pad 1 [GND] of C142 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(55.3720 mm, -12.1920 mm): PCB text 'C147' on F.Silkscreen
+    @(61.2140 mm, -13.4620 mm): Pad 1 [\EARPHONE_INSERTED] of EAR on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(60.4520 mm, -9.9060 mm): PCB text 'R146' on F.Silkscreen
     @(60.0180 mm, -7.1120 mm): Pad 2 [$$$9819] of C152 on F.Cu
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
     @(59.6900 mm, -0.7620 mm): PCB text 'CLK' on F.Silkscreen
     @(63.2460 mm, -3.0480 mm): PTH pad 1 [GND] of -
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(59.6900 mm, -0.7620 mm): PCB text 'CLK' on F.Silkscreen
-    @(60.7060 mm, -3.0480 mm): PTH pad 1 [JTCK/SWCLK] of CLK
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
     @(64.7700 mm, -0.7620 mm): PCB text 'IO' on F.Silkscreen
@@ -2654,136 +2646,132 @@
     @(61.2140 mm, -13.4620 mm): Pad 1 [\EARPHONE_INSERTED] of EAR on F.Cu
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
+    @(51.3080 mm, -10.4140 mm): PCB text 'C148' on F.Silkscreen
+    @(54.8640 mm, -10.7950 mm): Pad 1 [$$$14035] of C149 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(55.6260 mm, -8.8900 mm): PCB text 'C149' on F.Silkscreen
+    @(54.8640 mm, -9.5250 mm): Pad 2 [GND] of C149 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
     @(60.4520 mm, -9.9060 mm): PCB text 'R146' on F.Silkscreen
-    @(60.0180 mm, -7.1120 mm): Pad 2 [$$$9819] of C152 on F.Cu
+    @(54.8640 mm, -9.5250 mm): Pad 2 [GND] of C149 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(55.6260 mm, -8.8900 mm): PCB text 'C149' on F.Silkscreen
+    @(54.8640 mm, -10.7950 mm): Pad 1 [$$$14035] of C149 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(55.6260 mm, -8.8900 mm): PCB text 'C149' on F.Silkscreen
+    @(54.2820 mm, -15.7480 mm): Pad 2 [$$$14035] of C142 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(55.6260 mm, -8.8900 mm): PCB text 'C149' on F.Silkscreen
+    @(54.3306 mm, -12.7000 mm): Pad 2 [$$$14035] of C147 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(49.7840 mm, -13.7160 mm): PCB text 'C142' on F.Silkscreen
+    @(48.5140 mm, -14.6050 mm): Pad 1 [$$$26619] of R99 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(49.7840 mm, -13.7160 mm): PCB text 'C142' on F.Silkscreen
+    @(48.5140 mm, -15.8750 mm): Pad 2 [LED_3] of R99 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(51.3080 mm, -10.4140 mm): PCB text 'C148' on F.Silkscreen
+    @(52.3494 mm, -12.7000 mm): Pad 1 [GND] of C147 on F.Cu
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
     @(60.4520 mm, -9.9060 mm): PCB text 'R146' on F.Silkscreen
     @(57.8380 mm, -7.1120 mm): Pad 1 [$$$11822] of C151 on F.Cu
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
-    @(26.9240 mm, -27.9400 mm): PCB text 'CLKA' on F.Silkscreen
-    @(32.3850 mm, -28.5750 mm): Pad 1 [$$$31407] of CLKB on F.Cu
+    @(60.4520 mm, -9.9060 mm): PCB text 'R146' on F.Silkscreen
+    @(54.9380 mm, -7.1120 mm): Pad 2 [$$$11833] of C151 on F.Cu
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
-    @(26.9240 mm, -27.9400 mm): PCB text 'CLKA' on F.Silkscreen
-    @(30.6070 mm, -28.8290 mm): Pad 1 [$$$31408] of CLKA on F.Cu
+    @(57.9120 mm, -5.0800 mm): PCB text 'C151' on F.Silkscreen
+    @(60.0180 mm, -7.1120 mm): Pad 2 [$$$9819] of C152 on F.Cu
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
-    @(12.1920 mm, -31.4960 mm): PCB text 'C26' on F.Silkscreen
-    @(11.3030 mm, -30.4800 mm): Pad 2 [IMP_BRIDGE_OUT] of R29 on F.Cu
+    @(59.6900 mm, -0.7620 mm): PCB text 'CLK' on F.Silkscreen
+    @(60.7060 mm, -3.0480 mm): PTH pad 1 [JTCK/SWCLK] of CLK
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
-    @(9.6520 mm, -28.7020 mm): PCB text 'R29' on F.Silkscreen
-    @(11.3030 mm, -30.4800 mm): Pad 2 [IMP_BRIDGE_OUT] of R29 on F.Cu
+    @(57.9120 mm, -5.0800 mm): PCB text 'C151' on F.Silkscreen
+    @(62.9180 mm, -7.1120 mm): Pad 1 [$$$10136] of C152 on F.Cu
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
-    @(10.1600 mm, -26.1620 mm): PCB text 'DUT' on F.Silkscreen
-    @(11.1760 mm, -27.9400 mm): Pad 1 [RF_ANT] of DUT on F.Cu
+    @(48.5140 mm, -1.2700 mm): PCB text 'RST' on F.Silkscreen
+    @(52.0000 mm, -3.0000 mm): PTH pad 1 [GND] of M3
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
-    @(17.5260 mm, -32.7660 mm): PCB text 'C27' on F.Silkscreen
-    @(16.5100 mm, -33.4010 mm): Pad 1 [$$$16065] of C27 on F.Cu
+    @(32.7660 mm, -12.1920 mm): PCB text 'R76' on F.Silkscreen
+    @(36.0680 mm, -13.5890 mm): Pad 2 [$$$5934] of R74 on F.Cu
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
-    @(12.4460 mm, -34.7980 mm): PCB text 'R23' on F.Silkscreen
-    @(16.0020 mm, -35.4800 mm): Pad 5 [GND] of U24 on F.Cu
+    @(41.9100 mm, -17.2720 mm): PCB text 'R97' on F.Silkscreen
+    @(42.9260 mm, -15.1130 mm): Pad 1 [$$$16521] of R97 on F.Cu
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
-    @(12.4460 mm, -34.7980 mm): PCB text 'R23' on F.Silkscreen
-    @(16.5020 mm, -35.4800 mm): Pad 6 [$$$16065] of U24 on F.Cu
+    @(41.9100 mm, -17.2720 mm): PCB text 'R97' on F.Silkscreen
+    @(42.9260 mm, -16.3830 mm): Pad 2 [LED_WHITE] of R97 on F.Cu
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
-    @(9.6520 mm, -28.7020 mm): PCB text 'R29' on F.Silkscreen
-    @(10.0330 mm, -30.4800 mm): Pad 1 [RF_ANT] of R29 on F.Cu
+    @(29.7180 mm, -13.7160 mm): PCB text 'R74' on F.Silkscreen
+    @(26.4160 mm, -12.0650 mm): Pad 1 [$$$31771] of C73 on F.Cu
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
-    @(7.1120 mm, -32.2580 mm): PCB text 'R25' on F.Silkscreen
-    @(10.8480 mm, -32.7660 mm): Pad 1 [GND] of R25 on F.Cu
+    @(29.7180 mm, -10.9220 mm): PCB text 'C78' on F.Silkscreen
+    @(26.4160 mm, -10.7950 mm): Pad 2 [MIXER_LO2P] of C73 on F.Cu
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
-    @(15.2400 mm, -25.1460 mm): PCB text 'U30' on F.Silkscreen
-    @(15.5020 mm, -27.3520 mm): Pad 4 [$$$16999] of U30 on F.Cu
+    @(44.7040 mm, -10.6680 mm): PCB text 'D100' on F.Silkscreen
+    @(40.6400 mm, -10.7950 mm): Pad 2 [MIXER_LO1P] of C80 on F.Cu
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
-    @(8.8900 mm, -11.4300 mm): PCB text 'C38' on F.Silkscreen
-    @(8.4660 mm, -13.7160 mm): Pad 5 [+3V3] of U37 on F.Cu
+    @(30.9880 mm, -6.6040 mm): PCB text 'L82' on F.Silkscreen
+    @(35.8140 mm, -7.6200 mm): Pad 1 [MIXER_LO1N] of L81 on F.Cu
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
-    @(8.8900 mm, -11.4300 mm): PCB text 'C38' on F.Silkscreen
-    @(8.4660 mm, -13.0660 mm): Pad 4 [MIC_OUT] of U37 on F.Cu
+    @(41.9100 mm, -17.2720 mm): PCB text 'R97' on F.Silkscreen
+    @(42.6720 mm, -12.6915 mm): Pad 1 [$$$16521] of D100 on F.Cu
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
-    @(8.8900 mm, -11.4300 mm): PCB text 'C38' on F.Silkscreen
-    @(8.4660 mm, -14.3660 mm): Pad 6 [MIC_SELECT] of U37 on F.Cu
+    @(44.7040 mm, -10.6680 mm): PCB text 'D100' on F.Silkscreen
+    @(38.9890 mm, -10.6680 mm): Pad 2 [MIXER_LO1P] of R79 on F.Cu
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
-    @(8.8900 mm, -11.4300 mm): PCB text 'C38' on F.Silkscreen
-    @(7.3660 mm, -15.7480 mm): Pad 1 [+5V] of VUSB on F.Cu
+    @(32.7660 mm, -12.1920 mm): PCB text 'R76' on F.Silkscreen
+    @(36.0680 mm, -12.0650 mm): Pad 1 [$$$31769] of C78 on F.Cu
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
-    @(5.5880 mm, -18.7960 mm): PCB text 'L34' on F.Silkscreen
-    @(7.3660 mm, -15.7480 mm): Pad 1 [+5V] of VUSB on F.Cu
+    @(37.5920 mm, -55.6260 mm): PCB text '5VBST' on F.Silkscreen
+    @(42.6720 mm, -56.8706 mm): Pad 1 [+5V_BOOST] of C89 on F.Cu
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
-    @(5.3340 mm, -10.9220 mm): PCB text 'U37' on F.Silkscreen
-    @(4.2999 mm, -14.3500 mm): PTH pad 8 [GND] of USB
+    @(24.1300 mm, -46.2280 mm): PCB text 'C17' on F.Silkscreen
+    @(23.2410 mm, -46.4820 mm): Pad 1 [+3V3] of C17 on F.Cu
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
-    @(5.5880 mm, -18.7960 mm): PCB text 'L34' on F.Silkscreen
-    @(6.3500 mm, -18.1610 mm): Pad 1 [$$$13766] of C33 on F.Cu
+    @(38.3540 mm, -45.4660 mm): PCB text 'C93' on F.Silkscreen
+    @(34.9860 mm, -44.7340 mm): Pad 4 [$$$28421] of U47 on F.Cu
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
-    @(5.5880 mm, -18.7960 mm): PCB text 'L34' on F.Silkscreen
-    @(6.3500 mm, -16.8910 mm): Pad 2 [BUILT-IN_MIC_OUT] of C33 on F.Cu
+    @(38.3540 mm, -45.4660 mm): PCB text 'C93' on F.Silkscreen
+    @(36.8300 mm, -43.5610 mm): Pad 2 [RX-I_FILTERED] of C48 on F.Cu
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
-    @(12.1920 mm, -31.4960 mm): PCB text 'C26' on F.Silkscreen
-    @(10.0330 mm, -30.4800 mm): Pad 1 [RF_ANT] of R29 on F.Cu
+    @(38.3540 mm, -45.4660 mm): PCB text 'C93' on F.Silkscreen
+    @(36.8300 mm, -44.8310 mm): Pad 1 [$$$28421] of C48 on F.Cu
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
-    @(5.5880 mm, -27.1780 mm): PCB text 'REF' on F.Silkscreen
-    @(8.5090 mm, -27.4320 mm): Pad 1 [RF_REF] of REF on F.Cu
+    @(29.4640 mm, -47.7520 mm): PCB text 'TXI' on F.Silkscreen
+    @(30.3022 mm, -49.7078 mm): Pad 1 [TX-I_FILTERED] of TXI on F.Cu
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
-    @(12.1920 mm, -31.4960 mm): PCB text 'C26' on F.Silkscreen
-    @(8.0010 mm, -30.4800 mm): Pad 2 [$$$598] of R28 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(3.8100 mm, -29.9720 mm): PCB text 'R28' on F.Silkscreen
-    @(8.0010 mm, -30.4800 mm): Pad 2 [$$$598] of R28 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(7.1120 mm, -32.2580 mm): PCB text 'R25' on F.Silkscreen
-    @(7.9480 mm, -32.7660 mm): Pad 2 [$$$598] of R25 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(3.8100 mm, -29.9720 mm): PCB text 'R28' on F.Silkscreen
-    @(6.7310 mm, -30.4800 mm): Pad 1 [RF_REF] of R28 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(11.6840 mm, -17.7800 mm): PCB text 'C35' on F.Silkscreen
-    @(12.6990 mm, -15.9980 mm): Pad 6 [$$$16013] of L39 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(11.6840 mm, -17.7800 mm): PCB text 'C35' on F.Silkscreen
-    @(12.6990 mm, -14.4780 mm): Pad 5 [<no net>] of L39 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(13.2080 mm, -10.9220 mm): PCB text 'L39' on F.Silkscreen
-    @(12.6990 mm, -14.4780 mm): Pad 5 [<no net>] of L39 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(13.2080 mm, -10.9220 mm): PCB text 'L39' on F.Silkscreen
-    @(12.6990 mm, -12.9580 mm): Pad 4 [GND] of L39 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(9.6520 mm, -22.3520 mm): PCB text 'U32' on F.Silkscreen
-    @(10.6680 mm, -17.6530 mm): Pad 1 [$$$16013] of C35 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(9.6520 mm, -22.3520 mm): PCB text 'U32' on F.Silkscreen
-    @(10.6680 mm, -18.9230 mm): Pad 2 [$$$16999] of C35 on F.Cu
+    @(26.1620 mm, -48.2600 mm): PCB text 'U15' on F.Silkscreen
+    @(30.3022 mm, -49.7078 mm): Pad 1 [TX-I_FILTERED] of TXI on F.Cu
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
     @(13.9700 mm, -50.8000 mm): PCB text 'C13' on F.Silkscreen
@@ -2878,48 +2866,24 @@
     @(9.3980 mm, -40.8930 mm): Pad 1 [RF_AMP_OUT] of L19 on F.Cu
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
+    @(7.1120 mm, -32.2580 mm): PCB text 'R25' on F.Silkscreen
+    @(7.9480 mm, -32.7660 mm): Pad 2 [$$$598] of R25 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(3.8100 mm, -29.9720 mm): PCB text 'R28' on F.Silkscreen
+    @(6.7310 mm, -30.4800 mm): Pad 1 [RF_REF] of R28 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(3.8100 mm, -29.9720 mm): PCB text 'R28' on F.Silkscreen
+    @(8.0010 mm, -30.4800 mm): Pad 2 [$$$598] of R28 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
     @(21.0820 mm, -56.6420 mm): PCB text 'U4' on F.Silkscreen
     @(24.0190 mm, -58.4360 mm): Pad 6 [TRX_SWITCH] of U4 on F.Cu
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
     @(24.1300 mm, -46.2280 mm): PCB text 'C17' on F.Silkscreen
-    @(23.2410 mm, -46.4820 mm): Pad 1 [+3V3] of C17 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(38.3540 mm, -45.4660 mm): PCB text 'C93' on F.Silkscreen
-    @(36.8300 mm, -43.5610 mm): Pad 2 [RX-I_FILTERED] of C48 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(38.3540 mm, -45.4660 mm): PCB text 'C93' on F.Silkscreen
-    @(36.8300 mm, -44.8310 mm): Pad 1 [$$$28421] of C48 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(38.3540 mm, -45.4660 mm): PCB text 'C93' on F.Silkscreen
-    @(34.9860 mm, -44.7340 mm): Pad 4 [$$$28421] of U47 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(17.7800 mm, -47.2440 mm): PCB text 'U16' on F.Silkscreen
-    @(20.6850 mm, -48.7840 mm): Pad 5 [GAIN_POT_NSS] of U15 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(24.1300 mm, -46.2280 mm): PCB text 'C17' on F.Silkscreen
     @(21.9710 mm, -46.4820 mm): Pad 2 [GND] of C17 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(29.4640 mm, -47.7520 mm): PCB text 'TXI' on F.Silkscreen
-    @(30.3022 mm, -49.7078 mm): Pad 1 [TX-I_FILTERED] of TXI on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(26.1620 mm, -48.2600 mm): PCB text 'U15' on F.Silkscreen
-    @(30.3022 mm, -49.7078 mm): Pad 1 [TX-I_FILTERED] of TXI on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(26.1620 mm, -43.1800 mm): PCB text 'U18' on F.Silkscreen
-    @(29.7180 mm, -44.8310 mm): Pad 1 [+3V3] of C45 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(26.1620 mm, -43.1800 mm): PCB text 'U18' on F.Silkscreen
-    @(29.7180 mm, -43.5610 mm): Pad 2 [GND] of C45 on F.Cu
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
     @(24.1300 mm, -46.2280 mm): PCB text 'C17' on F.Silkscreen
@@ -2954,8 +2918,12 @@
     @(20.5740 mm, -30.6070 mm): Pad 1 [PHASE] of PHSE on F.Cu
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
-    @(38.6080 mm, -56.8960 mm): PCB text 'D44' on F.Silkscreen
-    @(40.7670 mm, -54.9910 mm): Pad 1 [+5V_BOOST] of 5VBST on F.Cu
+    @(26.1620 mm, -43.1800 mm): PCB text 'U18' on F.Silkscreen
+    @(29.7180 mm, -43.5610 mm): Pad 2 [GND] of C45 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(26.1620 mm, -43.1800 mm): PCB text 'U18' on F.Silkscreen
+    @(29.7180 mm, -44.8310 mm): Pad 1 [+3V3] of C45 on F.Cu
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
     @(11.9380 mm, -51.8160 mm): PCB text 'L11' on F.Silkscreen
@@ -2980,6 +2948,38 @@
     Local override; warning
     @(13.9700 mm, -60.7060 mm): PCB text '1/2VCC' on F.Silkscreen
     @(21.9710 mm, -61.7220 mm): Pad 2 [GND] of C3 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(21.8440 mm, -62.4840 mm): PCB text 'C3' on F.Silkscreen
+    @(21.9710 mm, -61.7220 mm): Pad 2 [GND] of C3 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(17.7800 mm, -47.2440 mm): PCB text 'U16' on F.Silkscreen
+    @(20.6850 mm, -48.7840 mm): Pad 5 [GAIN_POT_NSS] of U15 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(12.1920 mm, -31.4960 mm): PCB text 'C26' on F.Silkscreen
+    @(10.0330 mm, -30.4800 mm): Pad 1 [RF_ANT] of R29 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(12.1920 mm, -31.4960 mm): PCB text 'C26' on F.Silkscreen
+    @(8.0010 mm, -30.4800 mm): Pad 2 [$$$598] of R28 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(12.1920 mm, -31.4960 mm): PCB text 'C26' on F.Silkscreen
+    @(11.3030 mm, -30.4800 mm): Pad 2 [IMP_BRIDGE_OUT] of R29 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(9.6520 mm, -28.7020 mm): PCB text 'R29' on F.Silkscreen
+    @(11.3030 mm, -30.4800 mm): Pad 2 [IMP_BRIDGE_OUT] of R29 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(7.1120 mm, -32.2580 mm): PCB text 'R25' on F.Silkscreen
+    @(10.8480 mm, -32.7660 mm): Pad 1 [GND] of R25 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(10.1600 mm, -26.1620 mm): PCB text 'DUT' on F.Silkscreen
+    @(11.1760 mm, -27.9400 mm): Pad 1 [RF_ANT] of DUT on F.Cu
 
 ** Found 0 unconnected pads **
 

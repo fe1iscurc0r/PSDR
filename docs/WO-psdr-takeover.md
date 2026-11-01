@@ -890,8 +890,9 @@ pad-net conflicts: 0 []
 wrote         dist/kicad/PSDR_2.6.1_pcb_spike_full.kicad_pcb
 ```
 
-（这是 §C-14 之后的最终输出；`outline`/`pours`/`silk` 三行是第三批时还没有的。
-第三批的输出块记的是 `outline 100.00 x 65.00 mm` 包络矩形。）
+（这是 §C-14 之后的输出；`outline`/`pours`/`silk` 三行是第三批时还没有的。
+第三批的输出块记的是 `outline 100.00 x 65.00 mm` 包络矩形。§C-17 之后
+`silk` 行变为 `1497 board pieces {26: 754, 29: 743}`，其余不变。）
 
 同一输入重跑，`cmp` 逐字节相同（§C-14 末尾复核）。第一版 UUID 用 `uuid4`，
 每次重跑都会改 UUID；现在按发射顺序用 `uuid5` 派生（与 §C-12 的原理图生成器一致）。
@@ -1109,15 +1110,18 @@ samples 2144, >0.1 mm: 0, worst 0.0025 mm at segment 25
 **丝印**：
 
 - 图元来源：`*PARTDECAL*` 的 OPEN/CLOSED/CIRCLE（level 26/0/1）+
-  `*LINES*` 的 level 26/29 板级线条 + 376 条 Ref.Des. + 4 条自由文本。
+  `*LINES*` 的 level 26/29 板级线条 + **`*LINES*` 段里的 2 条 `COPPER`
+  记录**（level 26/29 的填充形状，§C-17 补齐）+ 376 条 Ref.Des. +
+  4 条自由文本。
 - 层次规则有 ASCII 里嵌入的 CAM 文档作证（第 51011 行起）：
   `CAM_DOC_NAME Top Silkscreen` → `DOC_LAYER_NUMBERS 1 26`，
   `Bottom Silkscreen` → `4 29`。实测：**level 26 → 器件所在面**；
   **level 0/1 → 只在非镜像器件上归 F.SilkS**（底面孔件的 0/1 图元在
   GTO/GBO 都不出现）；level 20/23/27/29 → 不画；零长线段跳过。
-- 数量：162 个 decal 图元、1495 个板级图元 {26: 753, 29: 742}、4 条自由文本、
-  376 个位号；15 个器件在源文件里没有 Ref.Des.（6 个 FIDUCIAL、7 个 MH3M、
-  2 个 MH_80M——只有 Part Type 文本，而 CAM job 不画 Part Type）。
+- 数量：162 个 decal 图元、1497 个板级图元 {26: 754, 29: 743}（含 §C-17
+  的 2 个 `COPPER` 填充形状）、4 条自由文本、376 个位号；15 个器件在源文件里
+  没有 Ref.Des.（6 个 FIDUCIAL、7 个 MH3M、2 个 MH_80M——只有 Part Type
+  文本，而 CAM job 不画 Part Type）。
 - 双向覆盖率（40 px/mm，容差 0.10 mm）：
 
 | 宽度 | GTO 源→KiCad | GTO KiCad→源 | GBO 源→KiCad | GBO KiCad→源 |
@@ -1125,16 +1129,20 @@ samples 2144, >0.1 mm: 0, worst 0.0025 mm at segment 25
 | 2 mil | 100.00% | 100.00% | 100.00% | 100.00% |
 | 6 mil | 35.48% | 23.93% | 29.23% | 18.42% |
 | 8 mil | 100.00% | 100.00% | 100.00% | 100.00% |
-| 10 mil | 98.03% | 100.00% | 29.47% | 46.88% |
+| 10 mil | 100.00% | 100.00% | 84.82% | 73.04% |
+
+  （10 mil 这一行是 §C-17 补齐 `COPPER` 记录后的数字；补齐前是 GTO
+  98.03% / 100.00%、GBO 29.47% / 46.88%。）
 
   - 2 mil 是 "psdr" 标志，8 mil 是板级线条/器件轮廓：两档双向 100%，
     说明坐标与层别都对。
   - 6 mil 是位号文本：KiCad 笔画字体 vs PADS Romansim，字形不同；
     6 mil 这一档的两向百分比不能当几何误差读。
-  - GBO 10 mil 的 29.47/46.88 由背面 4 条 10 mil 自由文本主导。GTO 10 mil
-    的 1.97% 缺口是 **9 条笔画组成的一个约 1.4 mm 实心三角标记**
-    （C151 左侧、板下缘附近）；它的来源未在 `PARTDECAL`/`LINES`/`TEXT`
-    段中定位到（本轮逐段查过），如实记为已知缺口。
+  - GBO 10 mil 剩余的 84.82/73.04 由背面 4 条 10 mil 自由文本（`portablesdr.com`、
+    `Serial No`、`HW V2.6.1 - 6/29/2016`、`Michael Colton - KE7HIA`）主导，
+    与 6 mil 一样是 KiCad 笔画字体 vs PADS Romansim 的字形差，不是几何误差。
+  - 补齐前 GTO 10 mil 的 1.97% 缺口（C151 左侧、板下缘附近）是 PADS 的
+    `COPPER` 记录，不是 decal/LINES/TEXT 图元；根因与修法见 §C-17。
 - 修了一个真 bug：PADS 把 decal 的 CIRCLE 写成一条 start == end 的 G75 圆弧，
   `gerbparse._arc_points` 原来把这种弧当零扫角，所有圆形丝印都没进对账栅格。
   修好后源 GTO drawup 从 9003 涨到 11663、GBO 10961 → 12956；KiCad 侧
@@ -1160,10 +1168,10 @@ $ python tools/kicad_gerber_compare.py --pads <468dc41 原始 Gerber> \
 最后一条重跑结果（§C-16 修复后）：**0 个源 flash 未覆盖、461/461 个钻孔对上**。
 
 **判定**：铺铜、真实板框、丝印三件事完成。四层板现在是
-4 层铜 / 12 个铺铜区 / 67 段板框 / 双向丝印对账通过 / 0 断点；
+4 层铜 / 12 个铺铜区 / 67 段板框 / 双向丝印对账通过（10 mil 档 GTO 双向
+100%，GBO 余量为背面 4 条自由文本的字形差）/ 0 断点；
 但它仍不是可投产的板：795 条 DRC（分类与处置见 §C-16，以源设计允许的
-丝印压焊盘和紧间距为主）、丝印还差一个约 1.4 mm 的三角标记（来源未定位）。
-生产包继续以上游 `468dc41` 的原始 Gerber 为准。
+丝印压焊盘和紧间距为主）。生产包继续以上游 `468dc41` 的原始 Gerber 为准。
 
 ---
 
@@ -1387,8 +1395,8 @@ md5(板) = 157f000bc9caa4eb67492a9a751d8f91
 
 **5. 仍未闭合的缺口**
 
-- 丝印：GTO 上约 1.4 mm 的实心三角标记（C151 左侧、板下缘）来源未定位，
-  见 §C-14；
+- ~~丝印：GTO 上约 1.4 mm 的实心三角标记来源未定位~~ —— **§C-17 已闭合**
+  （PADS `COPPER` 记录，连同背面 800×190 mil 的序列号白块一起补上）；
 - 嘉立创EDA：`+3V3_FLIP_FLOP`（In1）和 `V_SUPPLY`（F.Cu）两个铺铜重建后
   0 铜皮，根因是 KiCad `island_removal_mode 0` 与 PADS `keepIsland=true`
   不一致，未改，见 §C-15；
@@ -1409,6 +1417,87 @@ $ kicad-cli pcb export drill -o <fab> --format excellon --excellon-units mm \
 $ python tools/kicad_gerber_compare.py --pads <468dc41 原始 Gerber> \
       --fab <fab> --board PSDR_2.6.1_pcb_spike_full
 ```
+
+---
+
+### C-17 M1：丝印 `COPPER` 记录补齐（2026-11-01）
+
+§C-14/§C-16 留下的"1.4 mm 实心三角标记来源未定位"在 M1 里闭合。
+缺口不是 decal、不是 `TEXT`，而是 `*LINES*` 段里的 **`COPPER` 记录**：
+PADS 的板级铜皮形状也写在 `*LINES*` 里，piece 类型是 `COPCLS`，生成器的
+`parse_board_silk` 只认 `LINES` + `OPEN/CLOSED/CIRCLE/TAG`，于是整条记录
+被跳过。源文件里 level 26/29 的 `COPPER` 共 2 条：
+
+```
+3413:DRW4825552  COPPER  57912000 8763000 1 0          # level 29，背面
+3421:DRW18244250 COPPER  85344000 4572000 1 0          # level 26，正面
+```
+
+| 记录 | 层 | 多边形（ASCII 绝对坐标，mil） | 换算到 KiCad（mm） |
+|---|---|---|---|
+| DRW4825552 | 29 | 锚点 (1520,230)，相对顶点 (0,0)(−800,0)(−800,−190)(0,−190) → 800×190 矩形 (720,40)–(1520,230) | x 18.288–38.608，y −1.016 – −5.842 |
+| DRW18244250 | 26 | (2240,120) (2200,160) (2200,80) | (56.896,−3.048) (55.88,−4.064) (55.88,−2.032) |
+
+先出现的 3413 不是大家一直在找的"三角"，而是 **800×190 mil 的背面序列号
+白块**（就在 `Serial No` 文本左侧）：它此前也被一起丢掉，只是 GBO 侧
+10 mil 缺口被大三角和自由文本掩盖，没有单独暴露。两条都是 `COPCLS`
+填充形状，描边宽度 381000 = 10 mil。
+
+**PADS 的画法**：这类铜皮的轮廓是**按线宽一半内缩后描边**，内部再以 9 mil
+间距、10 mil 笔宽打剖面线（间距小于笔宽，并集就是实心）。证据是源 GTO 里
+三角形的三条边正好比源多边形内缩 5 mil，GBO 矩形的剖面线端点也内缩 5 mil。
+所以生成器不能按原多边形实心填充（那样四个角会多出半笔画），而应输出
+**内缩半个线宽的多边形 + 10 mil 描边 + 实心填充**：
+
+- `parse_board_silk` 接受 `COPPER` 记录与 `COPCLS` piece；
+- 新增 `inset_polygon(pts, d)`：沿顶点角平分线内移 `d = width/2`；
+- `emit_board_silk` 对 `COPCLS` 输出 `gr_poly`，`(stroke (width 0.254))` +
+  `(fill solid)`。
+
+**验证**（40 px/mm、0.10 mm 容差、双向）：
+
+```
+$ python tools/pads_asc_pcb.py Hardware/PSDR.asc --all -o <board>
+silk  162 decal pieces, 1497 board pieces {26: 754, 29: 743}, 4 free texts, 376 refdes labels
+$ kicad-cli pcb export gerbers ... -l F.Cu,In1.Cu,In2.Cu,B.Cu,F.Silkscreen,B.Silkscreen,F.Mask,B.Mask
+$ python <diff_silk2.py>            # 源 GTO/GBO vs KiCad 丝印 Gerber
+GTO 10 mil: src->ki 100.00%  ki->src 100.00%   (src 74099, ki 74297, src-only 0, ki-only 0)
+GBO 10 mil: src->ki  84.82%  ki->src  73.04%   (src 265005, ki 308525, src-only 40216, ki-only 83171)
+```
+
+- 三角专用区域 (55.5,1.7)–(57.3,4.4) mm：**src-only 0 px、ki-only 0 px**；
+- 矩形专用区域 (18.0,0.7)–(39.0,6.2) mm：src-only 0 px；ki-only 只剩 408 px，
+  逐像素定位在 y 5.965–6.215 mm，是矩形上沿之外的字形像素，不属于矩形；
+- GBO 10 mil 剩余 15.18%/26.96% 与 6 mil 档同一性质：背面 4 条 10 mil 自由
+  文本（`portablesdr.com`、`Serial No`、`HW V2.6.1 - 6/29/2016`、
+  `Michael Colton - KE7HIA`）的 KiCad 笔画字体 vs PADS Romansim 字形差；
+- 另外两条 level 4 的 `COPPER`（DRW66110231、DRW17477132，带 `GND` 网名）
+  是地平面补块，已被 B.Cu 的 GND 铺铜覆盖，栅格对账 src-only 0 px，故不单独
+  发射，避免与铺铜重复。
+
+**回归**：
+
+```
+$ kicad-cli pcb drc --severity-all --refill-zones -o dist/kicad/drc_...txt dist/kicad/...kicad_pcb
+发现 795 条违规项
+发现 0 个未连接的项目
+```
+
+- DRC 与修复前同为 **795 条 / 0 断点**，逐类计数完全相同；新增补块所在的
+  (17.5,−0.5)–(39.0,−6.5) mm 区域在报告里 0 条。注意 KiCad 的
+  `silk_overlap` 只报每个项目的一部分配对，两次重跑的具体配对会变
+  （旧报告 R97/D100 的对数多、新报告 C106/C107 的多），因此这里只对
+  计数与类别，不对到逐条；
+- `kicad_gerber_compare.py`：**0 个源 flash 未覆盖、461/461 个钻孔对上**；
+- 生成器确定性：同一输入连跑三次，`sha256 = 5029bd02…288cc` 三次相同；
+- 新板替换 `dist/kicad/PSDR_2.6.1_pcb_spike_full.kicad_pcb`（md5
+  `478a4fac8dc4745fe9bfd082826c9062`）；UUID 归一化后与上一版只差 +14 行
+  （2 个 `gr_poly`），无其它改动。未归一化时，插入点之后的 UUID 因发射
+  序号整体 +2 而变化——UUID 是 `uuid5` over 发射序号的确定性值，不是
+  `uuid4`。
+
+**判定**：丝印缺口闭合；M1 剩下的两项是 EDA 两处零铜铺铜（§C-15）和
+一条命令复现 + SHA256 清单。
 
 ---
 
@@ -1625,7 +1714,7 @@ $ git ls-remote upstream 'refs/heads/workorders/*'
 | 里程碑 | 内容 | 退出标准 |
 |---|---|---|
 | M0 建线（2026-11-01） | 推工单提交；打分叉 tag；建 `next`；写 `README.fork.md` | `origin/next` 与 tag 存在，tree 对账一致 |
-| M1 转换闭环（2–4 周） | 1.4 mm 丝印三角、EDA 两处零铜铺铜、一条命令复现 + SHA256 清单 | 重跑 md5 不变；EDA 12/12 有填充 |
+| M1 转换闭环（2–4 周） | ~~1.4 mm 丝印三角~~（§C-17 已闭合，2026-11-01）、EDA 两处零铜铺铜、一条命令复现 + SHA256 清单 | 重跑 md5 不变；EDA 12/12 有填充 |
 | M2 主线成型（1–2 个月） | 把 F7 构建线并入 `next`，验证 F4/F7 构建与 KiCad 产物 | 两条固件线在同一主线可复现；冲突有记录 |
 | M3 硬件验证（硬件到位后） | RF bring-up、#6/#8/#9 | 每项有实测数据；无实物则 SKIP |
 | M4 可制造/整机 | 以上游 `468dc41` Gerber 为生产基线 | 制造与整机验证记录 |

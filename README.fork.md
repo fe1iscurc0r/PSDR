@@ -58,9 +58,12 @@ section is §C-16.
 - **795 KiCad DRC violations remain.** They are triaged in §C-16: none is a
   conversion geometry error; they are source-design violations or two known
   conversion differences (thermal spoke topology, zero-drill Morse paddles).
-- **Known conversion gaps:** a ~1.4 mm silk triangle on GTO is unlocated, and
-  two zones (`+3V3_FLIP_FLOP` on In1, `V_SUPPLY` on F.Cu) rebuild with zero
-  fill when imported into JLCEDA Pro due to a `keepIsland` mismatch.
+- **Known conversion gaps:** two zones (`+3V3_FLIP_FLOP` on In1, `V_SUPPLY`
+  on F.Cu) rebuild with zero fill when imported into JLCEDA Pro due to a
+  `keepIsland` mismatch (§C-15). The silk gap is closed (§C-17): the GTO
+  triangle and the GBO serial patch are PADS `COPPER` records, now emitted as
+  inner-offset polygons, and the 10 mil silk band reconciles 100% GTO /
+  84.82% GBO (the rest is the stroke-font difference on four back-side texts).
 - **Not converted:** SolidWorks enclosures and the PADS binary sources.
 
 ## Reproduce

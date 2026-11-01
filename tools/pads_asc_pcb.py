@@ -3,8 +3,8 @@
 
 The board is emitted whole: every part, every routed segment and via, the four
 planes' pours, the board profile from the ``BOARD`` record, and the silkscreen
-(decals, board-level *LINES*, free *TEXT* and the Ref.Des. labels).  The
-reconciliation against the 2.6.1 Gerbers is in
+(decals, board-level *LINES* and *COPPER*, free *TEXT* and the Ref.Des. labels).
+The reconciliation against the 2.6.1 Gerbers is in
 :mod:`kicad_gerber_compare`; the evidence for each decoding choice is in
 ``docs/WO-psdr-takeover.md``.
 
@@ -52,6 +52,13 @@ Silkscreen decoding, checked stroke by stroke against ``1 - top-ss.GTO`` and
 * A board-level *LINES* piece is not part-relative: layer 26 = F.SilkS,
   29 = B.SilkS.  The two 736-piece hatched "psdr" logos are 2-mil strokes and
   appear as exactly 736 draws of the 0.002 in aperture on each Gerber silk.
+* A board-level **COPPER** record is a filled PADS copper shape, not a route.
+  The two whose COPCLS piece sits on level 26/29 plot as filled silk: the
+  record's boundary is stroked *inside* by a pen of the record's line width
+  (10 mil) and the interior is hatched at 9 mil, so at that pitch the plotted
+  shape is solid.  GTO's triangle by C151 and GBO's 800x190 mil serial-number
+  patch are these records; both are emitted as the inset polygon stroked at
+  the record width, which reproduces the plotted union exactly.
 * Ref.Des. labels go on the part's side with the label's **absolute** ORI
   (R113 part 270/label 90 plots vertical text in GTO).  Part Type is never
   plotted; on R113 its anchor has no stroke where the Ref.Des. anchor has the
@@ -427,16 +434,18 @@ def footprint(ref, part, decal, decal_name, pin_net, silk=False):
 
 
 def parse_board_silk(lines):
-    """Return the *LINES* pieces on the two silkscreen layers.
+    """Return the *LINES*/*COPPER* pieces on the two silkscreen layers.
 
-    Each record is ``NAME LINES XLOC YLOC PIECES FLAGS`` and its piece
+    Each record is ``NAME LINES|COPPER XLOC YLOC PIECES FLAGS`` and its piece
     vertices are relative to XLOC/YLOC.  Layer 26 is the top silk and 29 the
-    bottom; the 15-18 annotation levels of the same section stay out.
+    bottom; the 15-18 annotation levels of the same section stay out.  A
+    ``COPPER`` record is a filled PADS copper shape: the two on layers 26/29
+    plot as hatched fills in GTO/GBO (9 mil hatch, 10 mil stroke).
     """
     start = next(i for i, l in enumerate(lines) if l.startswith("*LINES*"))
     end = next(i for i, l in enumerate(lines) if i > start and l.startswith("*VIA*"))
-    header = re.compile(r"^\S+\s+LINES\s+(-?\d+)\s+(-?\d+)\s+(\d+)\s+(\d+)\s*$")
-    piece = re.compile(r"^(OPEN|CLOSED|CIRCLE|TAG)\s+(\d+)\s+(\d+)\s+(-?\d+)\s+(\d+)\s*$")
+    header = re.compile(r"^\S+\s+(?:LINES|COPPER)\s+(-?\d+)\s+(-?\d+)\s+(\d+)\s+(\d+)(?:\s+\S+)?\s*$")
+    piece = re.compile(r"^(OPEN|CLOSED|CIRCLE|TAG|COPCLS)\s+(\d+)\s+(\d+)\s+(-?\d+)\s+(\d+)")
     pieces = []
     i = start
     while i < end:
@@ -466,6 +475,35 @@ def parse_board_silk(lines):
                                "width": int(m.group(3)), "pts": pts})
             i += n + 1
     return pieces
+
+
+def inset_polygon(pts, d):
+    """Move each vertex of a convex polygon ``d`` units along its bisector.
+
+    PADS strokes a copper shape's boundary as a pen of the shape's line width
+    drawn *inside* the polygon: the GTO copper triangle is exactly the source
+    polygon offset inward by half the 10 mil stroke, and the GBO rectangle's
+    hatches run 5 mil inside its outline.  Stroking this path with the full
+    width reproduces the plotted union.
+    """
+    n = len(pts)
+    out = []
+    for i in range(n):
+        prev, cur, nxt = pts[i - 1], pts[i], pts[(i + 1) % n]
+        ax, ay = prev[0] - cur[0], prev[1] - cur[1]
+        bx, by = nxt[0] - cur[0], nxt[1] - cur[1]
+        la, lb = math.hypot(ax, ay), math.hypot(bx, by)
+        ux, uy, vx, vy = ax / la, ay / la, bx / lb, by / lb
+        cross = ux * vy - uy * vx
+        wx, wy = ux + vx, uy + vy
+        if math.hypot(wx, wy) < 1e-9 or abs(cross) < 1e-9:
+            out.append((cur[0], cur[1]))
+            continue
+        # |u+v| = 2 cos(theta/2), sin(theta) = |cross|, so the bisector step
+        # that clears each edge by d is (u+v) * d / |cross|.
+        out.append((cur[0] + wx * d / abs(cross),
+                    cur[1] + wy * d / abs(cross)))
+    return out
 
 
 def parse_free_text(lines):
@@ -593,10 +631,26 @@ def emit_footprint_silk(part, fp_x, fp_y, decal, out):
 
 
 def emit_board_silk(pieces, out):
-    """Board-level *LINES* silk as gr_line/gr_arc/gr_circle."""
+    """Board-level *LINES* silk as gr_line/gr_arc/gr_circle/gr_poly."""
     for g in pieces:
         layer = "F.SilkS" if g["level"] == 26 else "B.SilkS"
         width = g["width"] / UNITS_PER_MIL * MIL
+        if g["kind"] == "COPCLS":
+            pts = [p[:2] for p in g["pts"]]
+            if len(pts) > 1 and pts[0] == pts[-1]:
+                pts = pts[:-1]
+            # PADS draws a filled shape as its boundary stroked *inside* by a pen
+            # of the record's line width: emit that inner path, stroked full
+            # width, so the outline and the fill land where PADS plots them.
+            pts = inset_polygon(pts, g["width"] / 2.0)
+            xy = " ".join(
+                f"(xy {p[0] / UNITS_PER_MIL * MIL:.4f} {-p[1] / UNITS_PER_MIL * MIL:.4f})"
+                for p in pts)
+            out.append(f'\t(gr_poly\n\t\t(pts {xy})\n'
+                       f'\t\t{_stroke(width)}\n'
+                       f'\t\t(fill solid)\n'
+                       f'\t\t(layer "{layer}")\n\t\t(uuid "{uid()}")\n\t)')
+            continue
         for seg in silk_geometry(g["kind"], g["pts"]):
             if seg[0] == "line":
                 x1, y1 = seg[1][0] / UNITS_PER_MIL * MIL, -seg[1][1] / UNITS_PER_MIL * MIL
