@@ -1927,7 +1927,7 @@ $ git ls-remote upstream 'refs/heads/workorders/*'
 |---|---|---|
 | M0 建线（2026-11-01） | 推工单提交；打分叉 tag；建 `next`；写 `README.fork.md` | `origin/next` 与 tag 存在，tree 对账一致 |
 | M1 转换闭环（2–4 周） | ~~1.4 mm 丝印三角~~（§C-17）、~~一条命令复现 + SHA256 清单~~（§C-18）、~~EDA 两处零铜铺铜~~（§C-15 补充：keepIsland 假设被证伪，真因是转换器丢优先级 + EDA `order` 小者优先；现场 12/12 已达成，复现工具 `tools/eda_epro2_pour_source.py` 已进仓库） | 重跑 md5 不变（达成）；EDA 12/12 有填充（达成）；剩：走一次完整"转换→补丁→导入"实测（#31） |
-| M2 主线成型（1–2 个月） | 把 F7 构建线并入 `next`，验证 F4/F7 构建与 KiCad 产物 | 两条固件线在同一主线可复现；冲突有记录 |
+| M2 主线成型（1–2 个月） | 把 F7 构建线并入 `next`（目录隔离 `Source_F7/`），验证 F4/F7 构建与 KiCad 产物 | 两条固件线在同一主线可复现（达成，见 §E-7：两个 `make` 全 rc=0，产物与合并前逐字节相同）；冲突有记录（达成）；KiCad 产物在新主线上重跑复现链（达成，库内默认路径）；剩：`4dd2fca` 待批准推送 |
 | M3 硬件验证（硬件到位后） | RF bring-up、#6/#8/#9 | 每项有实测数据；无实物则 SKIP |
 | M4 可制造/整机 | 以上游 `468dc41` Gerber 为生产基线 | 制造与整机验证记录 |
 
@@ -2010,6 +2010,184 @@ $ git ls-remote upstream refs/heads/next
 
 EDA 侧（§C-15 补充）：宿主从 3.2.203 升到 **4.1.60** 后，
 `+3V3_FLIP_FLOP`/`V_SUPPLY` 两个铺铜靠改优先级做到 **12/12 出铜**并通过
-`save → 关闭 → 重开 → 回读` 持久化验证；代价是 EDA 自带 DRC 507→520
-（岛铜 `No Connection` 6 + 铜区互相间距 7），且这份改法暂不可从仓库复现
+`save → 关闭 → 重开 → 回读` 持久化验证；代价是 EDA 自带 DRC 507→**513**
+（多的 6 条全是 `+3V3_FLIP_FLOP` 在 In1 的孤岛铜 `No Connection`；中途那次
+读数里的 7 条铜区互相间距在宿主重启后复测归零，报数以重开后复测为准，见 §C-15），
+且这份改法暂不可从仓库复现
 （已另立任务）。
+
+> 后注（同一天的 `786c412`）：可复现的那一半已经落地——`tools/eda_epro2_pour_source.py`
+> 按 `Hardware/PSDR.asc` 的 `POUROUT` 尾部字段和 `PLANEFLAGS` 直接改 `.epro2` 里的
+> `order`/`keepIsland`，12 条 `(net, layer, order, keepIsland)` 与 EDA 自己从 PADS 路由
+> 出来的那份工程逐值相同。还缺的是「从转换开始跑一遍完整链并量到 12/12」这一步，
+> 记在 §E-7 之后未完成任务里。
+
+### E-7 M2 执行记录：F7 构建线并入 next（2026-11-02，本地未推送）
+
+**先量代价，再决定怎么并。** 在 merge base `2c1530d`（2016-05-07，比 fork base `45acd0f` 老）上
+比两条线对 `Source/` 的改动：F7 那条线改了 **503** 个文件，我们这条线改了 **6** 个，重叠 **3** 个
+（`src/hal.c`、`src/main.c`、`src/misc.c`）。`git merge-tree --write-tree 786c412 2e19ad0`
+复算合并结果：**10 条 CONFLICT、涉及 8 个路径**，另有 7 次 auto-merge。
+要紧的是 git 自己给出的三个 file-location 建议——它把我们这侧新增的
+`Source/Makefile.linux`、`Source/Firmware_Build_Notes.md`、`Source/src/uart_hal_stub.c`
+统统建议搬进 `Source_F7/`，再把 F4 那份 `Makefile.linux` 和 F7 那份判成 add/add。
+照它的建议走，得到的就是一棵 F4 源码配 F7 构建脚本（或反之）的杂种树——这就是不能直接并的原因。
+
+**做法：改名在前，合并在后。**
+
+```
+$ git checkout -b m2/f7-as-source-f7 9de9b93 && git mv Source Source_F7
+2e19ad0 chore(merge-prep): 把 F7 构建线整体移到 Source_F7/，准备并入 next
+
+$ git checkout next && git merge --no-ff m2/f7-as-source-f7
+4dd2fca merge: 把 F7 构建线并入 next，用目录隔离而不是覆盖
+ 3156 files changed, 3098506 insertions(+)     ← 全是新增，Source/ 一行没动
+```
+
+`4dd2fca` 的两个父提交是 `786c412`（我们的 `next`）和 `2e19ad0`（改名后的 F7 线）。
+
+冲突解决（8 个路径 10 条，逐条按「两侧各自保持自己那条线的字节」处理，不接受 git 的搬家建议）：
+
+| 路径 | 冲突类型 | 取法 |
+|---|---|---|
+| `.gitignore` | content | 并集：两侧各加自己的构建目录 |
+| `README.md` | content | `--ours`，以 `next` 上已交付的版本为准 |
+| `LICENSE.md` | add/add | 同上 |
+| `Hardware/BOMs/PSDR_2.0.0/PSDR2_BOMwithoutAmp.xlsx` | rename/delete + add/add | `--ours`（32,315 B）：这份就是上游 master `45acd0f` 的字节（`37c3da4` 引入且是其祖先），theirs 是 F7 线上 `2d3f7ee` 的旧版 26,838 B |
+| `Source/src/misc.c` | modify/delete（F7 线把它删了）| 留 ours：F4 线必须要它，§B-2 那处 `#include "stm32f4xx_hal_conf.h"` 的修复就在里面 |
+| `Source/Makefile.linux` → 建议搬到 `Source_F7/Makefile.linux` | file-location + add/add | 拒绝搬家：`Source/Makefile.linux` 保持 F4 那份，`Source_F7/Makefile.linux` 用 F7 那份 |
+| `Source/Firmware_Build_Notes.md` → 建议搬到 `Source_F7/` | file-location | 同上，不搬；`Source_F7/` 里用的是 F7 线自己那份 |
+| `Source/src/uart_hal_stub.c` → 建议搬到 `Source_F7/src/` | file-location | 同上；F7 线本来没有这个文件，HEAD 里 `Source_F7/src/uart_hal_stub.c` 确实不存在 |
+
+auto-merge 过的两个源码路径（`hal.c`/`main.c`，两侧都改过）落成的仍是各自原字节：
+
+```
+$ git rev-parse HEAD:Source/src/hal.c HEAD:Source_F7/src/hal.c
+82a2a8edda666f2cdf85056ae278d47ef54cc937   = 786c412:Source/src/hal.c（F4，未混）
+3e4862232b488d30190e84743c9ea95950205027   = 2e19ad0:Source_F7/src/hal.c（F7，未混）
+$ git rev-parse HEAD:Source/src/main.c HEAD:Source_F7/src/main.c
+4339e617…   = ours（F4）      def78a44…   = theirs（F7）
+```
+
+**树是逐字节搬的，不是重写出来的：**
+
+```
+$ git diff --name-only 2e19ad0 HEAD -- Source_F7 | wc -l
+0        # Source_F7/ 与改名前的 F7 线完全相同
+$ git diff --name-only 786c412 HEAD -- Source | wc -l
+0        # Source/ 仍是 M1 结束时的 F4 线，一个字节没被 F7 覆盖
+```
+
+**`Hardware/` 这次变了 97 个文件，方向是往前不是回退。** 分类是 56 个新增、
+31 个纯改名（`R100`）、1 个 64% 相似改名、1 个「删除」（`Face Cover.SLDPRT` 其实是
+搬进 `Hardware/Enclosure/Archive/`）、8 个内容修改。要紧的三处：
+
+- `Hardware/PSDR.pcb` 2,058,120 → 1,899,112 B、`Hardware/PSDR.sch` 525,874 → 563,969 B、
+  `Hardware/PSDR Schematic.pdf` 317,207 → 346,496 B。这三份在**上游 master `45acd0f`
+  上最后一次改动是 2016-04-18 的 `1890b25`「PSDR 2.5 prototypes」**，而 2.6/2.6.1 的工作
+  （`8ad6b3c`、`468dc41`）只在 F7/Rebuild 那条线上——`468dc41` 不是 `45acd0f` 的祖先。
+  所以 F7 侧那份才是 2.6.1 的设计二进制，merge 是把主线缺的东西补进来。
+  我们这侧自 merge base `2c1530d` 起没碰过这三个文件，所以 git 直接取 theirs，不报冲突。
+- `Hardware/Gerbers/PSDR26 Main Board/`（14 个）和 `Hardware/Gerbers/PSDR261 Main Board/`
+  （16 个）第一次出现在主线树里。§C-18 复现链默认 `--pads-gerbers` 指的就是后者，
+  **合并前它在 `next` 上根本不存在**，M1 那两次跑是把上游 `468dc41` 的 Gerber 单独
+  clone 到板外再显式指过去。
+- 转换源 `Hardware/PSDR.asc` 两侧 blob 相同（`115cf190`，1,641,124 B），合并没动它。
+
+合并后立刻用**库内**默认路径重跑一次复现链，确认 §C-16/§C-17 的对账基线没漂：
+
+```
+$ python tools/reproduce_kicad.py --check
+...
+OK   PSDR_2.6.1_pcb_spike_full.kicad_pcb
+OK   fab/…-B_Cu.gbr … fab/…-In2_Cu.gbr
+OK   fab/PSDR_2.6.1_pcb_spike_full.drl
+all files match the manifest          # 10 个文件全 OK，rc=0
+
+$ sha256sum "Hardware/Gerbers/PSDR261 Main Board/8 - bot-ss.GBO" \
+            "../PSDR-build-artifacts/gerber261/Hardware/Gerbers/PSDR261 Main Board/8 - bot-ss.GBO"
+0f7c904f65dd3e707c9228f49803eb07d3ca64541d5044b7d94408f9249fe271  (两个)
+$ sha256sum "Hardware/Gerbers/PSDR261 Main Board/1 - top-ss.GTO" \
+            "../PSDR-build-artifacts/gerber261/Hardware/Gerbers/PSDR261 Main Board/1 - top-ss.GTO"
+b037b7f2e9a090eeed916207f42b0dd7dcca9687157232cdd51f279cd008026c  (两个)
+```
+
+**退出标准（两条固件线在同一主线可构建）——两条都过，且产物与合并前逐字节相同。**
+WSL Ubuntu-24.04 + `arm-none-eabi-gcc 13.2.1`，两个 Makefile 只用树内相对路径，
+所以改名不影响构建：
+
+| 线 | 目录 | `make -f Makefile.linux -j` | text/data/bss | 锚点自证 |
+|---|---|---|---|---|
+| F4 | `Source/` | `F4_MAKE_RC=0` | 133644 / 2884 / 18152 | `anchor_check.py` 对 `Debug/PSDR.hex`：SP `0x20030000`、reset `0x080001B5` 双双 OK，`RESULT: PASS` |
+| F7 | `Source_F7/` | `F7_MAKE_RC=0` | 103324 / 9144 / 17276 | 见下：向量锚点与作者 2018-06-21 的 `Source_F7/Debug/PSDR.hex`（上游 `457c270` 写入）对账 |
+
+F7 的锚点对账结果第一次落到仓库里（之前只存在板外的
+`../PSDR-build-artifacts/compare_vectors_out.txt`，任务 #20 的结论没有回写文档，这一条补上），
+并把那次比对照成了可重跑的 `tools/anchor_check_f7.py`：
+
+```
+$ python tools/anchor_check_f7.py Source_F7/build_linux_f7/PSDR.hex Source_F7/Debug/PSDR.hex
+reference Source_F7/Debug/PSDR.hex
+          base=0x08000000  SP=0x20050000  reset=0x080002F9  empty-slots=[7, 8, 9, 10, 13, 95]
+built     Source_F7/build_linux_f7/PSDR.hex
+          base=0x08000000  SP=0x20050000  reset=0x080001D5  empty-slots=[7, 8, 9, 10, 13, 95]
+initial SP agree     : True
+empty-slot pattern   : True
+reset value agree    : False (not a gate)
+words equal          : 7/118
+RESULT: PASS
+rc=0
+```
+
+判定与 F4 那条线同一口径：初始 SP 逐字节一致、空槽位模式一致，reset 向量的**取值**随
+GCC/链接器布局移动——`docs/psdr-handoff/anchor_check.py` 把 reset 取值也当门（F4 上确实
+相等），F7 上不能这么判，所以新脚本只把 SP 与空槽模式当门，reset 当观测值报出来。
+`Makefile.linux` 的 `anchors` 目标在 F7 线上只 `echo` 参考路径、不含自动判定。
+改名与合并没有移动任何一个字节（下面四对 sha256 全等）。
+
+产物哈希与合并前留在板外的 artifact 一模一样（4 对全等）：
+
+```
+$ sha256sum ../PSDR-build-artifacts/PSDR-f7-head.hex Source_F7/build_linux_f7/PSDR.hex
+5ce8588611ce4e6f5408d2858b8def5060ce45a417cc1779056829bc6bdbc43e  (两个)
+$ sha256sum ../PSDR-build-artifacts/PSDR-f7-head.bin  Source_F7/build_linux_f7/PSDR.bin
+f2c5874b52f23edba5d4ad68270e0b746c881c0d0263df2a4bfdc8e3d3ab4eec  (两个)
+$ sha256sum ../PSDR-build-artifacts/PSDR.hex Source/build_linux/PSDR.hex
+1c731aa599a49a8db4ec1ae591b37f9c47b093c88397430b69a66dff001a87a9  (两个)
+$ sha256sum ../PSDR-build-artifacts/PSDR.bin Source/build_linux/PSDR.bin
+1a824d1c1d47c0387f6c2cd6d5e09e5cbff991e1d1370a2ba87c67593829d9a7  (两个)
+```
+
+完整构建日志（含 newlib `_close`/`_write` 警告、`nineSmall` 符号尺寸警告这些本来就有的噪音）：
+`../PSDR-build-artifacts/f7_build.log`、`f4_build.log`（板外，不入库）。
+
+**上游自己的构建产物留在树里，这次没动。** `next` 上现在跟踪
+`Debug/` 141、`TestingMakeFile/` 1530、`TestingMakeFile2/` 813 个文件，其中
+`.o/.hex/.bin/.map/.lst` 共 **364** 个（`Debug` 140、`TestingMakeFile` 116、
+`TestingMakeFile2` 106、`Source/Debug/PSDR.hex` 与 `Source_F7/Debug/PSDR.hex` 各 1）。
+不在这次一并清理的理由：这两份 `Debug/PSDR.hex` 正是上面锚点自证的参考文件，
+`TestingMakeFile*` 是上游 Eclipse 工程的原始状态；把它们从版本控制里撤掉是一次
+独立的决定，混进 merge 提交会让「树逐字节搬」这句自证失效。已单独立项。
+
+`.gitignore` 这次只加了两条本次构建真正落地的目录（`Source/build_linux/`、
+`Source_F7/build_linux_f7/`），加完 `git status --porcelain` 干净。
+
+**补记：F7 构建线本身（任务 #18–#20）此前没写进本文档。** 那三步的结论只留在分支提交
+信息 `9de9b93` 和板外日志里，正文里连 `0x20050000` 都没出现过，这里补齐要点：
+
+- 基点：`PSDR_Rebuild` 的 `b9c0629`（不是 `master`），工作分支
+  `workorders/2026-11-01-psdr-f7-linux-build`；`Source/Makefile.linux` 按 `.cproject`
+  的 Debug 配置转写，默认 `-O0`，`OPT=` 可覆盖，产物目录 `build_linux_f7`。
+- 构建阻断 3 处（都是上游 Eclipse 配置里排除/漏掉的东西）：
+  `stm32f7xx_hal_msp_template.c` 造成 MSP 符号重复定义 → 排除；
+  `si5338.c`、`frequency_control.c` 缺 HAL 包含与 `handleI2C` 声明 → 补齐。
+- 与作者 2018-06-21 的 `Source_F7/Debug/PSDR.hex` 对账：初始 SP 与空槽模式一致，
+  reset 取值因链接器布局不同而移动。当时的四组对照（`compare_vectors_out.txt`）：
+  参考 `reset=0x080002f9`；HEAD 线 `-O0` 与本文件在 `457c270` 上的 `-O0` 都是
+  `0x080001d5`；`457c270` 的 `-Os` 是 `0x080001cd`——也就是优化档会移动 reset 取值，
+  默认 `-O0` 给出的才是现在记录的这一组（尺寸 `103324/9144/17276`）。
+- 上面这些现在都能在新主线上重跑：`make -f Makefile.linux -j` 与
+  `python tools/anchor_check_f7.py`。
+
+**推送状态：`4dd2fca` 只在本地，`origin/next` 仍停在 `786c412`（回滚点）。**
+M0/M1 的推送是逐次批准的，这次合并的推送要单独问过才动。

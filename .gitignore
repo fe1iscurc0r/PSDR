@@ -75,3 +75,5 @@ Hardware/Enclosure/~$Speaker.SLDPRT
 Hardware/Enclosure/~$USB_Connector.SLDPRT
 Hardware/Enclosure/~$paddle.SLDPRT
 Hardware/Enclosure/~$paddle_Mirrored.SLDPRT
+Source/build_linux/
+Source_F7/build_linux_f7/
