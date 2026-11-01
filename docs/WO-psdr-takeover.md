@@ -1164,6 +1164,126 @@ J170 缺 1 个 3.2 mm 安装孔、铺铜边界比源 CAM 多 0.13 mm。
 
 ---
 
+### C-15 导入嘉立创EDA Pro：KiCad 路线丢层/丢网/丢铺铜网络的根因与修复（2026-11-01）
+
+工单没要求这一步，属于接管后用户提出的"能不能放进嘉立创EDA"。结论先写：
+**能，但必须先在生成器和本地转换器上修三处缺陷**；修完后四层、278 网、
+12 个铺铜区、391 器件都能在 EDA 里读到。宿主的 EDA 是 **3.2.203（V3）**，
+低于本项目技能基线的 V4，属于已知限制。
+
+**路线**：官方 `eda.sys_FileManager.importProjectByProjectFile` 只吃
+`File` 对象，页面内的 KiCad 转换 worker 会把失败对象 stringify 成
+`[object Object]`，没法定位。改为**本地跑 EDA 自带的转换器**
+（`chameleon/3.2.50.42fc27da/js/convert-node-server.js`，`--cmd conversion`），
+再用一个带 CORS 的本地 HTTP 服务喂给页面里的官方 API。转换器副本放在仓外
+`PSDR-build-artifacts/eda-import/tools/convert-node-server-patched.js`。
+
+**缺陷 1（仓库内，已修）：生成器写的铜层编号是 KiCad 5 的旧编号。**
+`tools/pads_asc_pcb.py` 声明 `(version 20260206)`，却把 In1/In2/B.Cu 写成
+layer id 1/2/31。转换器按版本走 `init3`（KiCad 9/10 编号：1=F.Mask、
+2=B.Cu、31=F.CrtYd），于是 In2→Bottom、B.Cu→自定义层 "B.Cu"(id 76)、
+In1→F.Mask 被当阻焊丢掉。改成 `(0 F.Cu)(4 In1.Cu)(6 In2.Cu)(2 B.Cu)`、
+四个都写 `signal` 后，整板除这 3 行外逐字节不变：
+
+```
+nets 278; parts 391; pads 1194 (1132 netted, 62 not)
+track segments 5034 (189 zero-length dropped); arcs 22; vias 419
+outline 42 lines + 25 arcs 100.00x65.00 mm
+pours 12 {F.Cu:7, In1.Cu:3, In2.Cu:1, B.Cu:1}
+DRC 795 violations / 0 unconnected（与修改前同类同数，仅时间戳与两条报错顺序变化）
+```
+
+对照物是 pcbnew 10.0 自己写出的四层板 `probe/ki10_4layer.kicad_pcb`，
+确认 KiCad 10 的规范编号就是 0/4/6/2。
+
+**缺陷 2（转换器）：`parseNet` 用 shell 式分词器取网名，反斜杠被当转义。**
+`AUDIO_AMP_\SHDN`、`\EARPHONE_INSERTED` 两个网因此变成 `undefined`，
+276 网、7 个焊盘丢网。补丁只去掉包围引号、保留反斜杠原文。
+
+**缺陷 3（转换器）：`parseCopperpour` 用 `netObj[net]` 按数字 ID 查网名，
+但 KiCad 9/10 的 zone 写的是 `(net "GND")` 字符串**，查表得 `undefined`，
+12 个铺铜的 `netName` 全空。EDA 读回直接报
+`Copper pour boundary ie9344 has no readable net`。补丁：字符串直接做网名、
+数字才查表。
+
+**离线校验（修完后的 epro2）**：
+
+```
+837 docs {SCH 10, SCH_PAGE 10, DEVICE 541, SYMBOL 164, FOOTPRINT 100,
+          INSTANCE 9, CONFIG 1, BOARD 1, PCB 1}
+铜层 TOP/In1.Cu/In2.Cu/BOTTOM 均 use=true；In3..In30 未启用
+PCB 文档：LINE 5024 + ARC 22 + VIA 419 + COMPONENT 391 + POUR 12 + PAD_NET 1870
+PAD_NET 不同网名 279（含空网名）= 278 个真实网络，两个反斜杠网各 5/2 个焊盘
+POLY 按层：3=787、4=757、11=67（板框 67 段）
+12 个 POUR 的 (层, 网) 与源板 12 个 zone 一一对应
+```
+
+**线上导入结果**（新工程 `PSDR 2.6.1 (KiCad 4L final)`，
+uuid `2fec79e66cba43fd9f0d848161f902a9`）：
+
+| 项 | 读回命令 | 结果 |
+|---|---|---|
+| 铜层 | `pcb layers` | `copperLayerCount 4`，In1/In2 启用 |
+| 网络 | `pcb nets` | 278，含 `\EARPHONE_INSERTED`、`AUDIO_AMP_\SHDN` |
+| 器件 | `pcb list` | 391 |
+| 铺铜边界 | `call pcb.pour.list` | 12 个，(层,网) 全对 |
+| 铺铜铜皮 | `call pcb.pour.rebuild` → `pcb poured-list` | 12 个边界重建，10 个产出铜皮 |
+| 板框 | `pcb outline-get` | `67` 条 layer 11 折线；`outlineFormat:"ambiguous:67-polylines:empty"` |
+| 原理图 | `sch pages` | 10 页（root + p02..p10） |
+
+**板框读回缺口**：EDA 把 KiCad 的 42 线 + 25 弧拆成 67 条 layer 11 折线，
+`outline-get` 不会把它们拼成一条闭合轮廓，所以只回读成 AABB（`pcb dump`
+明确标 `partial`）。但引擎本身认这条边界：DRC 报出 32 条
+`Board Outline to SMD Pad/Track`，对象 id 就是 `ie94xx` 这些折线。
+对比 PADS 路线：PADS 的 epru 里是**一条** `polyType:"BOARD_OUTLINE"`，
+`outline-get` 同样回读失败（`outline:1 / segments:0 / format empty`）。
+两条路线的这个 API 都是读回缺口，不是数据丢失。
+
+**两个铺铜不出铜**：`+3V3_FLIP_FLOP`（In1，ie9349）和 `V_SUPPLY`
+（F.Cu，ie9355）重建后 `poured fills 0`。原因是 eda 导入时
+`keepIsland=false`（源 KiCad zone 写的是 `island_removal_mode 0`），
+这两个小区被周边更高优先级的铜完全覆盖，孤岛被剔除。PADS 原始 POUR
+记录里 `keepIsland=true`。要完全对齐，得在 epro2 里改这两个 POUR 的
+`keepIsland` 后重导；本轮没做，如实记为差异。
+
+**EDA 自带 DRC**（`pcb drc --json`，默认规则，不是源设计规则）：
+
+```
+passed false / total 507
+Via Size 419（EDA 默认要求孔径 19.7~393.7 mil，源过孔 14 mil）
+Board Outline to SMD Pad 20 / SMD Pad to Track 19 / TH Pad to Track 18
+SMD Pad to TH Pad 14 / Board Outline to Track 12 / Device to TH Pad 4
+Netlist Error 1（原理图↔PCB 网表差异；原理图是 2016 PDF 重建版）
+```
+
+这 507 条与 KiCad 的 795 条不是同一套规则，不能互相加减。
+
+**复现命令**（仓外）：
+
+```
+node tools/convert-node-server-patched.js --cmd conversion --params \
+  '{"decodingOptions":{"decodingType":"kicad",
+    "decodingFilePath":".../PSDR_2.6.1_kicad_fixed.zip","projectName":"PSDR_2.6.1"},
+    "encodingOptions":{"encodingType":"easyeda-pro-2",
+    "savingDirPath":".../out","savingFileName":"PSDR_full_zip2"}}'
+# 页面内：
+# const r=await fetch('http://127.0.0.1:48765/out/PSDR_full_zip2.epro2');
+# const f=new File([await r.arrayBuffer()],'PSDR_2.6.1.epro2');
+# await eda.sys_FileManager.importProjectByProjectFile(f,'EasyEDA Pro',
+#   {importOption:'ImportDocument'},
+#   {operation:'Existing Project',existingProjectUuid:'<新工程 uuid>'});
+```
+
+后续 `pcb save` → `project export-source` 回导（1,109,579 B）复核：
+12 个 POUR 带网、12 个 POURED 记录（其中 2 个 fills 0）、391 器件、
+419 过孔、67 条 layer 11 折线，持久化无误。
+
+**已知限制**：宿主 V3，技能基线要求 V4；中间工程
+`PSDR 2.6.1 (KiCad 4L)`（铺铜无网的过渡版）和旧的降级工程
+`PSDR 2.6.1 KiCad` 需要用户在 EDA 里手工删除——typed 接口没有删工程的 action。
+
+---
+
 ## 任务 D · 提交归档
 
 待推清单（工单列的）与本轮实际状态：

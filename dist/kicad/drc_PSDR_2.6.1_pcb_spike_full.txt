@@ -1,68 +1,72 @@
 ** Drc report for PSDR_2.6.1_pcb_spike_full.kicad_pcb **
-** Created on 2026-11-01T13:46:35 **
+** Created on 2026-11-01T16:37:52 **
 ** Report includes: Errors, Warnings, Exclusions **
 
 ** Found 795 DRC violations **
-[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1607 mm)
-    Local override; error
-    @(41.6306 mm, -41.1226 mm): Track [GND] on B.Cu, length 1.0853 mm
-    @(41.8980 mm, -42.3110 mm): Pad 5 [<no net>] of U241 on B.Cu
-[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1797 mm)
-    Local override; error
-    @(43.0730 mm, -41.6360 mm): Pad 7 [+3V3_CPU] of U241 on B.Cu
-    @(42.3980 mm, -41.8900 mm): Track [GND] on B.Cu, length 0.4210 mm
-[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1272 mm)
-    Local override; error
-    @(24.2290 mm, -58.4480 mm): Track [GND] on B.Cu, length 0.3196 mm
-    @(23.8050 mm, -57.5900 mm): Pad 7 [<no net>] of U253 on B.Cu
 [clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1174 mm)
     Local override; error
     @(23.5458 mm, -59.1312 mm): Track [GND] on B.Cu, length 0.9662 mm
     @(23.8050 mm, -57.5900 mm): Pad 7 [<no net>] of U253 on B.Cu
-[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1640 mm)
+[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1784 mm)
     Local override; error
-    @(34.7700 mm, -12.5360 mm): Pad 25 [GND] of U287 on B.Cu
-    @(34.5948 mm, -11.7856 mm): Track [FILTER_IN_P] on B.Cu, length 0.4593 mm
-[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2393 mm)
+    @(35.4700 mm, -16.2360 mm): Pad 18 [$$$31740] of U287 on B.Cu
+    @(35.0240 mm, -16.7360 mm): Track [GND] on B.Cu, length 0.6788 mm
+[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1272 mm)
+    Local override; error
+    @(24.2290 mm, -58.4480 mm): Track [GND] on B.Cu, length 0.3196 mm
+    @(23.8050 mm, -57.5900 mm): Pad 7 [<no net>] of U253 on B.Cu
+[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1797 mm)
+    Local override; error
+    @(43.0730 mm, -41.6360 mm): Pad 7 [+3V3_CPU] of U241 on B.Cu
+    @(42.3980 mm, -41.8900 mm): Track [GND] on B.Cu, length 0.4210 mm
+[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1607 mm)
+    Local override; error
+    @(41.6306 mm, -41.1226 mm): Track [GND] on B.Cu, length 1.0853 mm
+    @(41.8980 mm, -42.3110 mm): Pad 5 [<no net>] of U241 on B.Cu
+[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2227 mm)
     Rule: <电路板配置> 中的 "孔" 约束; error
-    @(81.7910 mm, -53.2638 mm): Track [ENC_SW] on F.Cu, length 1.5044 mm
-    @(81.5241 mm, -52.2000 mm): NPTH pad of J153
-[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2055 mm)
-    Rule: <电路板配置> 中的 "孔" 约束; error
-    @(81.7372 mm, -53.6702 mm): Track [ENC_B] on F.Cu, length 2.1736 mm
-    @(81.5241 mm, -54.7400 mm): NPTH pad of J153
-[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1641 mm)
+    @(82.7278 mm, -42.3440 mm): Track [LIPO] on B.Cu, length 8.0750 mm
+    @(81.5241 mm, -47.1200 mm): NPTH pad of J153
+[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1443 mm)
     Local override; error
-    @(9.2964 mm, -26.9494 mm): Track [$$$1603] on B.Cu, length 0.0865 mm
-    @(8.2760 mm, -26.7520 mm): Pad 1 [GND] of U314 on B.Cu
-[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1231 mm)
-    Local override; error
-    @(8.2760 mm, -26.7520 mm): Pad 1 [GND] of U314 on B.Cu
-    @(9.2352 mm, -27.0106 mm): Track [$$$1603] on B.Cu, length 0.5535 mm
-[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1506 mm)
-    Local override; error
-    @(63.6458 mm, -32.3662 mm): Track [GPS_POWER] on F.Cu, length 0.8355 mm
-    @(64.1458 mm, -33.0928 mm): Pad 68 [USB_VBUS] of U121 on F.Cu
+    @(48.0470 mm, -52.6390 mm): Pad 1 [$$$14690] of U85 on F.Cu
+    @(48.2906 mm, -53.6702 mm): Track [$$$14589] on F.Cu, length 0.5747 mm
 [clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1923 mm)
     Local override; error
     @(25.0350 mm, -49.7840 mm): Pad 8 [+3V3_CPU] of U15 on F.Cu
     @(24.0284 mm, -50.0380 mm): Track [OP_GAIN_A_WP] on F.Cu, length 0.3479 mm
-[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2285 mm)
-    Rule: <电路板配置> 中的 "孔" 约束; error
-    @(79.1591 mm, -46.0375 mm): Track [+3V3_CPU] on F.Cu, length 2.8702 mm
-    @(81.5241 mm, -47.1200 mm): NPTH pad of J153
-[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1507 mm)
+[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1506 mm)
     Local override; error
-    @(46.2280 mm, -46.0248 mm): Track [DAC2_TO_RF] on F.Cu, length 1.4368 mm
-    @(45.7280 mm, -45.3230 mm): Pad 7 [DAC2_TO_SPEAKER] of U86 on F.Cu
-[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2285 mm)
-    Rule: <电路板配置> 中的 "孔" 约束; error
-    @(82.0293 mm, -46.0375 mm): Track [+3V3_CPU] on F.Cu, length 2.8702 mm
-    @(81.5241 mm, -47.1200 mm): NPTH pad of J153
-[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1460 mm)
+    @(63.6458 mm, -32.3662 mm): Track [GPS_POWER] on F.Cu, length 0.8355 mm
+    @(64.1458 mm, -33.0928 mm): Pad 68 [USB_VBUS] of U121 on F.Cu
+[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1231 mm)
     Local override; error
-    @(26.2890 mm, -50.3428 mm): Track [+3V3_CPU] on F.Cu, length 0.7903 mm
-    @(25.0350 mm, -50.2840 mm): Pad 9 [OP_GAIN_A_WP] of U15 on F.Cu
+    @(8.2760 mm, -30.6520 mm): Pad 7 [GND] of U314 on B.Cu
+    @(9.3218 mm, -30.4800 mm): Track [$$$1611] on B.Cu, length 0.6760 mm
+[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2098 mm)
+    Rule: <电路板配置> 中的 "孔" 约束; error
+    @(44.9834 mm, -1.5240 mm): Track [$$$11833] on In1.Cu, length 6.5017 mm
+    @(44.9580 mm, -2.5400 mm): NPTH pad of RST
+[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2098 mm)
+    Rule: <电路板配置> 中的 "孔" 约束; error
+    @(43.3070 mm, -1.9304 mm): Track [$$$9819] on In1.Cu, length 1.9038 mm
+    @(44.9580 mm, -2.5400 mm): NPTH pad of RST
+[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2100 mm)
+    Rule: <电路板配置> 中的 "孔" 约束; error
+    @(44.6532 mm, -3.2766 mm): Track [$$$9819] on In1.Cu, length 1.4986 mm
+    @(44.9580 mm, -2.5400 mm): NPTH pad of RST
+[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1590 mm)
+    Local override; error
+    @(55.7022 mm, -41.2750 mm): Track [MIC_FILTER_OUT] on F.Cu, length 1.4747 mm
+    @(53.9208 mm, -41.8178 mm): Pad 36 [TX_RF_SWITCH_A] of U121 on F.Cu
+[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1866 mm)
+    Local override; error
+    @(46.7280 mm, -48.9204 mm): Track [DAC1] on F.Cu, length 0.3592 mm
+    @(47.2280 mm, -49.6730 mm): Pad 1 [DAC1_TO_RF] of U86 on F.Cu
+[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1875 mm)
+    Local override; error
+    @(62.4586 mm, -31.7754 mm): Via [TX_FROM_GPS] on F.Cu - B.Cu
+    @(62.6458 mm, -33.0928 mm): Pad 65 [SDIO_DAT0] of U121 on F.Cu
 [clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1902 mm)
     Local override; error
     @(65.4304 mm, -31.7754 mm): Via [GPS_POWER] on F.Cu - B.Cu
@@ -71,10 +75,6 @@
     Local override; error
     @(68.0466 mm, -38.1254 mm): Via [CHARGE_STATUS2] on F.Cu - B.Cu
     @(69.3708 mm, -38.3178 mm): Pad 83 [SDIO_CMD] of U121 on F.Cu
-[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1875 mm)
-    Local override; error
-    @(62.4586 mm, -31.7754 mm): Via [TX_FROM_GPS] on F.Cu - B.Cu
-    @(62.6458 mm, -33.0928 mm): Pad 65 [SDIO_DAT0] of U121 on F.Cu
 [clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1945 mm)
     Local override; error
     @(57.6458 mm, -48.5428 mm): Pad 21 [+3V3] of U121 on F.Cu
@@ -87,10 +87,6 @@
     Local override; error
     @(53.9208 mm, -40.8178 mm): Pad 38 [FLIP-FLOP_POWER] of U121 on F.Cu
     @(56.0324 mm, -39.9288 mm): Track [GPS_PPS] on F.Cu, length 1.9643 mm
-[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1866 mm)
-    Local override; error
-    @(46.7280 mm, -48.9204 mm): Track [DAC1] on F.Cu, length 0.3592 mm
-    @(47.2280 mm, -49.6730 mm): Pad 1 [DAC1_TO_RF] of U86 on F.Cu
 [clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1438 mm)
     Local override; error
     @(55.4736 mm, -47.4980 mm): Track [AMP_SWITCH_A] on F.Cu, length 1.3291 mm
@@ -99,14 +95,22 @@
     Local override; error
     @(56.6458 mm, -48.5428 mm): Pad 23 [BOOT1] of U121 on F.Cu
     @(57.1458 mm, -47.7520 mm): Track [AMP_SWITCH_A] on F.Cu, length 0.3592 mm
+[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1460 mm)
+    Local override; error
+    @(26.2890 mm, -50.3428 mm): Track [+3V3_CPU] on F.Cu, length 0.7903 mm
+    @(25.0350 mm, -50.2840 mm): Pad 9 [OP_GAIN_A_WP] of U15 on F.Cu
+[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2285 mm)
+    Rule: <电路板配置> 中的 "孔" 约束; error
+    @(82.0293 mm, -46.0375 mm): Track [+3V3_CPU] on F.Cu, length 2.8702 mm
+    @(81.5241 mm, -47.1200 mm): NPTH pad of J153
+[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2285 mm)
+    Rule: <电路板配置> 中的 "孔" 约束; error
+    @(79.1591 mm, -46.0375 mm): Track [+3V3_CPU] on F.Cu, length 2.8702 mm
+    @(81.5241 mm, -47.1200 mm): NPTH pad of J153
 [clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1283 mm)
     Local override; error
     @(40.0177 mm, -23.0759 mm): Track [$$$32286] on B.Cu, length 6.7172 mm
     @(44.1325 mm, -17.6860 mm): Pad 4 [FILTER_OUT_N] of U211 on B.Cu
-[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1578 mm)
-    Local override; error
-    @(46.7280 mm, -49.6730 mm): Pad 2 [DAC1] of U86 on F.Cu
-    @(47.0455 mm, -50.5667 mm): Track [DAC1_TO_RF] on F.Cu, length 0.2940 mm
 [clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1573 mm)
     Local override; error
     @(46.7280 mm, -49.6730 mm): Pad 2 [DAC1] of U86 on F.Cu
@@ -119,94 +123,90 @@
     Local override; error
     @(46.2280 mm, -48.9204 mm): Track [DAC1_TO_SPEAKER] on F.Cu, length 0.3592 mm
     @(45.7280 mm, -49.6730 mm): Pad 4 [GND] of U86 on F.Cu
-[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2100 mm)
-    Rule: <电路板配置> 中的 "孔" 约束; error
-    @(44.6532 mm, -3.2766 mm): Track [$$$9819] on In1.Cu, length 1.4986 mm
-    @(44.9580 mm, -2.5400 mm): NPTH pad of RST
-[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2098 mm)
-    Rule: <电路板配置> 中的 "孔" 约束; error
-    @(43.3070 mm, -1.9304 mm): Track [$$$9819] on In1.Cu, length 1.9038 mm
-    @(44.9580 mm, -2.5400 mm): NPTH pad of RST
+[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1507 mm)
+    Local override; error
+    @(46.2280 mm, -46.0248 mm): Track [DAC2_TO_RF] on F.Cu, length 1.4368 mm
+    @(45.7280 mm, -45.3230 mm): Pad 7 [DAC2_TO_SPEAKER] of U86 on F.Cu
 [clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1231 mm)
     Local override; error
-    @(8.2760 mm, -30.6520 mm): Pad 7 [GND] of U314 on B.Cu
-    @(9.3218 mm, -30.4800 mm): Track [$$$1611] on B.Cu, length 0.6760 mm
-[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1590 mm)
+    @(8.2760 mm, -26.7520 mm): Pad 1 [GND] of U314 on B.Cu
+    @(9.2352 mm, -27.0106 mm): Track [$$$1603] on B.Cu, length 0.5535 mm
+[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1641 mm)
     Local override; error
-    @(55.7022 mm, -41.2750 mm): Track [MIC_FILTER_OUT] on F.Cu, length 1.4747 mm
-    @(53.9208 mm, -41.8178 mm): Pad 36 [TX_RF_SWITCH_A] of U121 on F.Cu
-[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2098 mm)
-    Rule: <电路板配置> 中的 "孔" 约束; error
-    @(44.9834 mm, -1.5240 mm): Track [$$$11833] on In1.Cu, length 6.5017 mm
-    @(44.9580 mm, -2.5400 mm): NPTH pad of RST
+    @(9.2964 mm, -26.9494 mm): Track [$$$1603] on B.Cu, length 0.0865 mm
+    @(8.2760 mm, -26.7520 mm): Pad 1 [GND] of U314 on B.Cu
+[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1578 mm)
+    Local override; error
+    @(46.7280 mm, -49.6730 mm): Pad 2 [DAC1] of U86 on F.Cu
+    @(47.0455 mm, -50.5667 mm): Track [DAC1_TO_RF] on F.Cu, length 0.2940 mm
 [clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1542 mm)
     Local override; error
     @(83.4644 mm, -26.7716 mm): Track [LOW_BAT] on B.Cu, length 4.0950 mm
     @(85.8600 mm, -30.0790 mm): Pad 9 [GND] of U161 on B.Cu
-[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2066 mm)
-    Rule: <电路板配置> 中的 "孔" 约束; error
-    @(78.7908 mm, -41.0464 mm): Track [SDIO_DAT2] on F.Cu, length 2.0116 mm
-    @(77.0000 mm, -40.5400 mm): NPTH pad of J170
 [hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2144 mm)
     Rule: <电路板配置> 中的 "孔" 约束; error
     @(77.3684 mm, -39.6240 mm): Track [SDIO_DAT2] on F.Cu, length 1.9812 mm
+    @(77.0000 mm, -40.5400 mm): NPTH pad of J170
+[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2066 mm)
+    Rule: <电路板配置> 中的 "孔" 约束; error
+    @(78.7908 mm, -41.0464 mm): Track [SDIO_DAT2] on F.Cu, length 2.0116 mm
     @(77.0000 mm, -40.5400 mm): NPTH pad of J170
 [hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2042 mm)
     Rule: <电路板配置> 中的 "孔" 约束; error
     @(76.6318 mm, -41.4528 mm): Track [SDIO_DAT3] on F.Cu, length 7.2620 mm
     @(77.0000 mm, -40.5400 mm): NPTH pad of J170
-[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1808 mm)
-    Local override; error
-    @(69.3708 mm, -37.8178 mm): Pad 82 [CHARGE_STATUS2] of U121 on F.Cu
-    @(70.6628 mm, -37.7952 mm): Track [SDIO_CMD] on F.Cu, length 0.7391 mm
 [hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2112 mm)
     Rule: <电路板配置> 中的 "孔" 约束; error
     @(81.3054 mm, -41.4528 mm): Track [SDIO_DAT3] on F.Cu, length 4.6736 mm
     @(77.0000 mm, -40.5400 mm): NPTH pad of J170
-[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2221 mm)
-    Rule: <电路板配置> 中的 "孔" 约束; error
-    @(79.7814 mm, -54.3814 mm): Track [LIPO] on In1.Cu, length 3.0533 mm
-    @(76.0000 mm, -55.0500 mm): NPTH pad of J170
+[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1808 mm)
+    Local override; error
+    @(69.3708 mm, -37.8178 mm): Pad 82 [CHARGE_STATUS2] of U121 on F.Cu
+    @(70.6628 mm, -37.7952 mm): Track [SDIO_CMD] on F.Cu, length 0.7391 mm
 [hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2201 mm)
     Rule: <电路板配置> 中的 "孔" 约束; error
     @(77.6224 mm, -56.5404 mm): Track [LIPO] on In1.Cu, length 3.0533 mm
     @(76.0000 mm, -55.0500 mm): NPTH pad of J170
-[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2227 mm)
+[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2221 mm)
     Rule: <电路板配置> 中的 "孔" 约束; error
-    @(82.7278 mm, -42.3440 mm): Track [LIPO] on B.Cu, length 8.0750 mm
-    @(81.5241 mm, -47.1200 mm): NPTH pad of J153
-[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1443 mm)
-    Local override; error
-    @(48.0470 mm, -52.6390 mm): Pad 1 [$$$14690] of U85 on F.Cu
-    @(48.2906 mm, -53.6702 mm): Track [$$$14589] on F.Cu, length 0.5747 mm
+    @(79.7814 mm, -54.3814 mm): Track [LIPO] on In1.Cu, length 3.0533 mm
+    @(76.0000 mm, -55.0500 mm): NPTH pad of J170
+[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2055 mm)
+    Rule: <电路板配置> 中的 "孔" 约束; error
+    @(81.7372 mm, -53.6702 mm): Track [ENC_B] on F.Cu, length 2.1736 mm
+    @(81.5241 mm, -54.7400 mm): NPTH pad of J153
 [hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2098 mm)
     Rule: <电路板配置> 中的 "孔" 约束; error
     @(43.3578 mm, -1.9812 mm): Track [USB_ID] on B.Cu, length 6.9328 mm
     @(44.9580 mm, -2.5400 mm): NPTH pad of RST
-[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1466 mm)
-    Local override; error
-    @(70.0918 mm, -44.8178 mm): Track [ENC_SW] on F.Cu, length 0.3046 mm
-    @(69.3708 mm, -44.3178 mm): Pad 95 [CHARGE_SOURCE] of U121 on F.Cu
+[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2393 mm)
+    Rule: <电路板配置> 中的 "孔" 约束; error
+    @(81.7910 mm, -53.2638 mm): Track [ENC_SW] on F.Cu, length 1.5044 mm
+    @(81.5241 mm, -52.2000 mm): NPTH pad of J153
 [clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1517 mm)
     Local override; error
     @(70.3072 mm, -44.6024 mm): Track [ENC_SW] on F.Cu, length 4.0386 mm
     @(69.3708 mm, -44.3178 mm): Pad 95 [CHARGE_SOURCE] of U121 on F.Cu
-[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1788 mm)
+[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1466 mm)
     Local override; error
-    @(65.2881 mm, -47.6351 mm): Track [VBAT_BKP] on F.Cu, length 0.2012 mm
-    @(65.6458 mm, -48.5428 mm): Pad 5 [AMP_SWITCH_B] of U121 on F.Cu
-[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1589 mm)
-    Local override; error
-    @(64.6458 mm, -48.5428 mm): Pad 7 [LCD_LED] of U121 on F.Cu
-    @(65.1458 mm, -49.2812 mm): Track [VBAT_BKP] on F.Cu, length 1.0703 mm
+    @(70.0918 mm, -44.8178 mm): Track [ENC_SW] on F.Cu, length 0.3046 mm
+    @(69.3708 mm, -44.3178 mm): Pad 95 [CHARGE_SOURCE] of U121 on F.Cu
 [hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2182 mm)
     Rule: <电路板配置> 中的 "孔" 约束; error
     @(72.8472 mm, -55.0926 mm): Track [V_SUPPLY] on In1.Cu, length 10.4530 mm
     @(76.0000 mm, -55.0500 mm): NPTH pad of J170
+[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1788 mm)
+    Local override; error
+    @(65.2881 mm, -47.6351 mm): Track [VBAT_BKP] on F.Cu, length 0.2012 mm
+    @(65.6458 mm, -48.5428 mm): Pad 5 [AMP_SWITCH_B] of U121 on F.Cu
 [clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1780 mm)
     Local override; error
     @(65.6458 mm, -48.5428 mm): Pad 5 [AMP_SWITCH_B] of U121 on F.Cu
     @(66.5428 mm, -46.3804 mm): Track [VBAT_BKP] on F.Cu, length 1.7744 mm
+[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1589 mm)
+    Local override; error
+    @(64.6458 mm, -48.5428 mm): Pad 7 [LCD_LED] of U121 on F.Cu
+    @(65.1458 mm, -49.2812 mm): Track [VBAT_BKP] on F.Cu, length 1.0703 mm
 [clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1283 mm)
     Local override; error
     @(45.4025 mm, -18.3261 mm): Track [$$$5480] on B.Cu, length 1.0237 mm
@@ -219,6 +219,10 @@
     Local override; error
     @(30.5700 mm, -16.7360 mm): Pad 8 [GND] of U287 on B.Cu
     @(30.1444 mm, -16.2360 mm): Track [FILTER_OUT_N] on B.Cu, length 0.6030 mm
+[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1640 mm)
+    Local override; error
+    @(34.7700 mm, -12.5360 mm): Pad 25 [GND] of U287 on B.Cu
+    @(34.5948 mm, -11.7856 mm): Track [FILTER_IN_P] on B.Cu, length 0.4593 mm
 [clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1449 mm)
     Local override; error
     @(70.0894 mm, -43.3178 mm): Track [LCD_DC/RS] on F.Cu, length 0.8109 mm
@@ -243,29 +247,29 @@
     Rule: <电路板配置> 中的 "孔" 约束; error
     @(72.7202 mm, -4.7498 mm): Track [+5V] on B.Cu, length 5.5880 mm
     @(73.9175 mm, -2.6590 mm): NPTH pad of M6
-[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2177 mm)
-    Rule: <电路板配置> 中的 "孔" 约束; error
-    @(45.6692 mm, -1.8034 mm): Track [+5V] on B.Cu, length 6.5735 mm
-    @(44.9580 mm, -2.5400 mm): NPTH pad of RST
 [hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2179 mm)
     Rule: <电路板配置> 中的 "孔" 约束; error
     @(45.1612 mm, -1.2954 mm): Track [+5V] on B.Cu, length 0.7184 mm
     @(44.9580 mm, -2.5400 mm): NPTH pad of RST
-[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2144 mm)
+[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2177 mm)
     Rule: <电路板配置> 中的 "孔" 约束; error
-    @(77.3684 mm, -37.0840 mm): Track [SDIO_DAT0] on F.Cu, length 0.6096 mm
-    @(77.0000 mm, -38.0000 mm): NPTH pad of J170
-[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2066 mm)
+    @(45.6692 mm, -1.8034 mm): Track [+5V] on B.Cu, length 6.5735 mm
+    @(44.9580 mm, -2.5400 mm): NPTH pad of RST
+[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2256 mm)
     Rule: <电路板配置> 中的 "孔" 约束; error
-    @(77.9272 mm, -37.6428 mm): Track [SDIO_DAT0] on F.Cu, length 0.7903 mm
+    @(77.9272 mm, -39.0144 mm): Track [SDIO_DAT0] on F.Cu, length 1.3716 mm
     @(77.0000 mm, -38.0000 mm): NPTH pad of J170
 [hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2456 mm)
     Rule: <电路板配置> 中的 "孔" 约束; error
     @(76.7588 mm, -37.0840 mm): Track [SDIO_DAT0] on F.Cu, length 0.9339 mm
     @(77.0000 mm, -38.0000 mm): NPTH pad of J170
-[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2256 mm)
+[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2066 mm)
     Rule: <电路板配置> 中的 "孔" 约束; error
-    @(77.9272 mm, -39.0144 mm): Track [SDIO_DAT0] on F.Cu, length 1.3716 mm
+    @(77.9272 mm, -37.6428 mm): Track [SDIO_DAT0] on F.Cu, length 0.7903 mm
+    @(77.0000 mm, -38.0000 mm): NPTH pad of J170
+[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.2144 mm)
+    Rule: <电路板配置> 中的 "孔" 约束; error
+    @(77.3684 mm, -37.0840 mm): Track [SDIO_DAT0] on F.Cu, length 0.6096 mm
     @(77.0000 mm, -38.0000 mm): NPTH pad of J170
 [clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1544 mm)
     Local override; error
@@ -287,54 +291,46 @@
     Local override; error
     @(67.6458 mm, -33.0928 mm): Pad 75 [+3V3_CPU] of U121 on F.Cu
     @(69.5198 mm, -32.4358 mm): Track [SDIO_DAT1] on F.Cu, length 3.8076 mm
-[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1784 mm)
-    Local override; error
-    @(35.4700 mm, -16.2360 mm): Pad 18 [$$$31740] of U287 on B.Cu
-    @(35.0240 mm, -16.7360 mm): Track [GND] on B.Cu, length 0.6788 mm
 [clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1768 mm)
     Local override; error
     @(39.8980 mm, -42.3110 mm): Pad 1 [$$$5395] of U241 on B.Cu
     @(39.2230 mm, -41.6360 mm): Pad 24 [+3V3_CPU] of U241 on B.Cu
 [clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1768 mm)
     Local override; error
-    @(42.3980 mm, -42.3110 mm): Pad 6 [GND] of U241 on B.Cu
     @(43.0730 mm, -41.6360 mm): Pad 7 [+3V3_CPU] of U241 on B.Cu
+    @(42.3980 mm, -42.3110 mm): Pad 6 [GND] of U241 on B.Cu
 [clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1768 mm)
     Local override; error
-    @(42.3980 mm, -38.4610 mm): Pad 13 [<no net>] of U241 on B.Cu
     @(43.0730 mm, -39.1360 mm): Pad 12 [I2C_SCL] of U241 on B.Cu
-[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1768 mm)
-    Local override; error
-    @(39.2230 mm, -39.1360 mm): Pad 19 [I2C_SDA] of U241 on B.Cu
-    @(39.8980 mm, -38.4610 mm): Pad 18 [FILTER_CAL] of U241 on B.Cu
+    @(42.3980 mm, -38.4610 mm): Pad 13 [<no net>] of U241 on B.Cu
+[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.0001 mm)
+    Rule: <电路板配置> 中的 "孔" 约束; error
+    @(83.2742 mm, -57.2800 mm): Pad 1 [ENC_B] of J153 on F.Cu
+    @(81.5241 mm, -57.2800 mm): NPTH pad of J153
 [hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.0001 mm)
     Rule: <电路板配置> 中的 "孔" 约束; error
     @(78.7501 mm, -27.8400 mm): Pad 1 [+3V3_CPU] of J170 on B.Cu
     @(77.0000 mm, -27.8400 mm): NPTH pad of J170
 [hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.0001 mm)
     Rule: <电路板配置> 中的 "孔" 约束; error
-    @(79.7740 mm, -54.7400 mm): Pad 2 [ENC_A] of J153 on F.Cu
-    @(81.5241 mm, -54.7400 mm): NPTH pad of J153
-[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.0001 mm)
-    Rule: <电路板配置> 中的 "孔" 约束; error
     @(75.2499 mm, -30.3800 mm): Pad 2 [GND] of J170 on B.Cu
     @(77.0000 mm, -30.3800 mm): NPTH pad of J170
 [hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.0001 mm)
     Rule: <电路板配置> 中的 "孔" 约束; error
-    @(78.7501 mm, -32.9200 mm): Pad 3 [LCD_CS] of J170 on B.Cu
-    @(77.0000 mm, -32.9200 mm): NPTH pad of J170
-[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.0001 mm)
-    Rule: <电路板配置> 中的 "孔" 约束; error
-    @(75.2499 mm, -35.4600 mm): Pad 4 [LCD_RESET] of J170 on B.Cu
-    @(77.0000 mm, -35.4600 mm): NPTH pad of J170
+    @(83.2742 mm, -52.2000 mm): Pad 3 [ENC_SW] of J153 on F.Cu
+    @(81.5241 mm, -52.2000 mm): NPTH pad of J153
 [hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.0001 mm)
     Rule: <电路板配置> 中的 "孔" 约束; error
     @(78.7501 mm, -38.0000 mm): Pad 5 [LCD_DC/RS] of J170 on B.Cu
     @(77.0000 mm, -38.0000 mm): NPTH pad of J170
 [hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.0001 mm)
     Rule: <电路板配置> 中的 "孔" 约束; error
-    @(83.2742 mm, -57.2800 mm): Pad 1 [ENC_B] of J153 on F.Cu
-    @(81.5241 mm, -57.2800 mm): NPTH pad of J153
+    @(83.2742 mm, -47.1200 mm): Pad 5 [GND] of J153 on F.Cu
+    @(81.5241 mm, -47.1200 mm): NPTH pad of J153
+[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.0001 mm)
+    Rule: <电路板配置> 中的 "孔" 约束; error
+    @(79.7740 mm, -54.7400 mm): Pad 2 [ENC_A] of J153 on F.Cu
+    @(81.5241 mm, -54.7400 mm): NPTH pad of J153
 [hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.0001 mm)
     Rule: <电路板配置> 中的 "孔" 约束; error
     @(75.2499 mm, -40.5400 mm): Pad 6 [LCD_MOSI] of J170 on B.Cu
@@ -343,10 +339,6 @@
     Rule: <电路板配置> 中的 "孔" 约束; error
     @(78.7501 mm, -43.0800 mm): Pad 7 [LCD_SCK] of J170 on B.Cu
     @(77.0000 mm, -43.0800 mm): NPTH pad of J170
-[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.0001 mm)
-    Rule: <电路板配置> 中的 "孔" 约束; error
-    @(83.2742 mm, -52.2000 mm): Pad 3 [ENC_SW] of J153 on F.Cu
-    @(81.5241 mm, -52.2000 mm): NPTH pad of J153
 [hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.0001 mm)
     Rule: <电路板配置> 中的 "孔" 约束; error
     @(75.2499 mm, -45.6200 mm): Pad 8 [$$$23052] of J170 on B.Cu
@@ -359,10 +351,18 @@
     Rule: <电路板配置> 中的 "孔" 约束; error
     @(79.7740 mm, -49.6600 mm): Pad 4 [LIPO] of J153 on F.Cu
     @(81.5241 mm, -49.6600 mm): NPTH pad of J153
+[clearance]: 间距违规 ( 间距 0.2000 mm; 实际 0.1768 mm)
+    Local override; error
+    @(39.2230 mm, -39.1360 mm): Pad 19 [I2C_SDA] of U241 on B.Cu
+    @(39.8980 mm, -38.4610 mm): Pad 18 [FILTER_CAL] of U241 on B.Cu
 [hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.0001 mm)
     Rule: <电路板配置> 中的 "孔" 约束; error
-    @(83.2742 mm, -47.1200 mm): Pad 5 [GND] of J153 on F.Cu
-    @(81.5241 mm, -47.1200 mm): NPTH pad of J153
+    @(78.7501 mm, -32.9200 mm): Pad 3 [LCD_CS] of J170 on B.Cu
+    @(77.0000 mm, -32.9200 mm): NPTH pad of J170
+[hole_clearance]: 孔间距违规 (<电路板配置> 中的 "孔" 约束 间距 0.2500 mm; 实际 0.0001 mm)
+    Rule: <电路板配置> 中的 "孔" 约束; error
+    @(75.2499 mm, -35.4600 mm): Pad 4 [LCD_RESET] of J170 on B.Cu
+    @(77.0000 mm, -35.4600 mm): NPTH pad of J170
 [copper_edge_clearance]: 电路板边缘间距违规 (<电路板配置> 中的 "板边" 约束 间距 0.5000 mm; 实际 0.0000 mm)
     Rule: <电路板配置> 中的 "板边" 约束; error
     @(93.3196 mm, -24.0792 mm): Segment on Edge.Cuts

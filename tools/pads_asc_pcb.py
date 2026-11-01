@@ -724,8 +724,8 @@ def main():
     out.append('(kicad_pcb\n\t(version 20260206)\n\t(generator "pcbnew")\n'
                '\t(generator_version "10.0")\n\t(general\n\t\t(thickness 1.6)\n'
                '\t\t(legacy_teardrops no)\n\t)\n\t(paper "A4")\n\t(layers')
-    for num, name, kind in ((0, "F.Cu", "signal"), (1, "In1.Cu", "power"),
-                            (2, "In2.Cu", "power"), (31, "B.Cu", "signal")):
+    for num, name, kind in ((0, "F.Cu", "signal"), (4, "In1.Cu", "signal"),
+                            (6, "In2.Cu", "signal"), (2, "B.Cu", "signal")):
         out.append(f'\t\t({num} "{name}" {kind})')
     for num, name, alias in ((9, "F.Adhes", "F.Adhesive"), (11, "B.Adhes", "B.Adhesive"),
                              (13, "F.Paste", None), (15, "B.Paste", None),
