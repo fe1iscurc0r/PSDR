@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 """Emit a KiCad board from the PADS ASCII: real decal pads plus routed copper.
 
-This is the direction-A spike, not a whole-board converter.  It places only the
-parts that touch one net and copies only that net's tracks and vias, so the
-output can be diffed against the source without a whole-board comparison.
+The board is emitted whole: every part, every routed segment and via, the four
+planes' pours, the board profile from the ``BOARD`` record, and the silkscreen
+(decals, board-level *LINES*, free *TEXT* and the Ref.Des. labels).  The
+reconciliation against the 2.6.1 Gerbers is in
+:mod:`kicad_gerber_compare`; the evidence for each decoding choice is in
+``docs/WO-psdr-takeover.md``.
 
 Three facts this leans on, each checked against
 ``Hardware/Gerbers/PSDR25 Main Board`` (same board revision: after translating by
@@ -23,18 +26,43 @@ outline of 100.0 x 65.0 mm):
   a ``CW``/``CCW`` record is an arc centre, not a vertex -- see
   :mod:`pads_asc_route` for the Gerber evidence.
 
-The board outline is **not** a rectangle.  Levels 15, 16, 17 and 18 of *LINES*
-(after adding each line's own XLOC/YLOC) all bound the same 3937.0 x 2559.1 mil
-= 100.0 x 65.0 mm box, but they carry 258 OPEN/CIRCLE pieces between them:
-rounded corners, three connector notches on the left edge and a clipped corner
-at the lower right.  This emitter still draws the bounding rectangle, so treat
-the Edge.Cuts here as a placeholder, not the real profile.
+The board outline is **not** a rectangle: the one ``BOARD`` record in *LINES* is
+a 68-vertex CLOSED polygon (42 straight edges and 25 fillet arcs) covering
+3937.0 x 2559.1 mil = 100.0 x 65.0 mm, with three connector notches on the left
+edge and a clipped corner at the lower right.  Levels 15-18 of *LINES* are
+annotation graphics, not the profile: their absolute extent is 5773 x 1379 mil,
+far larger than the board.  A vertex line carrying eight numbers starts an arc that
+ends at the next vertex: after x/y come the begin angle and signed sweep in
+0.1 degrees, then two points symmetric about the centre.  Their midpoint is the
+arc centre; the sweep fixes the mid point used by KiCad's three-point arc.
+
+Silkscreen decoding, checked stroke by stroke against ``1 - top-ss.GTO`` and
+``8 - bot-ss.GBO``:
+
+* The CAM job is embedded in the ASCII: ``Top Silkscreen`` is
+  ``DOC_LAYER_NUMBERS 1 26`` and ``Bottom Silkscreen`` is ``4 29``, each with
+  the copper layer of its side plus the silkscreen layer.  A full level x side
+  x Gerber census agrees: a decal piece on level 26 is drawn on **the part's
+  side** (top part -> GTO, bottom part -> GBO); levels 0 and 1 are drawn on GTO
+  for top parts only and nowhere for bottom parts; levels 20/23/27/29 are drawn
+  nowhere.  Layer 29 is not the far-side outline: the level-29 pieces that
+  looked like matches duplicate level-26 circles, and J170's level-29 CLOSED
+  rectangle is absent from both silks from every tested transform variant.
+* Zero-length decal segments are not plotted by PADS and are skipped here too.
+* A board-level *LINES* piece is not part-relative: layer 26 = F.SilkS,
+  29 = B.SilkS.  The two 736-piece hatched "psdr" logos are 2-mil strokes and
+  appear as exactly 736 draws of the 0.002 in aperture on each Gerber silk.
+* Ref.Des. labels go on the part's side with the label's **absolute** ORI
+  (R113 part 270/label 90 plots vertical text in GTO).  Part Type is never
+  plotted; on R113 its anchor has no stroke where the Ref.Des. anchor has the
+  glyphs.
 """
 
 import argparse
 import itertools
 import math
 import os
+import re
 import sys
 import uuid
 
@@ -56,8 +84,70 @@ def quoted(text):
     and pcbnew refused the whole board ("应为 … 实际 ''symbol''").
     """
     return text.replace('"', "in")
-BOARD_W_MIL = 3937.0
-BOARD_H_MIL = 2559.1
+
+
+def arc_midpoint(vertex):
+    """Mid point of the arc whose vertex line carries six extra numbers.
+
+    The trailing four numbers are two points symmetric about the centre (the
+    midpoint of the two agrees with the centre implied by the begin angle and
+    sweep to well under a mil).  ``begin`` and ``sweep`` are in 0.1 degrees.
+    """
+    x, y, begin, sweep, px, py, qx, qy = vertex
+    cx, cy = (px + qx) / 2.0, (py + qy) / 2.0
+    r = math.hypot(x - cx, y - cy)
+    ang = math.radians((begin + sweep / 2.0) / 10.0)
+    return (cx + r * math.cos(ang), cy + r * math.sin(ang))
+
+
+def parse_outline(lines):
+    """Return the board profile as ordered ('line'|'arc', ...) segments.
+
+    Only the ``BOARD`` record in *LINES* is the profile.  Its vertices are
+    relative to the record's XLOC/YLOC and the ring repeats its first point at
+    the end.  The extra arc numbers are in that same relative frame.
+    """
+    start = next(i for i, l in enumerate(lines) if l.startswith("*LINES*"))
+    end = next(i for i, l in enumerate(lines) if i > start and l.startswith("*VIA*"))
+    for i in range(start, end):
+        tok = lines[i].split()
+        if len(tok) >= 6 and tok[1] == "BOARD":
+            xloc, yloc = int(tok[2]), int(tok[3])
+            break
+    else:
+        raise SystemExit("no BOARD record in *LINES*")
+    for j in range(i + 1, end):
+        tok = lines[j].split()
+        if tok and tok[0] == "CLOSED":
+            count = int(tok[1])
+            vertices = []
+            for k in range(j + 1, j + 1 + count):
+                vals = [int(v) for v in lines[k].split()]
+                vals[0] += xloc
+                vals[1] += yloc
+                if len(vals) == 8:
+                    for n in (4, 5, 6, 7):
+                        vals[n] += xloc if n % 2 == 0 else yloc
+                vertices.append(vals)
+            break
+    else:
+        raise SystemExit("BOARD record has no CLOSED piece")
+    if vertices[0][:2] != vertices[-1][:2]:
+        raise SystemExit("BOARD outline is not closed")
+    ring = vertices[:-1]
+    segs = []
+    for idx, v in enumerate(ring):
+        a = (v[0], v[1])
+        nxt = ring[(idx + 1) % len(ring)]
+        b = (nxt[0], nxt[1])
+        if len(v) == 8:
+            if len(nxt) == 8:
+                raise SystemExit(f"consecutive outline arcs at {a}")
+            segs.append(("arc", a, b, arc_midpoint(v)))
+        else:
+            segs.append(("line", a, b))
+    return segs
+
 
 
 def parse_stack(raw_lines):
@@ -192,7 +282,7 @@ def pad_angle(part, finori):
     return -a if part["mirror"] == "M" else a
 
 
-def footprint(ref, part, decal, decal_name, pin_net):
+def footprint(ref, part, decal, decal_name, pin_net, silk=False):
     fp_x, fp_y = kicad_point(part, 0, 0)
     side = "B.Cu" if part["mirror"] == "M" else "F.Cu"
     mask = "B.Mask" if part["mirror"] == "M" else "F.Mask"
@@ -295,8 +385,278 @@ def footprint(ref, part, decal, decal_name, pin_net):
         body.append(f'\t\t\t(uuid "{uid()}"){net}')
         body[-1] += "\n\t\t)"
         out.extend(body)
+    if silk:
+        emit_footprint_silk(part, fp_x, fp_y, decal, out)
     out.append("\t)")
     return "\n".join(out)
+
+
+def parse_board_silk(lines):
+    """Return the *LINES* pieces on the two silkscreen layers.
+
+    Each record is ``NAME LINES XLOC YLOC PIECES FLAGS`` and its piece
+    vertices are relative to XLOC/YLOC.  Layer 26 is the top silk and 29 the
+    bottom; the 15-18 annotation levels of the same section stay out.
+    """
+    start = next(i for i, l in enumerate(lines) if l.startswith("*LINES*"))
+    end = next(i for i, l in enumerate(lines) if i > start and l.startswith("*VIA*"))
+    header = re.compile(r"^\S+\s+LINES\s+(-?\d+)\s+(-?\d+)\s+(\d+)\s+(\d+)\s*$")
+    piece = re.compile(r"^(OPEN|CLOSED|CIRCLE|TAG)\s+(\d+)\s+(\d+)\s+(-?\d+)\s+(\d+)\s*$")
+    pieces = []
+    i = start
+    while i < end:
+        h = header.match(lines[i])
+        if not h:
+            i += 1
+            continue
+        xloc, yloc, count = int(h.group(1)), int(h.group(2)), int(h.group(3))
+        i += 1
+        for _ in range(count):
+            m = piece.match(lines[i].strip())
+            if not m:
+                break
+            kind, n = m.group(1), int(m.group(2))
+            level = int(m.group(5))
+            pts = []
+            for k in range(n):
+                vals = [int(v) for v in lines[i + 1 + k].split()]
+                vals[0] += xloc
+                vals[1] += yloc
+                if len(vals) == 8:
+                    for q in (4, 5, 6, 7):
+                        vals[q] += xloc if q % 2 == 0 else yloc
+                pts.append(vals)
+            if level in (26, 29):
+                pieces.append({"level": level, "kind": kind,
+                               "width": int(m.group(3)), "pts": pts})
+            i += n + 1
+    return pieces
+
+
+def parse_free_text(lines):
+    """Return the *TEXT* strings: coord line, font line, text line."""
+    start = next(i for i, l in enumerate(lines) if l.startswith("*TEXT*"))
+    end = next(i for i, l in enumerate(lines) if i > start and l.startswith("*LINES*"))
+    pattern = re.compile(
+        r"^\s*(-?\d+)\s+(-?\d+)\s+(-?[\d.]+)\s+(\d+)\s+(\d+)\s+(\d+)\s+"
+        r"([NYM])\s+(LEFT|CENTER|RIGHT)\s+(UP|CENTER|DOWN)")
+    out = []
+    i = start
+    while i < end:
+        m = pattern.match(lines[i])
+        if not m or i + 2 >= end:
+            i += 1
+            continue
+        out.append({
+            "x": int(m.group(1)), "y": int(m.group(2)),
+            "ori": float(m.group(3)), "level": int(m.group(4)),
+            "height": int(m.group(5)), "width": int(m.group(6)),
+            "mirrored": m.group(7), "hjust": m.group(8), "vjust": m.group(9),
+            "text": lines[i + 2].strip(),
+        })
+        i += 3
+    return out
+
+
+def silk_geometry(kind, pts):
+    """Yield ('line', a, b) / ('arc', a, b, mid) / ('circle', a, b).
+
+    ``pts`` are ASCII-unit vertices; an eight-number vertex starts an arc that
+    ends at the next vertex (see :func:`arc_midpoint`).
+    """
+    if kind == "CIRCLE":
+        return [("circle", pts[0][:2], pts[1][:2])]
+    ring = pts + [pts[0]] if kind == "CLOSED" else pts
+    out = []
+    for v, nxt in zip(ring, ring[1:]):
+        if len(v) == 8:
+            out.append(("arc", v[:2], nxt[:2], arc_midpoint(v)))
+        else:
+            out.append(("line", v[:2], nxt[:2]))
+    return out
+
+
+def _stroke(width):
+    return f"(stroke (width {width:.4f}) (type solid))"
+
+
+def _justify(hjust, vjust, mirror=False):
+    """PADS LEFT/CENTER/RIGHT + UP/CENTER/DOWN -> KiCad justify tokens.
+
+    ``mirror`` is required for text on back layers; without it KiCad DRC flags
+    the item and plots it unreadable.
+    """
+    parts = []
+    if hjust != "CENTER":
+        parts.append(hjust.lower())
+    if vjust != "CENTER":
+        parts.append({"UP": "top", "DOWN": "bottom"}[vjust])
+    if mirror:
+        parts.append("mirror")
+    return f" (justify {' '.join(parts)})" if parts else ""
+
+
+def emit_footprint_silk(part, fp_x, fp_y, decal, out):
+    """Decal graphics on levels 0/1/26 as fp_line/fp_arc/fp_circle.
+
+    Level 26 is the part-side silkscreen: a mirrored part's 26 mirrors to 29,
+    which is what the ``Bottom Silkscreen`` CAM doc plots.  Levels 0 and 1 are
+    *absolutely* top-side: every top part's 0/1 graphics land on GTO (e.g. all
+    five top C1210s and the three LEDs at 100% coverage), and no bottom part's
+    0/1 graphics are on GTO or GBO (its layer 1 would mirror to 4, and the
+    bottom doc lists ``DOC_OUTLINES None`` for that layer).  Levels 20/23/27/29
+    are drawn nowhere: 20 is the courtyard cross, 27 the assembly outline, and
+    J170's level-29 rectangle is absent from both silks under every part
+    transform variant.  The decal-local vertices travel through the same part
+    transform as the pads.
+    """
+    def local(px, py):
+        x, y = kicad_point(part, int(round(px)), int(round(py)))
+        return x - fp_x, y - fp_y
+
+    mirrored = part["mirror"] == "M"
+    if mirrored:
+        side_layer = "B.SilkS"
+    else:
+        side_layer = "F.SilkS"
+    for g in decal.get("graphics", []):
+        level = g["level"]
+        if level == 26:
+            layer = side_layer
+        elif level in (0, 1) and not mirrored:
+            layer = "F.SilkS"
+        else:
+            continue
+        width = g["width"] / UNITS_PER_MIL * MIL
+        for seg in silk_geometry(g["kind"], g["pts"]):
+            if seg[0] == "line":
+                if seg[1][:2] == seg[2][:2]:
+                    continue          # PADS skips zero-length silk strokes too
+                x1, y1 = local(*seg[1])
+                x2, y2 = local(*seg[2])
+                out.append(f'\t\t(fp_line\n\t\t\t(start {x1:.4f} {y1:.4f})\n'
+                           f'\t\t\t(end {x2:.4f} {y2:.4f})\n'
+                           f'\t\t\t{_stroke(width)}\n\t\t\t(layer "{layer}")\n'
+                           f'\t\t\t(uuid "{uid()}")\n\t\t)')
+            elif seg[0] == "arc":
+                x1, y1 = local(*seg[1])
+                xm, ym = local(*seg[3])
+                x2, y2 = local(*seg[2])
+                out.append(f'\t\t(fp_arc\n\t\t\t(start {x1:.4f} {y1:.4f})\n'
+                           f'\t\t\t(mid {xm:.4f} {ym:.4f})\n'
+                           f'\t\t\t(end {x2:.4f} {y2:.4f})\n'
+                           f'\t\t\t{_stroke(width)}\n\t\t\t(layer "{layer}")\n'
+                           f'\t\t\t(uuid "{uid()}")\n\t\t)')
+            else:
+                x1, y1 = local(*seg[1])
+                x2, y2 = local(*seg[2])
+                cx, cy = (x1 + x2) / 2.0, (y1 + y2) / 2.0
+                out.append(f'\t\t(fp_circle\n\t\t\t(center {cx:.4f} {cy:.4f})\n'
+                           f'\t\t\t(end {x2:.4f} {y2:.4f})\n'
+                           f'\t\t\t{_stroke(width)}\n\t\t\t(layer "{layer}")\n'
+                           f'\t\t\t(uuid "{uid()}")\n\t\t)')
+
+
+def emit_board_silk(pieces, out):
+    """Board-level *LINES* silk as gr_line/gr_arc/gr_circle."""
+    for g in pieces:
+        layer = "F.SilkS" if g["level"] == 26 else "B.SilkS"
+        width = g["width"] / UNITS_PER_MIL * MIL
+        for seg in silk_geometry(g["kind"], g["pts"]):
+            if seg[0] == "line":
+                x1, y1 = seg[1][0] / UNITS_PER_MIL * MIL, -seg[1][1] / UNITS_PER_MIL * MIL
+                x2, y2 = seg[2][0] / UNITS_PER_MIL * MIL, -seg[2][1] / UNITS_PER_MIL * MIL
+                out.append(f'\t(gr_line\n\t\t(start {x1:.4f} {y1:.4f})\n'
+                           f'\t\t(end {x2:.4f} {y2:.4f})\n\t\t{_stroke(width)}\n'
+                           f'\t\t(layer "{layer}")\n\t\t(uuid "{uid()}")\n\t)')
+            elif seg[0] == "arc":
+                x1, y1 = seg[1][0] / UNITS_PER_MIL * MIL, -seg[1][1] / UNITS_PER_MIL * MIL
+                xm, ym = seg[3][0] / UNITS_PER_MIL * MIL, -seg[3][1] / UNITS_PER_MIL * MIL
+                x2, y2 = seg[2][0] / UNITS_PER_MIL * MIL, -seg[2][1] / UNITS_PER_MIL * MIL
+                out.append(f'\t(gr_arc\n\t\t(start {x1:.4f} {y1:.4f})\n'
+                           f'\t\t(mid {xm:.4f} {ym:.4f})\n'
+                           f'\t\t(end {x2:.4f} {y2:.4f})\n\t\t{_stroke(width)}\n'
+                           f'\t\t(layer "{layer}")\n\t\t(uuid "{uid()}")\n\t)')
+            else:
+                x1, y1 = seg[1][0] / UNITS_PER_MIL * MIL, -seg[1][1] / UNITS_PER_MIL * MIL
+                x2, y2 = seg[2][0] / UNITS_PER_MIL * MIL, -seg[2][1] / UNITS_PER_MIL * MIL
+                cx, cy = (x1 + x2) / 2.0, (y1 + y2) / 2.0
+                out.append(f'\t(gr_circle\n\t\t(center {cx:.4f} {cy:.4f})\n'
+                           f'\t\t(end {x2:.4f} {y2:.4f})\n\t\t{_stroke(width)}\n'
+                           f'\t\t(fill none)\n'
+                           f'\t\t(layer "{layer}")\n\t\t(uuid "{uid()}")\n\t)')
+
+
+def emit_text(text, x, y, ori, height, width, hjust, vjust, layer, out,
+              mirror=False):
+    """One gr_text at absolute board coordinates (PADS ASCII units)."""
+    kx, ky = x / UNITS_PER_MIL * MIL, -y / UNITS_PER_MIL * MIL
+    size = height / UNITS_PER_MIL * MIL
+    thick = width / UNITS_PER_MIL * MIL
+    out.append(f'\t(gr_text "{quoted(text)}"\n\t\t(at {kx:.4f} {ky:.4f} {ori % 360:.4f})\n'
+               f'\t\t(layer "{layer}")\n\t\t(uuid "{uid()}")\n'
+               f'\t\t(effects (font (size {size:.4f} {size:.4f}) '
+               f'(thickness {thick:.4f})){_justify(hjust, vjust, mirror)})\n\t)')
+
+
+def emit_labels(parts, out):
+    """One Ref.Des. gr_text per part, on the part's side.
+
+    A part can carry several Ref.Des. blocks (Q178 has one on layer 1 and one
+    on 27); the layer-1 block is the silkscreen one, so it wins when present.
+    Part Type and Comment are not plotted by the 2.6.1 CAM job and are skipped.
+    """
+    emitted = 0
+    skipped = []
+    for ref in sorted(parts):
+        part = parts[ref]
+        labels = [l for l in part.get("labels", []) if l["kind"] == "Ref.Des."]
+        if not labels:
+            skipped.append(ref)
+            continue
+        lab = next((l for l in labels if l["level"] == 1), labels[0])
+        bx, by = transform(part, lab["x"], lab["y"], "x", 1, "rotate-then-mirror")
+        layer = "B.SilkS" if part["mirror"] == "M" else "F.SilkS"
+        emit_text(ref, bx, by, lab["ori"], lab["height"], lab["width"],
+                  lab["hjust"], lab["vjust"], layer, out,
+                  mirror=(layer == "B.SilkS"))
+        emitted += 1
+    return emitted, skipped
+
+
+def parse_pours(lines):
+    """Return ``[(net, layer, [vertices])]`` for the POUROUT polygons.
+
+    Only ``POUROUT`` is the copper boundary; the ``HATOUT`` records after each
+    pour are the source tool's already-hatched islands and KiCad re-derives
+    them from the zone.  Vertices are relative to the record's XLOC/YLOC and
+    repeat the first point at the end.  PADS pours extend past the board edge;
+    KiCad clips them at Edge.Cuts when filling.
+    """
+    start = next(i for i, l in enumerate(lines) if l.startswith("*POUR*"))
+    end = next(i for i, l in enumerate(lines) if i > start and l.startswith("*TESTPOINT*"))
+    pours = []
+    i = start
+    while i < end:
+        tok = lines[i].split()
+        if len(tok) >= 8 and tok[1] == "POUROUT":
+            net, xloc, yloc = tok[7], int(tok[2]), int(tok[3])
+            i += 1
+            poly = lines[i].split()
+            count, arc_count, _width, level = (int(v) for v in poly[1:5])
+            if arc_count:
+                raise SystemExit(f"pour {tok[0]} has {arc_count} arc corners")
+            pts = []
+            for k in range(count):
+                row = [int(v) for v in lines[i + 1 + k].split()]
+                pts.append((row[0] + xloc, row[1] + yloc))
+            if pts[0] != pts[-1]:
+                raise SystemExit(f"pour {tok[0]} is not closed")
+            pours.append((net, LAYER[level], pts[:-1]))
+            i += 1 + count
+        else:
+            i += 1
+    return pours
 
 
 def main():
@@ -314,6 +674,10 @@ def main():
     decals = parse_decals(lines)
     types = parse_parttypes(lines)
     parts = parse_parts(lines)
+    outline = parse_outline(lines)
+    pours = parse_pours(lines) if args.all else []
+    board_silk = parse_board_silk(lines) if args.all else []
+    free_text = parse_free_text(lines) if args.all else []
 
     all_conns = list(connections(lines))
     conns = all_conns if args.all else [c for c in all_conns if c[0] == args.net]
@@ -323,6 +687,9 @@ def main():
     net_names = list(dict.fromkeys(c[0] for c in conns))
     net_id = {n: i + 1 for i, n in enumerate(net_names)}
     net_id[None] = 0
+    unrouteable = sorted({n for n, _l, _p in pours} - set(net_names))
+    if unrouteable:
+        raise SystemExit(f"pour nets without tracks: {unrouteable}")
 
     pad_net = {}
     conflicts = []
@@ -339,8 +706,8 @@ def main():
     arc_segs = []
     vias = []
     for net, _ra, _pa, _rb, _pb, pts in conns:
-        lines, arcs, route_vias = route_geometry(pts)
-        segs.extend((a, b, layer, width, net) for layer, a, b, width in lines)
+        route_lines, arcs, route_vias = route_geometry(pts)
+        segs.extend((a, b, layer, width, net) for layer, a, b, width in route_lines)
         arc_segs.extend((a, centre, b, ccw, layer, width, net)
                         for layer, a, centre, b, ccw, width in arcs)
         vias.extend((v[0], v[1], net) for v in route_vias)
@@ -392,7 +759,7 @@ def main():
         emitted_pads += len(decal["terminals"])
         netted_pads += sum(1 for t in decal["terminals"] if t[0] in pins)
         unrouted.extend((ref, p) for p in terminals if p not in pins)
-        out.append(footprint(ref, part, decal, decal_name, pins))
+        out.append(footprint(ref, part, decal, decal_name, pins, silk=args.all))
 
     zero_len = 0
     for (ax, ay), (bx, by), layer, width, net in segs:
@@ -425,13 +792,47 @@ def main():
                    f'\t\t(drill 0.3556)\n\t\t(layers "F.Cu" "B.Cu")\n'
                    f'\t\t(net {net_id[net]})\n\t\t(uuid "{uid()}")\n\t)')
 
-    w, h = BOARD_W_MIL * MIL, BOARD_H_MIL * MIL
-    corners = [(0, 0), (w, 0), (w, -h), (0, -h), (0, 0)]
-    for (x1, y1), (x2, y2) in zip(corners, corners[1:]):
-        out.append(f'\t(gr_line\n\t\t(start {x1:.4f} {y1:.4f})\n'
-                   f'\t\t(end {x2:.4f} {y2:.4f})\n'
-                   f'\t\t(stroke (width 0.1) (type default))\n'
-                   f'\t\t(layer "Edge.Cuts")\n\t\t(uuid "{uid()}")\n\t)')
+    for net, layer, pts in pours:
+        xy = " ".join(f"(xy {x / UNITS_PER_MIL * MIL:.4f} {-y / UNITS_PER_MIL * MIL:.4f})"
+                      for x, y in pts)
+        out.append(f'\t(zone\n\t\t(net "{quoted(net)}")\n\t\t(layer "{layer}")\n'
+                   f'\t\t(uuid "{uid()}")\n\t\t(hatch edge 0.5)\n\t\t(connect_pads\n'
+                   f'\t\t\t(clearance 0.254)\n\t\t)\n\t\t(min_thickness 0.254)\n'
+                   f'\t\t(fill\n\t\t\t(thermal_gap 0.254)\n'
+                   f'\t\t\t(thermal_bridge_width 0.254)\n'
+                   f'\t\t\t(island_removal_mode 0)\n\t\t)\n\t\t(polygon\n\t\t\t(pts\n'
+                   f'\t\t\t\t{xy}\n\t\t\t)\n\t\t)\n\t)')
+
+    if args.all:
+        emit_board_silk(board_silk, out)
+        for t in free_text:
+            layer = "F.SilkS" if t["level"] == 26 else "B.SilkS"
+            emit_text(t["text"], t["x"], t["y"], t["ori"], t["height"],
+                      t["width"], t["hjust"], t["vjust"], layer, out,
+                      mirror=(t["mirrored"] == "M" or layer == "B.SilkS"))
+        labels, no_label = emit_labels(parts, out)
+
+    w = max(p[0] for s in outline for p in s[1:3]) / UNITS_PER_MIL * MIL
+    h = max(p[1] for s in outline for p in s[1:3]) / UNITS_PER_MIL * MIL
+    for seg in outline:
+        if seg[0] == "line":
+            _kind, a, b = seg
+            x1, y1 = a[0] / UNITS_PER_MIL * MIL, -a[1] / UNITS_PER_MIL * MIL
+            x2, y2 = b[0] / UNITS_PER_MIL * MIL, -b[1] / UNITS_PER_MIL * MIL
+            out.append(f'\t(gr_line\n\t\t(start {x1:.4f} {y1:.4f})\n'
+                       f'\t\t(end {x2:.4f} {y2:.4f})\n'
+                       f'\t\t(stroke (width 0.1) (type default))\n'
+                       f'\t\t(layer "Edge.Cuts")\n\t\t(uuid "{uid()}")\n\t)')
+        else:
+            _kind, a, b, m = seg
+            x1, y1 = a[0] / UNITS_PER_MIL * MIL, -a[1] / UNITS_PER_MIL * MIL
+            x2, y2 = b[0] / UNITS_PER_MIL * MIL, -b[1] / UNITS_PER_MIL * MIL
+            mx, my = m[0] / UNITS_PER_MIL * MIL, -m[1] / UNITS_PER_MIL * MIL
+            out.append(f'\t(gr_arc\n\t\t(start {x1:.4f} {y1:.4f})\n'
+                       f'\t\t(mid {mx:.4f} {my:.4f})\n'
+                       f'\t\t(end {x2:.4f} {y2:.4f})\n'
+                       f'\t\t(stroke (width 0.1) (type default))\n'
+                       f'\t\t(layer "Edge.Cuts")\n\t\t(uuid "{uid()}")\n\t)')
 
     out.append(")")
     text = "\n".join(out) + "\n"
@@ -447,7 +848,23 @@ def main():
           f"{sorted({LAYER[s[2]] for s in segs})}")
     print(f"track arcs    {len(arc_segs)} distinct of {raw_arcs}")
     print(f"vias          {len(vias)} distinct of {raw_vias}")
-    print(f"outline       {BOARD_W_MIL * MIL:.2f} x {BOARD_H_MIL * MIL:.2f} mm")
+    n_line = sum(1 for s in outline if s[0] == "line")
+    print(f"outline       {n_line} lines + {len(outline) - n_line} arcs, "
+          f"{w:.2f} x {h:.2f} mm")
+    by_layer = {}
+    for _net, layer, _pts in pours:
+        by_layer[layer] = by_layer.get(layer, 0) + 1
+    print(f"pours         {len(pours)} zones {by_layer}")
+    if args.all:
+        decal_pieces = sum(1 for d in decals.values() for g in d["graphics"]
+                           if g["level"] in (0, 1, 26))
+        by_level = {}
+        for g in board_silk:
+            by_level[g["level"]] = by_level.get(g["level"], 0) + 1
+        print(f"silk          {decal_pieces} decal pieces, "
+              f"{len(board_silk)} board pieces {by_level}, "
+              f"{len(free_text)} free texts, {labels} refdes labels "
+              f"({len(no_label)} parts without one)")
     print(f"pad-net conflicts: {len(conflicts)} {conflicts[:5]}")
     print(f"wrote         {args.out}")
 

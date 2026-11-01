@@ -32,6 +32,10 @@ PART_HEADER = re.compile(
 )
 PAD_HEADER = re.compile(r"^PAD\s+(\S+)\s+(\d+)\s*$")
 TERMINAL = re.compile(r"^T\s*(-?\d+)\s+(-?\d+)\s+(-?\d+)\s+(-?\d+)\s+(\S+)\s*$")
+GRAPHIC = re.compile(r"^(OPEN|CLOSED|CIRCLE|TAG)\s+(\d+)\s+(\d+)\s+(-?\d+)\s+(\d+)\s*$")
+LABEL = re.compile(
+    r"^VALUE\s+(-?\d+)\s+(-?\d+)\s+(-?[\d.]+)\s+(\d+)\s+(\d+)\s+(\d+)\s+"
+    r"([NYM])\s+(LEFT|CENTER|RIGHT)\s+(UP|CENTER|DOWN)")
 CONNECTION = re.compile(r"^(\S+)\.(\S+)\s+(\S+)\.(\S+)\s*$")
 SECTION = re.compile(r"^\*([A-Z][A-Z0-9_]*)\*")
 COORD = re.compile(r"^(-?\d+)\s+(-?\d+)\s+(-?\d+)\s+(\d+)\s+(\d+)\b")
@@ -45,7 +49,16 @@ def index(lines, name):
 
 
 def parse_decals(lines):
-    """Return {decal name: {"terminals": [(pin, tx, ty)], "pads": {pin: [...]}}}."""
+    """Return {decal name: {"terminals", "pads", "graphics"}}.
+
+    ``graphics`` keeps the decal's drawn pieces in source order.  Each piece is
+    ``{"kind", "width", "style", "level", "pts"}``: ``width`` is the stroke
+    width in ASCII units, ``level`` the PADS layer (26 = silkscreen top,
+    29 = silkscreen bottom, 27 = assembly top, 20/23 = notes/fiducial), and
+    ``pts`` the vertices in decal-local ASCII units.  A vertex list of eight
+    numbers starts an arc: x y begin sweep Px Py Qx Qy, angles in 0.1 degrees,
+    P/Q the two points symmetric about the centre (same shape as *LINES*).
+    """
     start = index(lines, "*PARTDECAL*")
     end = index(lines, "*PARTTYPE*")
     decals = {}
@@ -58,14 +71,16 @@ def parse_decals(lines):
         name = m.group(1)
         terminals = []
         pads = {}
+        graphics = []
         i += 1
         while i < end and not DECAL_HEADER.match(lines[i]):
-            t = TERMINAL.match(lines[i].strip())
+            line = lines[i].strip()
+            t = TERMINAL.match(line)
             if t:
                 terminals.append((t.group(5), int(t.group(1)), int(t.group(2))))
                 i += 1
                 continue
-            p = PAD_HEADER.match(lines[i].strip())
+            p = PAD_HEADER.match(line)
             if p:
                 pin, count = p.group(1), int(p.group(2))
                 pads.setdefault(pin, []).extend(
@@ -73,8 +88,22 @@ def parse_decals(lines):
                 )
                 i += count + 1
                 continue
+            g = GRAPHIC.match(line)
+            if g:
+                count = int(g.group(2))
+                graphics.append({
+                    "kind": g.group(1),
+                    "width": int(g.group(3)),
+                    "style": int(g.group(4)),
+                    "level": int(g.group(5)),
+                    "pts": [[int(v) for v in lines[i + 1 + k].split()]
+                            for k in range(count)],
+                })
+                i += count + 1
+                continue
             i += 1
-        decals[name] = {"terminals": terminals, "pads": pads}
+        decals[name] = {"terminals": terminals, "pads": pads,
+                        "graphics": graphics}
     return decals
 
 
@@ -98,18 +127,42 @@ def parse_parttypes(lines):
 
 
 def parse_parts(lines):
+    """Return {refdes: {"type", "x", "y", "ori", "mirror", "labels"}}.
+
+    ``labels`` keeps the part's VALUE blocks in source order.  The block is
+    ``VALUE XLOC YLOC ORI LEVEL HEIGHT WIDTH MIRRORED HJUST VJUST`` followed by
+    a font line and a placeholder line (``Ref.Des.`` / ``Part Type`` /
+    ``Comment``); the actual text comes from the part.  The label's ORI is
+    absolute, not relative to the part: R113 (part 270, label 90) plots vertical
+    text, as the 2.6.1 GTO shows.  The XLOC/YLOC are part-local and do travel
+    through the part transform.
+    """
     start = index(lines, "*PART*       ITEMS")
     end = index(lines, "*ROUTE*")
     parts = {}
     for i in range(start, end):
         m = PART_HEADER.match(lines[i])
-        if not m:
-            continue
-        ref, ptype, x, y, ori, glue, mirror = (
-            m.group(1), m.group(2), int(m.group(3)), int(m.group(4)),
-            float(m.group(5)), m.group(6), m.group(7),
-        )
-        parts[ref] = {"type": ptype, "x": x, "y": y, "ori": ori, "mirror": mirror}
+        if m:
+            ref, ptype, x, y, ori, glue, mirror = (
+                m.group(1), m.group(2), int(m.group(3)), int(m.group(4)),
+                float(m.group(5)), m.group(6), m.group(7),
+            )
+            labels = []
+            j = i + 1
+            while j < end and not PART_HEADER.match(lines[j]):
+                lab = LABEL.match(lines[j])
+                if lab:
+                    labels.append({
+                        "x": int(lab.group(1)), "y": int(lab.group(2)),
+                        "ori": float(lab.group(3)), "level": int(lab.group(4)),
+                        "height": int(lab.group(5)), "width": int(lab.group(6)),
+                        "mirrored": lab.group(7), "hjust": lab.group(8),
+                        "vjust": lab.group(9),
+                        "kind": lines[j + 2].strip() if j + 2 < end else "",
+                    })
+                j += 1
+            parts[ref] = {"type": ptype, "x": x, "y": y, "ori": ori,
+                          "mirror": mirror, "labels": labels}
     return parts
 
 

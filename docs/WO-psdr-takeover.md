@@ -5,9 +5,10 @@
 
 > **当前状态：任务 A 通过验收；任务 B 通过（GC=1 与 GC=0 各一次完整构建，0 error、
 > 365 warning、锚点 `_estack=0x20030000` / Reset `0x080001B5` 与 2016 上游 hex 一致，
-> 尺寸对账见 §B-4）；任务 C 完成但带 5 项 SKIP（见 §C-8：4 铜层未覆盖；`.kicad_sch`
-> 仍未产出，但它的前置缺口已补齐——2.6.1 的 PADS Layout ASCII 与 10 页原理图 PDF 已入库，
-> 网表 391 器件 / 278 网 / 1132 引脚并通过四重校验，见 §C-11）；制板仍走 `dist/gerber/`；
+> 尺寸对账见 §B-4）；任务 C 的 5 项 SKIP 已解除 3 项——`.kicad_sch` 已由 §C-12 生成，
+> 4 铜层与真实焊盘见 §C-13，铺铜/真实板框/丝印见 §C-14；剩 2 项（SolidWorks 壳体、
+> PADS 二进制原文件）见 §C-8。四层 KiCad 板已 0 断点，但仍有 795 条 DRC 违规
+> （多为源设计允许的丝印压焊盘与紧间距），**制板仍以 2.6.1 的原始 Gerber 为准**；
 > 任务 D 记录已写、已推 `origin`（fork），未碰上游。**
 > 本记录不含任何未经真实命令验证的"已完成"。
 
@@ -526,17 +527,19 @@ L41/L81 走 Mini-Circuits 直供（非 Digi-Key）。
 
 | # | 项 | 原因（可复核） |
 |---|---|---|
-| SKIP-1 | `.kicad_sch` 图形化原理图 | **前置缺口已补齐，图形仍未生成**（原判据"唯一可读的 PDF 是 2014 旧版"已由 §C-10 推翻，此处是修正后的状态）。① 2.6.1 的 **10 页原理图 PDF** 与 **PADS Layout ASCII** 都在 `PSDR_Rebuild@468dc41`，本轮已复制进本分支（`Hardware/PSDR_2.6.1_Schematic_2016-07-31.pdf`、`Hardware/PSDR.asc`）；② 从 `.asc` 已提取**完整网表**：391 器件 / 278 网 / 1132 连接引脚 / 41 未连接（全部可解释为 NC、基准点、安装孔），四重校验见 §C-11；③ `Hardware/PSDR.sch` 仍是 PADS Logic 二进制，开源工具读不了，但**不再阻塞网表**。⇒ 现在缺的只是"按 2.6.1 版面画的 `.kicad_sch`"，连接关系已有权威来源。 |
+| SKIP-1 | `.kicad_sch` 图形化原理图 | **已由 §C-12 解除**（2026-10-31）。① 2.6.1 的 **10 页原理图 PDF** 与 **PADS Layout ASCII** 已复制进本分支（`Hardware/PSDR_2.6.1_Schematic_2016-07-31.pdf`、`Hardware/PSDR.asc`）；② 从 `.asc` 提取的网表 391 器件 / 278 网 / 1132 引脚通过四重校验（§C-11）；③ 已生成根图 + 9 张子图 + 57 个符号，网表划分 278/278 一致、ERC 0 error、几何重合 0 冲突（§C-12）。它仍是**连通性模型**（靠全局标签连接，不是按 PDF 重画走线），"看图"以 2016 PDF 为准。 |
 | SKIP-2 | `Hardware/Enclosure/` SolidWorks 壳体/装配 | `.SLDPRT`/`.SLDASM`，嘉立创EDA 无对应能力，工单也明确要求不要试图转换。 |
 | SKIP-3 | `.sch`/`.pcb` 源文件 | 工单称 Eagle，实测是 **PADS Logic / PADS Layout 二进制**（`Hardware/README.md`："Schematics and Board layout files are for Mentorgraphics PADS"；头 `00 fe 0d 00` / `00 ff 26 20`）。KiCad 10.0.6 的 Eagle 插件报 `XML 解析错误：'not well-formed'` 却 **exit 0**（假成功）——因为它不是 Eagle XML。要转这两个二进制必须先有 PADS Logic/Layout 本体，本机没有；**但 2.6.1 的 PADS Layout ASCII（`Hardware/PSDR.asc`）已在库里，二进制不再阻塞网表**，只影响"图形原理图"（§C-11）。 |
-| SKIP-4 | 铜走线 / 内层 / 网络 | **已由 §C-13 解除**（2026-11-01）。`.emn` 无 `TRACE` 段，所以 C-5 的 `PSDR_2.6.1.kicad_pcb` 只有 2 个铜层；另生成的 `PSDR_2.6.1_pcb_spike_full.kicad_pcb` 从 `Hardware/PSDR.asc` 的 `*ROUTE*` 取铜，是 **4 层 / 5034 段走线 / 22 段弧 / 419 个过孔 / 278 网**，与 2.6.1 原始 Gerber 逐 flash、逐钻孔对过。仍未覆盖：**铺铜（12 条 POUROUT / 7 个网）、真实板框（现为 100×65 mm 占位矩形）、丝印**。 |
+| SKIP-4 | 铜走线 / 内层 / 网络 | **已由 §C-13 解除**（2026-11-01）。`.emn` 无 `TRACE` 段，所以 C-5 的 `PSDR_2.6.1.kicad_pcb` 只有 2 个铜层；另生成的 `PSDR_2.6.1_pcb_spike_full.kicad_pcb` 从 `Hardware/PSDR.asc` 的 `*ROUTE*` 取铜，是 **4 层 / 5034 段走线 / 22 段弧 / 419 个过孔 / 278 网**，与 2.6.1 原始 Gerber 逐 flash、逐钻孔对过。当时未覆盖的**铺铜、真实板框、丝印已由 §C-14 补齐**（12 个铺铜区 / 67 段板框 / 双向丝印对账）。 |
 | SKIP-5 | 器件真实焊盘形状 | **已由 §C-13 解除**（2026-11-01）。pad stack 改从 `Hardware/PSDR.asc` 的 `*PARTDECAL*` 读，1194 个焊盘全部来自 decal（圆/方/圆角矩形/椭圆、旋转角、钻孔）。KiCad 10 的内层铜连接限制见 §C-13 的 pad-type 表。 |
 
-**制板用哪套（2026-11-01 更正）**：生产必须用 **2.6.1 的原始 Gerber**，
+**制板用哪套（2026-11-01 第二次更正）**：生产必须用 **2.6.1 的原始 Gerber**，
 即上游 `468dc41` 的 `Hardware/Gerbers/PSDR261 Main Board/`（本分支没有复制进仓，
 本轮提取到仓外 `D:\my git\PSDR-build-artifacts\gerber261\` 作对账基准，见 §C-13）。
-`dist/gerber/` 是 **2.5** 主板的 Gerber，不是这块板；两块 KiCad 板都还不具备
-生产条件（无铺铜、板框是占位矩形）。`dist/kicad/` 只作可编辑参考。
+`dist/gerber/` 是 **2.5** 主板的 Gerber，不是这块板；
+`PSDR_2.6.1_pcb_spike_full.kicad_pcb` 现在有 4 层铜、12 个铺铜区、真实板框和丝印
+（§C-14），但 795 条 DRC 违规与 J170 缺一个安装孔意味着它仍只是可编辑参考，
+不能直接投产。
 
 ### C-9 本轮新踩的坑（工单未覆盖）
 
@@ -879,13 +882,18 @@ pads emitted  1194  (1132 carry a net, 62 do not)
 track segments 5034 written (189 zero-length dropped) of 5223 distinct of 9364  layers ['B.Cu', 'F.Cu', 'In1.Cu', 'In2.Cu']
 track arcs    22 distinct of 22
 vias          419 distinct of 1164
-outline       100.00 x 65.00 mm
+outline       42 lines + 25 arcs, 100.00 x 65.00 mm
+pours         12 zones {'In2.Cu': 1, 'In1.Cu': 3, 'F.Cu': 7, 'B.Cu': 1}
+silk          162 decal pieces, 1495 board pieces {26: 753, 29: 742}, 4 free texts, 376 refdes labels (15 parts without one)
 pad-net conflicts: 0 []
 wrote         dist/kicad/PSDR_2.6.1_pcb_spike_full.kicad_pcb
 ```
 
-同一输入重跑，`cmp` 逐字节相同。第一版 UUID 用 `uuid4`，每次重跑都会改 UUID；
-现在按发射顺序用 `uuid5` 派生（与 §C-12 的原理图生成器一致）。
+（这是 §C-14 之后的最终输出；`outline`/`pours`/`silk` 三行是第三批时还没有的。
+第三批的输出块记的是 `outline 100.00 x 65.00 mm` 包络矩形。）
+
+同一输入重跑，`cmp` 逐字节相同（§C-14 末尾复核）。第一版 UUID 用 `uuid4`，
+每次重跑都会改 UUID；现在按发射顺序用 `uuid5` 派生（与 §C-12 的原理图生成器一致）。
 
 **源文件的 7 条约定**（每条都对着 Gerber 或钻孔量过，不是猜的）：
 
@@ -986,7 +994,8 @@ KiCad 侧的数目逐层可推：
 两边都是 0/25，F.Mask 从 619 降到 594、B.Mask 从 620 降到 595，
 恰好等于"smd 焊盘 + 20 个 thru_hole"。
 
-**DRC**（`kicad-cli pcb drc --severity-all`，重跑结果稳定）：
+**DRC**（第三批状态，`kicad-cli pcb drc --severity-all`，重跑结果稳定；
+下面这组数字已被 §C-14 的 **795 条 / 0 断点**取代，保留用于对比铺铜前后）：
 
 ```
 199  lib_footprint_issues    封装库 'PSDR' 不在工程配置里（预期，封装数据内嵌在板上）
@@ -1001,29 +1010,157 @@ KiCad 侧的数目逐层可推：
 
 14 条 0.0001 mm 不是转换误差：J170/J153 的封装里，1.2 mm NPTH 孔与信号焊盘
 的边正好相切（焊盘半宽 1.15 + 孔半径 0.6 = 1.7501 mm = decal 间距），PADS
-允许，KiCad 的 0.25 mm 孔规则会报。20 个断点全部落在 GND 上，与"没有生成铺铜"
-一致：GND 在源设计里靠电源层/地平面连成整张网。
+允许，KiCad 的 0.25 mm 孔规则会报。当时 20 个断点全部落在 GND 上，与"还没有
+铺铜"一致：GND 在源设计里靠电源层/地平面连成整张网；§C-14 补上铺铜后降到 0。
 
 **单网样例**：`dist/kicad/PSDR_2.6.1_spike_TX-Q_DRIVER_P.kicad_pcb`，
 只含 C252 与 U4 两个器件、5 段 8 mil 走线、1 个 0.8128/0.3556 mm 过孔，
 DRC 2 条 warning（封装库）0 断点——这就是"一个 decal + 一个网"的原始探针产物。
 
-**还缺什么**（都不在本次解析范围内）：
+**三件缺口的勘误**（§C-14 补做，2026-11-01）：
 
-1. **铺铜**：`*ROUTE*` 里有 12 条 `POUROUT`（GND ×3、+3V3 ×2、+3V3_CPU ×3、
-   +3V3_FLIP_FLOP、BOOST_LOOP、V_SUPPLY、+5V_BOOST，共 7 个网），它们是
-   多边形灌注，不是走线；没有它们，GND 少 20 个连接。文件里没有 `*POUR*` 段头，
-   POUROUT 记录夹在 `*ROUTE*` 里。
-2. **真实板框**：`LINES` 的 15/16/17/18 层合起来是 3937.0 × 2559.1 mil
-   = 100.0 × 65.0 mm 的包络，但由 258 段 OPEN/CIRCLE 组成（圆角、左侧三个
-   连接器缺口、右下切角）。生成器现在画的是包络矩形，Edge.Cuts 是占位。
-3. **丝印**：`*PARTDECAL*` 里有 REF/line 图元，本轮只取焊盘；整板的 GTO/GBO
-   没有生成，DSub/接口的丝印缺口对装配有影响。
+1. **铺铜**：12 条 `POUROUT` 确实存在（GND ×3、+3V3 ×2、+3V3_CPU ×3、
+   +3V3_FLIP_FLOP、BOOST_LOOP、V_SUPPLY、+5V_BOOST，共 7 个网），但**文件里有
+   `*POUR*` 段头**——`Hardware/PSDR.asc` 第 24084 行 `*POUR*       POUR ITEMS`。
+   上一版"没有 `*POUR*` 段头、POUROUT 夹在 `*ROUTE*` 里"是错的。
+2. **真实板框**：不在 `LINES` 的 15/16/17/18 层（那 277 段是装配/注释线）。
+   整板只有一条 `BOARD` 记录，`CLOSED` 折线 68 个顶点 / 67 段
+   （42 直线 + 25 圆弧）。上一版"258 段 OPEN/CIRCLE 包络、生成器画占位矩形"作废。
+3. **丝印**：已生成（decal 图元 + 板级图元 + 位号 + 4 条自由文本），见 §C-14。
 
-**判定**：方向 A 的探针目标达成——ASCII → KiCad 的焊盘、走线、过孔、弧全部
-可自动生成，flash 位置与原始 Gerber 在 0.17 µm 内一致（钻孔最差 1.5 µm），
-且每一层铜的数量都能对账。要把它变成"能生产的 KiCad 板"，还差铺铜、板框、
-丝印三件事；在那之前，生产包仍以上游 `468dc41` 的原始 Gerber 为准。
+**第三批判定**（保留）：方向 A 的探针目标达成——ASCII → KiCad 的焊盘、走线、
+过孔、弧全部可自动生成，flash 位置与原始 Gerber 在 0.17 µm 内一致
+（钻孔最差 1.5 µm），且每一层铜的数量都能对账。
+
+---
+
+### C-14 铺铜、真实板框、丝印：三件缺口补齐（2026-11-01）
+
+**板框**（`parse_outline`，只认 `*LINES*` 里唯一的 `BOARD` 记录）：
+
+- 68 个顶点、67 段 = 42 直线 + 25 圆弧；包围盒 **100.00 × 65.00 mm**。
+  KiCad 侧是 42 条 `gr_line` + 25 条 `gr_arc`，全在 `Edge.Cuts`。
+- 对账基准是 `9 - fabnotes.GBR`——ASCII 自带的 CAM 文档写着
+  `CAM_DOC_NAME Board Outline` → `DOC_OUTPUT_FILE 9 - fabnotes.GBR`、
+  `DOC_BOARD Black`。按**真实弧线**每段采 32 点，共 2144 个采样点：
+
+```
+outline segments 67  lines 42  arcs 25
+fabnotes strokes 670
+samples 2144, >0.1 mm: 0, worst 0.0025 mm at segment 25
+```
+
+  （踩过的坑：最初按"直线段 + 弧的弦/中点"粗采样，得到 93/460 > 0.1 mm、
+  最差 1.296 mm 的假警报；弧必须按圆心/起角/扫角采样。见仓外
+  `PSDR-build-artifacts/outline_arc_check.py`。）
+
+**铺铜**（`parse_pours`，从第 24084 行的 `*POUR*` 段读 `POUROUT` 多边形）：
+
+| 网 | 层 | 顶点 | 网 | 层 | 顶点 |
+|---|---|---|---|---|---|
+| GND | In2.Cu | 4 | +3V3_CPU | F.Cu | 14 |
+| GND | F.Cu | 4 | +5V_BOOST | F.Cu | 11 |
+| GND | B.Cu | 4 | BOOST_LOOP | F.Cu | 5 |
+| +3V3 | In1.Cu | 14 | V_SUPPLY | F.Cu | 8 |
+| +3V3 | F.Cu | 10 | +3V3_CPU | In1.Cu | 4 |
+| +3V3_CPU | F.Cu | 7 | +3V3_FLIP_FLOP | In1.Cu | 5 |
+
+  12 个区 / 7 个网，层分布 In2 1、In1 3、F 7、B 1；全部闭合、无弧角。
+  `HATOUT` 是源工具已经打好的剖面线岛，KiCad 从 zone 重新推导，不单独发射。
+
+- **PADS 的铺铜多边形故意超出板框**（例如 In2 的 GND：x −13.18..110.16、
+  y −8.76..75.23 mm），源 CAM 把铜裁到距板边 0.63 mm（0.63..99.36 ×
+  0.63..64.36 mm）。KiCad 用默认 0.5 mm 铜边间距填充，实测填充范围
+  0.50..99.50 × −64.50..−0.50 mm，比源多 0.13 mm；未改板级规则（源用 25 mil）。
+- **生成物里的 zone 是未填充状态**（`filled_polygon` 0 个）。KiCad 的 CLI
+  不会自动重填，必须显式加开关：
+  - DRC：`kicad-cli pcb drc --severity-all --refill-zones`
+  - 出 Gerber：`kicad-cli pcb export gerbers ... --check-zones`
+
+  不加这两个开关，DRC 报 **796 条 / 20 断点**，Gerber 里一个 G36 区域都没有。
+  这是本轮最隐蔽的坑：文件能打开、命令 rc=0、导出成功，但铺铜整层缺失。
+- 加 `--check-zones` 后铜层 Gerber 出现 G36 区域：In2.Cu 1、In1.Cu 8、
+  F.Cu 57、B.Cu 50。
+
+**DRC**（`--severity-all --refill-zones`，重跑结果稳定）：
+
+```
+199  silk_overlap            丝印互相重叠（PADS 允许）
+199  silk_over_copper        丝印压阻焊开窗（PADS 允许）
+199  lib_footprint_issues    封装库 'PSDR' 不在工程配置（预期）
+ 55  silk_edge_clearance     丝印压板边
+ 52  clearance               最小实际 0.1174 mm，规则 0.2 mm
+ 39  copper_edge_clearance   右缘三个连接器舌口的 PADDLE_* 走线贴板边
+ 38  hole_clearance           14 条 0.0001 mm：J170/J153 孔与焊盘相切
+ 10  starved_thermal          6 条 B.Cu、4 条 F.Cu 的 GND 区多边形角上（角在板外）
+  4  through_hole_pad_without_hole   drill 0 的 Morse 桨焊盘
+795 条违规 + 0 unconnected
+```
+
+  与第三批的 309 条 / 20 断点相比：新增 486 条全是铺铜/丝印的预期告警
+  （丝印压焊盘、热焊盘、板边），换来 **GND 连通性 20 → 0**。
+  `copper_edge_clearance` 的锚点是板框顶点、不是实际交点；实际铜在
+  舌口附近贴近轮廓，源设计在这些边缘连接器处没有 0.5 mm 规则。
+
+**丝印**：
+
+- 图元来源：`*PARTDECAL*` 的 OPEN/CLOSED/CIRCLE（level 26/0/1）+
+  `*LINES*` 的 level 26/29 板级线条 + 376 条 Ref.Des. + 4 条自由文本。
+- 层次规则有 ASCII 里嵌入的 CAM 文档作证（第 51011 行起）：
+  `CAM_DOC_NAME Top Silkscreen` → `DOC_LAYER_NUMBERS 1 26`，
+  `Bottom Silkscreen` → `4 29`。实测：**level 26 → 器件所在面**；
+  **level 0/1 → 只在非镜像器件上归 F.SilkS**（底面孔件的 0/1 图元在
+  GTO/GBO 都不出现）；level 20/23/27/29 → 不画；零长线段跳过。
+- 数量：162 个 decal 图元、1495 个板级图元 {26: 753, 29: 742}、4 条自由文本、
+  376 个位号；15 个器件在源文件里没有 Ref.Des.（6 个 FIDUCIAL、7 个 MH3M、
+  2 个 MH_80M——只有 Part Type 文本，而 CAM job 不画 Part Type）。
+- 双向覆盖率（40 px/mm，容差 0.10 mm）：
+
+| 宽度 | GTO 源→KiCad | GTO KiCad→源 | GBO 源→KiCad | GBO KiCad→源 |
+|---|---|---|---|---|
+| 2 mil | 100.00% | 100.00% | 100.00% | 100.00% |
+| 6 mil | 35.48% | 23.93% | 29.23% | 18.42% |
+| 8 mil | 100.00% | 100.00% | 100.00% | 100.00% |
+| 10 mil | 98.03% | 100.00% | 29.47% | 46.88% |
+
+  - 2 mil 是 "psdr" 标志，8 mil 是板级线条/器件轮廓：两档双向 100%，
+    说明坐标与层别都对。
+  - 6 mil 是位号文本：KiCad 笔画字体 vs PADS Romansim，字形不同；
+    6 mil 这一档的两向百分比不能当几何误差读。
+  - GBO 10 mil 的 29.47/46.88 由背面 4 条 10 mil 自由文本主导。GTO 10 mil
+    的 1.97% 缺口是 **9 条笔画组成的一个约 1.4 mm 实心三角标记**
+    （C151 左侧、板下缘附近）；它的来源未在 `PARTDECAL`/`LINES`/`TEXT`
+    段中定位到（本轮逐段查过），如实记为已知缺口。
+- 修了一个真 bug：PADS 把 decal 的 CIRCLE 写成一条 start == end 的 G75 圆弧，
+  `gerbparse._arc_points` 原来把这种弧当零扫角，所有圆形丝印都没进对账栅格。
+  修好后源 GTO drawup 从 9003 涨到 11663、GBO 10961 → 12956；KiCad 侧
+  "多出来"的 10 mil 笔画随之对上（此前 1032/1121 条未匹配集中在若干
+  r = 0.3 mm 的圆上）。
+
+**复现**（生成器只依赖标准库；同一输入重跑逐字节相同）：
+
+```
+$ python tools/pads_asc_pcb.py Hardware/PSDR.asc --all \
+      -o dist/kicad/PSDR_2.6.1_pcb_spike_full.kicad_pcb
+$ kicad-cli pcb drc --severity-all --refill-zones \
+      -o dist/kicad/drc_PSDR_2.6.1_pcb_spike_full.txt \
+      dist/kicad/PSDR_2.6.1_pcb_spike_full.kicad_pcb
+$ kicad-cli pcb export gerbers -o <fab> --no-protel-ext --precision 6 --check-zones \
+      -l F.Cu,In1.Cu,In2.Cu,B.Cu,F.Silkscreen,B.Silkscreen,F.Mask,B.Mask <board>
+$ kicad-cli pcb export drill -o <fab> --format excellon --excellon-units mm \
+      --excellon-zeros-format decimal --drill-origin absolute <board>
+$ python tools/kicad_gerber_compare.py --pads <468dc41 原始 Gerber> \
+      --fab <fab> --board PSDR_2.6.1_pcb_spike_full
+```
+
+最后一条重跑结果与 §C-13 完全一致：**0 个源 flash 未覆盖、1 个 3.2 mm 孔缺失**
+（J170 的孤儿 PAD 20，根因见 §C-13）。
+
+**判定**：铺铜、真实板框、丝印三件事完成。四层板现在是
+4 层铜 / 12 个铺铜区 / 67 段板框 / 双向丝印对账通过 / 0 断点；
+但它仍不是可投产的板：795 条 DRC（以源设计允许的丝印压焊盘和紧间距为主）、
+J170 缺 1 个 3.2 mm 安装孔、铺铜边界比源 CAM 多 0.13 mm。
+生产包继续以上游 `468dc41` 的原始 Gerber 为准。
 
 ---
 
@@ -1147,3 +1284,17 @@ https://github.com/MichaelRColton/PSDR/pull/17#issuecomment-6553367174
 不提交的中间产物：上游 `468dc41` 的 2.6.1 原始 Gerber（对账基准）、本轮
 KiCad Gerber/钻孔导出与实验板，都在 `D:\my git\PSDR-build-artifacts\` 下；
 `dist/kicad/` 里上一轮的探针板与测试板已删除，只留下上面两块。
+
+2026-11-01 第四批（铺铜、真实板框、丝印）：
+
+```
+tools/pads_asc_decal.py                        M  增加 GRAPHIC/LABEL 解析与图元列表（283 → 336 行）
+tools/gerbparse.py                             M  修 G75 整圆弧（start == end 时零扫角）
+tools/pads_asc_pcb.py                          M  发射板框/铺铜/丝印（456 → 873 行）
+dist/kicad/PSDR_2.6.1_pcb_spike_full.kicad_pcb M  + 67 段板框、12 个铺铜区、双向丝印
+dist/kicad/drc_PSDR_2.6.1_pcb_spike_full.txt   M  309 条 / 20 断点 → 795 条 / 0 断点
+docs/WO-psdr-takeover.md                       M  §C-14 新增 + 状态/SKIP-1/SKIP-4/制板口径更正
+```
+
+`dist/kicad/PSDR_2.6.1_pcb_spike_full.kicad_prl` 是 KiCad 的本地 UI 状态，
+不是交付物：没有提交，已从工作区删除。

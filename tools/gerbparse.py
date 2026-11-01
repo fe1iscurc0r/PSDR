@@ -34,17 +34,23 @@ def _arc_points(x0, y0, x1, y1, cx, cy, r, ccw, multi=True, steps=24):
 
     G75 (multi-quadrant) is what PADS emits for filleted outlines; G74 clamps the
     sweep to one quadrant, and getting that wrong traces the long way round.
+    A full circle arrives as one arc whose start and end coincide (PADS writes
+    every decal CIRCLE that way); the angle difference is then zero and the
+    sweep has to be forced to a whole turn instead of collapsing to nothing.
     """
     import math
     a0 = math.atan2(y0 - cy, x0 - cx)
     a1 = math.atan2(y1 - cy, x1 - cx)
-    if ccw:
+    full = abs(a1 - a0) < 1e-9
+    if full:
+        a1 = a0 + (2 * math.pi if ccw else -2 * math.pi)
+    elif ccw:
         while a1 < a0:
             a1 += 2 * math.pi
     else:
         while a1 > a0:
             a1 -= 2 * math.pi
-    if not multi and abs(a1 - a0) > math.pi / 2 + 1e-9:
+    if not multi and not full and abs(a1 - a0) > math.pi / 2 + 1e-9:
         a1 = a0 + (math.pi / 2) * (1 if a1 > a0 else -1)
     span = a1 - a0
     n = max(2, int(abs(span) / (math.pi / 2) * steps) + 1)
