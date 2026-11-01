@@ -282,6 +282,40 @@ def pad_angle(part, finori):
     return -a if part["mirror"] == "M" else a
 
 
+def pin_number(pin):
+    try:
+        return int(pin)
+    except ValueError:
+        return None
+
+
+def pad_stacks(decal):
+    """Pair orphan pad stacks with bare terminals, return {pin: pad stack}."""
+    pins = [t[0] for t in decal["terminals"]]
+    pads = decal["pads"]
+    bare = [p for p in pins if p not in pads]
+    orphan = sorted(
+        (p for p in pads if p != "0" and p not in set(pins)),
+        key=lambda p: (pin_number(p) is None, pin_number(p) or 0, p),
+    )
+    stacks = {}
+    for pad in orphan:
+        if pin_number(pad) is None:
+            break
+        choices = sorted(
+            (abs(pin_number(pad) - pin_number(pin)), pin_number(pin), pin)
+            for pin in bare if pin_number(pin) is not None
+        )
+        if not choices:
+            break
+        stacks[choices[0][2]] = pads[pad]
+        bare.remove(choices[0][2])
+    for pin in pins:
+        if pin not in stacks:
+            stacks[pin] = pads.get(pin) or pads.get("0")
+    return stacks
+
+
 def footprint(ref, part, decal, decal_name, pin_net, silk=False):
     fp_x, fp_y = kicad_point(part, 0, 0)
     side = "B.Cu" if part["mirror"] == "M" else "F.Cu"
@@ -301,8 +335,9 @@ def footprint(ref, part, decal, decal_name, pin_net, silk=False):
         '\t\t(attr smd)',
         '\t\t(duplicate_pad_numbers_are_jumpers no)',
     ]
+    stacks = pad_stacks(decal)
     for pin, tx, ty in decal["terminals"]:
-        stack = decal["pads"].get(pin) or decal["pads"].get("0")
+        stack = stacks[pin]
         if not stack:
             raise SystemExit(f"{ref}: no pad stack for pin {pin}")
         p = parse_stack(stack)

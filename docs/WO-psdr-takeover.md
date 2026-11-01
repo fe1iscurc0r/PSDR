@@ -538,8 +538,8 @@ L41/L81 走 Mini-Circuits 直供（非 Digi-Key）。
 本轮提取到仓外 `D:\my git\PSDR-build-artifacts\gerber261\` 作对账基准，见 §C-13）。
 `dist/gerber/` 是 **2.5** 主板的 Gerber，不是这块板；
 `PSDR_2.6.1_pcb_spike_full.kicad_pcb` 现在有 4 层铜、12 个铺铜区、真实板框和丝印
-（§C-14），但 795 条 DRC 违规与 J170 缺一个安装孔意味着它仍只是可编辑参考，
-不能直接投产。
+（§C-14），与源 Gerber 逐 flash、逐钻孔对齐（§C-16），但 795 条 DRC 违规
+（分类与处置见 §C-16）意味着它仍只是可编辑参考，不能直接投产。
 
 ### C-9 本轮新踩的坑（工单未覆盖）
 
@@ -867,8 +867,8 @@ UUID 用 `uuid5(NAMESPACE_URL, "psdr261/…")` 派生，同一输入重跑输出
 1. **源侧全覆盖**：原始 Gerber 的每个 D03 flash 都能在 KiCad 同层 plot 的
    0.1 mil 内找到对应 flash，最差 0.0066 mil（0.17 µm）；
 2. **数量可解释**：KiCad 侧每层 flash 数正好等于"焊盘在该层的出现次数 + 419 个过孔"，
-   六层逐一对平——多出来的每个 flash 都能指名道姓（包括唯一的例外：源里没有的
-   J170 兜底焊盘，见钻孔一节）。
+   六层逐一对平；J170 的孤儿 PAD 20 在 §C-16 修复后不再产生兜底焊盘，
+   B.Cu/B.Mask 各减少 1 个 flash，与 F 面完全对称。
 
 **生成与复现**（只依赖 Python 标准库，1196 行：decal 283 + route 261 +
 emitter 456 + compare 196）：
@@ -938,9 +938,9 @@ layer    pads file                src#  kicad#  dup  worst mil
 F_Cu     3 - top-art.GTL           659    1013    0     0.0066
 In1_Cu   4 - L2.p.G1               163     439    0     0.0046
 In2_Cu   5 - L3.G2                 132     439    0     0.0050
-B_Cu     6 - bot-art.GBL           602    1014    0     0.0066
+B_Cu     6 - bot-art.GBL           602    1013    0     0.0066
 F_Mask   2 - top-sm.GTS            242     594    2     0.0066
-B_Mask   7 - bot-sm.GBS            185     595    2     0.0066
+B_Mask   7 - bot-sm.GBS            185     594    2     0.0066
 ```
 
 `dup` 是源文件里的完全重复 flash（PADS 在两层阻焊上各写了两个相同的 62 mil 开窗），
@@ -952,13 +952,14 @@ KiCad 侧的数目逐层可推：
 | 层 | KiCad flash | 组成 |
 |---|---|---|
 | F.Cu | 1013 | 574 个铜在 F.Cu 的 `smd` + 20 个 `thru_hole`（含 4 个 drill 0）+ 419 个过孔 |
-| B.Cu | 1014 | 575 + 20 + 419 |
+| B.Cu | 1013 | 574 + 20 + 419 |
 | In1.Cu / In2.Cu | 439 | 20 + 419 |
 | F.Mask | 594 | 574 + 20 |
-| B.Mask | 595 | 575 + 20 |
+| B.Mask | 594 | 574 + 20 |
 
-`np_thru_hole` 的 25 个孔既不出铜（焊盘尺寸 = 钻孔尺寸，零环宽）也不出阻焊窗，
-与 PADS 一致；第一次生成时给了 `*.Mask`，KiCad 每面多出 25 个开窗，已改掉（见下）。
+`np_thru_hole` 的 26 个孔（§C-16 补上 J170 第 4 个 3.2 mm 孔前是 25 个）
+既不出铜（焊盘尺寸 = 钻孔尺寸，零环宽）也不出阻焊窗，与 PADS 一致；
+第一次生成时给了 `*.Mask`，KiCad 每面多出 25 个开窗，已改掉（见下）。
 
 **对账二：钻孔**（按直径分组，0.1 mil 容差）：
 
@@ -971,28 +972,28 @@ KiCad 侧的数目逐层可推：
    1.200     14     14        0      0     0.0372
    2.032      2      2        0      0     0.0000
    3.000      7      7        0      0     0.0608
-   3.200      4      3        1      0     0.0346
+   3.200      4      4        0      0     0.0346
 ```
 
-461 个源孔对上 460 个。缺的那 1 个 3.2 mm 孔在 (582.70, 2167.30) mil
-= (14.80, 55.05) mm（工具打印的 KiCad/Gerber 帧），根因在源文件自己：
+461 个源孔全部对上（461/461）。第三批曾缺 1 个 3.2 mm 孔，根因在生成器的
+"只按端子发射焊盘"模型，不在源文件：
 
-- J170 的 decal 把四个 3.2 mm 安装孔编号为 `PAD 20/21/22/23`，而它的端子是
-  `21/22/23/24`。于是 `PAD 20` 成了没有端子的孤儿，`T24` 落到 `PAD 0` 的
-  默认焊盘（2.3 × 1.5 mm）；
-- 生成器按"端子"发射，所以第 4 个安装孔的位置上是一个兜底 SMD 焊盘
-  （B.Cu/B.Paste/B.Mask），少了那个 3.2 mm 孔；
-- 源 Gerber 在四个角上都**没有铜也没有阻焊开窗**（安装孔是纯 NPTH），
-  所以源数据本身是矛盾的：钻孔文件有 4 个孔，decal 有 4 个孔焊盘，
-  只有 3 个被端子引用。
+- J170 的 decal 把四个 3.2 mm NPTH 安装孔编号为 `PAD 20/21/22/23`，而它的
+  端子是 `21/22/23/24`，于是 `PAD 20` 成了没有端子的孤儿，`T24` 没有同名
+  焊盘、落到 `PAD 0` 的默认焊盘（2.3 × 1.5 mm）；
+- 2.6.1 原始钻孔在 J170 四个角上都有孔，且全板只有 J170 这一个 decal
+  同时具备"孤儿焊盘 + 无焊盘端子"，所以 PADS 只能把 `PAD 20` 放在 `T24` 上；
+- 生成器原来按端子查同名 pad stack，`T24` 拿不到 `PAD 20`，第 4 个安装孔
+  位置就变成了兜底 SMD 焊盘，少一个 3.2 mm 孔。
 
-**生产以钻孔文件为准**（4 个孔）。这里没有为单个器件加特例，如实记为已知缺口。
+§C-16 用通用的"孤儿焊盘配最近编号的无焊盘端子"规则修掉了（不是 J170 特例），
+修后 4/4 个 3.2 mm 孔对上，B.Cu/B.Mask 各少一个兜底 flash。
 
 **对账三：NPTH 的阻焊**。KiCad 第一次生成时给 `np_thru_hole` 带了 `*.Mask`，
 每面多 25 个阻焊开窗；PADS 的 GTS/GBS 在 25 个孔位上没有任何 stroke
 （最近的 stroke 边缘也在 23.62 mil 外）。改成 `(layers "*.Cu")` 后重测：
-两边都是 0/25，F.Mask 从 619 降到 594、B.Mask 从 620 降到 595，
-恰好等于"smd 焊盘 + 20 个 thru_hole"。
+两边都是 0/25，F.Mask 从 619 降到 594、B.Mask 从 620 降到 594（§C-16 后
+两面各是 574 个 smd + 20 个 thru_hole），恰好等于"smd 焊盘 + 20 个 thru_hole"。
 
 **DRC**（第三批状态，`kicad-cli pcb drc --severity-all`，重跑结果稳定；
 下面这组数字已被 §C-14 的 **795 条 / 0 断点**取代，保留用于对比铺铜前后）：
@@ -1069,9 +1070,11 @@ samples 2144, >0.1 mm: 0, worst 0.0025 mm at segment 25
   `HATOUT` 是源工具已经打好的剖面线岛，KiCad 从 zone 重新推导，不单独发射。
 
 - **PADS 的铺铜多边形故意超出板框**（例如 In2 的 GND：x −13.18..110.16、
-  y −8.76..75.23 mm），源 CAM 把铜裁到距板边 0.63 mm（0.63..99.36 ×
-  0.63..64.36 mm）。KiCad 用默认 0.5 mm 铜边间距填充，实测填充范围
-  0.50..99.50 × −64.50..−0.50 mm，比源多 0.13 mm；未改板级规则（源用 25 mil）。
+  y −8.76..75.23 mm），源 CAM 把铜裁到板边附近：0.254 mm 填充线中心线为
+  0.635..99.365 × 0.635..64.364 mm，**铜边为 0.508..99.492 × 0.508..64.491 mm**。
+  KiCad 用默认 0.5 mm 铜边间距填充，实测 0.500..99.499 × 0.500..64.498 mm，
+  **两者铜边相差 0.008 mm**。早先写的"多 0.13 mm"是拿源中心线 0.635 与
+  KiCad 铜边 0.500 相比得出的，作废（§C-16 重测）；未改板级规则。
 - **生成物里的 zone 是未填充状态**（`filled_polygon` 0 个）。KiCad 的 CLI
   不会自动重填，必须显式加开关：
   - DRC：`kicad-cli pcb drc --severity-all --refill-zones`
@@ -1082,7 +1085,7 @@ samples 2144, >0.1 mm: 0, worst 0.0025 mm at segment 25
 - 加 `--check-zones` 后铜层 Gerber 出现 G36 区域：In2.Cu 1、In1.Cu 8、
   F.Cu 57、B.Cu 50。
 
-**DRC**（`--severity-all --refill-zones`，重跑结果稳定）：
+**DRC**（`--severity-all --refill-zones`，重跑结果稳定；逐类定性见 §C-16）：
 
 ```
 199  silk_overlap            丝印互相重叠（PADS 允许）
@@ -1090,9 +1093,9 @@ samples 2144, >0.1 mm: 0, worst 0.0025 mm at segment 25
 199  lib_footprint_issues    封装库 'PSDR' 不在工程配置（预期）
  55  silk_edge_clearance     丝印压板边
  52  clearance               最小实际 0.1174 mm，规则 0.2 mm
- 39  copper_edge_clearance   右缘三个连接器舌口的 PADDLE_* 走线贴板边
+ 39  copper_edge_clearance   16 条 PADDLE_* 舌口 + 23 条板边连接器焊盘
  38  hole_clearance           14 条 0.0001 mm：J170/J153 孔与焊盘相切
- 10  starved_thermal          6 条 B.Cu、4 条 F.Cu 的 GND 区多边形角上（角在板外）
+ 10  starved_thermal          6 条 B.Cu、4 条 F.Cu 的 GND 焊盘只剩 1 根辐条
   4  through_hole_pad_without_hole   drill 0 的 Morse 桨焊盘
 795 条违规 + 0 unconnected
 ```
@@ -1153,13 +1156,12 @@ $ python tools/kicad_gerber_compare.py --pads <468dc41 原始 Gerber> \
       --fab <fab> --board PSDR_2.6.1_pcb_spike_full
 ```
 
-最后一条重跑结果与 §C-13 完全一致：**0 个源 flash 未覆盖、1 个 3.2 mm 孔缺失**
-（J170 的孤儿 PAD 20，根因见 §C-13）。
+最后一条重跑结果（§C-16 修复后）：**0 个源 flash 未覆盖、461/461 个钻孔对上**。
 
 **判定**：铺铜、真实板框、丝印三件事完成。四层板现在是
 4 层铜 / 12 个铺铜区 / 67 段板框 / 双向丝印对账通过 / 0 断点；
-但它仍不是可投产的板：795 条 DRC（以源设计允许的丝印压焊盘和紧间距为主）、
-J170 缺 1 个 3.2 mm 安装孔、铺铜边界比源 CAM 多 0.13 mm。
+但它仍不是可投产的板：795 条 DRC（分类与处置见 §C-16，以源设计允许的
+丝印压焊盘和紧间距为主）、丝印还差一个约 1.4 mm 的三角标记（来源未定位）。
 生产包继续以上游 `468dc41` 的原始 Gerber 为准。
 
 ---
@@ -1281,6 +1283,131 @@ node tools/convert-node-server-patched.js --cmd conversion --params \
 **已知限制**：宿主 V3，技能基线要求 V4；中间工程
 `PSDR 2.6.1 (KiCad 4L)`（铺铜无网的过渡版）和旧的降级工程
 `PSDR 2.6.1 KiCad` 需要用户在 EDA 里手工删除——typed 接口没有删工程的 action。
+
+---
+
+### C-16 收尾：J170 安装孔修复、铺铜边界定量与 795 条 DRC 分类（2026-11-01）
+
+本轮把 §C-13/§C-14 留下的三处尾巴做完：缺的 3.2 mm 安装孔、0.13 mm 铺铜
+差异的定量、795 条 DRC 的逐类定性。交付物
+`dist/kicad/PSDR_2.6.1_pcb_spike_full.kicad_pcb` 已按修复后的生成器重写
+（与修复前只差 5 行），Gerber/钻孔对账和 DRC 报告都按新版重跑。
+
+**1. J170 孤儿焊盘：是生成器模型缺陷，已按通用规则修复**
+
+源数据并不矛盾，矛盾在生成器的"按端子查同名 pad stack"模型：
+
+- J170 的 decal 有四个 3.2 mm NPTH 安装孔，编号 `PAD 20/21/22/23`；
+  四个角端子是 `21/22/23/24`，于是 `PAD 20` 没有端子、`T24` 没有同名焊盘；
+- 原始钻孔在 J170 四个角上都有 3.2 mm 孔，且全板只有 J170 这一个 decal
+  同时出现"孤儿焊盘 + 无焊盘端子"；PADS 只能把 `PAD 20` 放在 `T24` 上；
+- 原生成器让 `T24` 落到 `PAD 0` 的默认焊盘（2.3 × 1.5 mm SMD），
+  第 4 个安装孔就丢了。
+
+`tools/pads_asc_pcb.py` 新增 `pad_stacks()`：把每个孤儿焊盘按编号差最小
+配给一个无焊盘端子（数字编号才算，找不到就停）。这是通用规则，没有 J170
+特例；其它 decal 没有孤儿焊盘，行为不变。重跑后与旧交付物只差这 5 行：
+
+```
+-		(pad "24" smd roundrect
+-			(at -62.2000 -17.0500 -180.0000)
+-			(size 2.3000 1.5000)
+-			(layers "B.Cu" "B.Paste" "B.Mask")
+-			(roundrect_rratio 0.2540)
++		(pad "24" np_thru_hole circle
++			(at -62.2000 -17.0500 -90.0000)
++			(size 3.2000 3.2000)
++			(drill 3.2000)
++			(layers "*.Cu")
+```
+
+（角度 −180 → −90 来自 `PAD 20` 的 `FINORI`；圆焊盘下无影响。）
+焊盘总数仍 1194；B.Cu/B.Mask 各少一个兜底 flash（1014→1013、595→594），
+F/B 两面从此完全对称。重跑对账：
+
+```
+$ python tools/kicad_gerber_compare.py --pads <468dc41 原始 Gerber> \
+      --fab <由新版导出的 Gerber+钻孔> --board PSDR_2.6.1_pcb_spike_full
+...
+source hits 461, missing 0
+RESULT: every source flash is covered and all drill hits match
+```
+
+DRC 仍是 795 条 / 0 unconnected，类别计数不变——新增的 NPTH 孔没有引入
+新违规。把新旧报告按"类别 + 描述 + 对象"去重比对：794 个签名里 792 个
+完全相同，另 2 个只是同一条违规的两个对象顺序互换（DRC 的报告顺序不稳定）。
+同一输入重跑，`cmp` 逐字节相同。
+
+**2. 铺铜边界：0.008 mm，不是 0.13 mm**
+
+早先的 0.13 mm 是拿源 Gerber 的填充线**中心线** 0.635 mm 与 KiCad 的
+**铜边** 0.500 mm 相比。按 0.254 mm 线宽重算源铜边：0.635 − 0.127 =
+0.508 mm；KiCad 实测铜边 0.500 mm（GTL/GBL/G2 三层的原始 stroke 端点
+范围 0.500..99.499 × 0.500..64.498 mm）。真实差异 **0.008 mm**，
+小于 2 mil，不构成规则或工艺差异，未改板级设置。
+
+（测量坑：`gerbparse.bbox()` 会把当前孔径宽度加到 G36/G37 区域描边上，
+对 KiCad 的 zone 填充返回 −47.8..126.3 mm 的假范围；必须直接用原始
+stroke 端点求范围。）
+
+**3. 795 条 DRC 逐类定性**
+
+判定口径：源 PADS 的规则在 `Hardware/PSDR.asc` 的 `RULES_SECTION`
+（唯一一组 `CLEARANCE_RULE`）：铜间距 304800 = **8 mil (0.2032 mm)**，
+孔间距 8 mil，铜到板框 762000 = **20 mil (0.508 mm)**；PADS 没有丝印 DRC，
+`STMINSPOKES` 则是 4。KiCad 侧是默认 0.2 / 0.25 / 0.5 mm。
+
+| 类别 | 条数 | 级别 | 定性 | 处置 |
+|---|---|---|---|---|
+| `lib_footprint_issues` | 199 | warning | 工程没有 `fp-lib-table`；封装数据内嵌在板上（391 个封装），KiCad 的去重计数不是按封装总数 | 不改 |
+| `silk_overlap` | 199 | warning | PADS 无丝印 DRC；丝印与源 GTO/GBO 双向对账 100%，重叠来自源图 | 不改 |
+| `silk_over_copper` | 199 | warning | 同上，每个封装至少一处位号/轮廓压开窗 | 不改（生产会裁丝印） |
+| `silk_edge_clearance` | 55 | warning | 源图把文字/线条画到板边附近 | 不改 |
+| `clearance` | 52 | error | 实际 0.1174..0.1986 mm，**全部小于源规则 0.2032**：源设计自身就不满足自己的规则；几何逐一来自源走线/焊盘 | 不改（保持源几何） |
+| `copper_edge_clearance` | 39 | error | 全部是板边连接器：16 条 `PADDLE_*` 舌口 + ANT/VNA-IN 5、EARPHONE 7、VNA-OUT 5、USB 2、SPEAKER 1、M1/M2/M3 3；源 20 mil 规则同样被源设计违反 | 不改 |
+| `hole_clearance` | 38 | error | 14 条 0.0001 mm 是 J170×9、J153×5 的 1.2 mm NPTH 与信号焊盘相切（源 8 mil 也不满足，PADS 允许）；其余 24 条 0.2042..0.2456 **≥ 源 8 mil**，只是严于 KiCad 默认 0.25 | 不改 |
+| `starved_thermal` | 10 | error | 6 条 B.Cu + 4 条 F.Cu 的 GND 焊盘（0402/0603、microSD、U314、USB）重填后只剩 1 根辐条；源 PADS 用 `THERLINEWID 15 mil`/`THERSMDWID 10 mil` 的剖面线填充，KiCad zone 是单一 0.254/0.254 实心填充，辐条拓扑无法逐根复现；0 断点 | 不改，记为转换差异 |
+| `through_hole_pad_without_hole` | 4 | error | CW1/CW2 的 4 个 Morse 桨焊盘，源设计是"多层铜 + 无钻孔"，这是 KiCad 连通性限制的既定绕法（§C-13） | 不改 |
+
+合计 **652 warning + 143 error = 795，0 unconnected**。也就是说：
+没有一条错误是"转换把几何做错了"——两类转换差异（热焊盘拓扑、零钻孔
+桨焊盘）已知且不影响连通性，其余错误在源设计里本来就存在（PADS 规则
+允许或源设计违反自己的规则）。
+
+**4. 本轮重写/新增的文件**
+
+```
+dist/kicad/PSDR_2.6.1_pcb_spike_full.kicad_pcb   M  仅 J170 pad 24 的 5 行
+dist/kicad/drc_PSDR_2.6.1_pcb_spike_full.txt     M  按新版重跑（795/0）
+tools/pads_asc_pcb.py                            M  新增通用 pad_stacks()
+docs/WO-psdr-takeover.md                         M  本文件（§C-13/14 勘误 + 本节）
+md5(板) = 157f000bc9caa4eb67492a9a751d8f91
+```
+
+**5. 仍未闭合的缺口**
+
+- 丝印：GTO 上约 1.4 mm 的实心三角标记（C151 左侧、板下缘）来源未定位，
+  见 §C-14；
+- 嘉立创EDA：`+3V3_FLIP_FLOP`（In1）和 `V_SUPPLY`（F.Cu）两个铺铜重建后
+  0 铜皮，根因是 KiCad `island_removal_mode 0` 与 PADS `keepIsland=true`
+  不一致，未改，见 §C-15；
+- DRC 795 条按上表保留，生产仍以 `468dc41` 的原始 Gerber 为准。
+
+**复现**：
+
+```
+$ C:/Users/ASUS/python-sdk/python3.13.2/python.exe tools/pads_asc_pcb.py \
+      Hardware/PSDR.asc --all -o dist/kicad/PSDR_2.6.1_pcb_spike_full.kicad_pcb
+$ kicad-cli pcb drc --severity-all --refill-zones \
+      -o dist/kicad/drc_PSDR_2.6.1_pcb_spike_full.txt \
+      dist/kicad/PSDR_2.6.1_pcb_spike_full.kicad_pcb
+$ kicad-cli pcb export gerbers -o <fab> --no-protel-ext --precision 6 --check-zones \
+      -l F.Cu,In1.Cu,In2.Cu,B.Cu,F.Silkscreen,B.Silkscreen,F.Mask,B.Mask <board>
+$ kicad-cli pcb export drill -o <fab> --format excellon --excellon-units mm \
+      --excellon-zeros-format decimal --drill-origin absolute <board>
+$ python tools/kicad_gerber_compare.py --pads <468dc41 原始 Gerber> \
+      --fab <fab> --board PSDR_2.6.1_pcb_spike_full
+```
 
 ---
 

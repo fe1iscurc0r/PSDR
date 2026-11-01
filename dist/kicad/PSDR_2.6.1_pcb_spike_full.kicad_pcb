@@ -7176,11 +7176,11 @@
 			(layers "*.Cu")
 			(uuid "ad7b44ad-c7a7-54f2-9be8-0cf426495f7c")
 		)
-		(pad "24" smd roundrect
-			(at -62.2000 -17.0500 -180.0000)
-			(size 2.3000 1.5000)
-			(layers "B.Cu" "B.Paste" "B.Mask")
-			(roundrect_rratio 0.2540)
+		(pad "24" np_thru_hole circle
+			(at -62.2000 -17.0500 -90.0000)
+			(size 3.2000 3.2000)
+			(drill 3.2000)
+			(layers "*.Cu")
 			(uuid "58054583-116d-5a05-8a5f-61aec296ec14")
 		)
 		(fp_line
