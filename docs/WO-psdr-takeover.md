@@ -524,6 +524,31 @@ L41/L81 走 Mini-Circuits 直供（非 Digi-Key）。
 **两版 BOM 的位号集合完全相同**（322 个，2.6 无重复）⇒ 上面那 20 个缺口是 2.6 就带过来的，
 不是 2.6.1 新漏的。
 
+#### C-7 补充二（M1，2026-11-01）：BOM 补丁已作为上游 PR #18 交付
+
+`#14` 的维护者 jeffersonbenson 回了 "Please do!"，补丁按上面三条做：
+
+| 文件 | 单元格 | 原值 | 新值 | 依据 |
+|---|---|---|---|---|
+| `PSDR2.6.1_BOM.xls` | 项 41（R45C2） | `R6,14,268` | `R268` | 项 42/43 已单列 R14(68R)/R6(180R)，41 行 qty=1 |
+| `PSDR2.6.1_BOM.xls` | 项 52（R56C2） | `R97,-99` | `R97-99` | qty=3；按原写法只能读出 R97+R99，缺 R98 |
+| `PSDR2.6_BOM.xls` | 项 50（R54C2） | `R97,-99` | `R97-99` | 同一笔误；该行 qty 与 Run Tot 本就按 3 颗算 |
+
+- R98 是真器件：`Hardware/PSDR_2.6.1_Schematic_2016-07-31.pdf` 里
+  R97/R98/R99 并排三颗 255R（LED_WHITE/LED_2/LED_3 对 D100/D101/D102）；
+  BOM 项 24 写 D101 = `LED_0603 RED`；网表 `R98.1 ↔ D101.1`、
+  `R98.2 ↔ LED_2/U121.43 (PE13)`。
+- 补丁后的对账：展开 323 个常规位号、**0 重复**、**0 幽灵行**，板上没有 BOM
+  行的只剩 19 个机械件（M1–M7、X1/X2、F1–F6、CW1/CW2、DAC1/DAC2）；
+  补前是 322 唯一 + R6/R14 各两次 + R98 缺失（20 个没有行）。
+- 文件完整性：LibreOffice 重存，逐单元格比对（文本/公式/缓存值/背景色/字体/
+  行高/列宽）只有上述单元格不同，列宽因 .xls 单位换算窄 0.01–0.02 mm；
+  CSV 导出 diff 也只有这两/三行。
+- 交付：分支 `upstream-pr/bom-2.6.1-refdes-fix` @ `9c3ca93`（基于上游
+  `master` 45acd0f），远端 blob `886c3d3…`/`04b470d…` 与本地逐位一致；
+  **PR https://github.com/MichaelRColton/PSDR/pull/18**（正文含 AI 辅助声明
+  与复现口径）。2.6 的历史 BOM 一并修了位号笔误（未改数量）。
+
 ### C-8 SKIP 清单（转不了的如实标，不假装成功）
 
 | # | 项 | 原因（可复核） |
@@ -1925,3 +1950,33 @@ $ git ls-remote upstream 'refs/heads/next' 'refs/tags/fork-base/*'
 推上去的 M0 提交是 `a524e06`（README.fork.md + 本节），父提交 `1d8e9ca`；
 annotated tag 对象 `448528d` 剥开后指向上游 `45acd0f`。`master` 仍与上游
 一致，upstream 未被写入。记录本节结果的提交随后推到同一分支。
+
+### E-6 M1 落地与推送结果（2026-11-01）
+
+三个提交推到 fork 的 `next`（单命令级代理，未改配置）：
+
+```
+$ git push origin HEAD:refs/heads/next
+   9b050b3..a627c35  HEAD -> next
+push rc=0
+
+$ gh api repos/fe1iscurc0r/PSDR/git/ref/heads/next --jq .object.sha
+a627c35458e553ef4ba87119b6dc5404c83c667e     ← 与本地 next 相同
+$ git ls-remote upstream refs/heads/next
+（空：upstream 未被写入）
+```
+
+| 提交 | 内容 | 验收 |
+|---|---|---|
+| `e4b5a06` | `fix(pcb)` 补 PADS `COPPER` 丝印（§C-17） | 10 mil 档 GTO 100%/100%、GBO 84.82%/73.04%；DRC 795/0 不变；0 flash 未覆盖、461/461 钻孔；重跑 sha256 不变 |
+| `a627c35` | `feat(tools)` §C-18 复现链 + `SHA256SUMS`、§C-15 补充更正 EDA 零铜铺铜真因、README 过期 md5 更正 | 两次运行清单逐字节相同；`--check` 10 个文件全 OK |
+| 本次 | §C-7 补充二（BOM 补丁＝上游 PR #18）+ 本节 | 见下 |
+
+同日对外：`upstream-pr/bom-2.6.1-refdes-fix` @ `9c3ca93` → **PR #18**（未合并）；
+`#14` 未再回帖（不在批准范围内）。
+
+EDA 侧（§C-15 补充）：宿主从 3.2.203 升到 **4.1.60** 后，
+`+3V3_FLIP_FLOP`/`V_SUPPLY` 两个铺铜靠改优先级做到 **12/12 出铜**并通过
+`save → 关闭 → 重开 → 回读` 持久化验证；代价是 EDA 自带 DRC 507→520
+（岛铜 `No Connection` 6 + 铜区互相间距 7），且这份改法暂不可从仓库复现
+（已另立任务）。
