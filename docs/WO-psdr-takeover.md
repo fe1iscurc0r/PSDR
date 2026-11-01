@@ -1298,3 +1298,16 @@ docs/WO-psdr-takeover.md                       M  §C-14 新增 + 状态/SKIP-1/
 
 `dist/kicad/PSDR_2.6.1_pcb_spike_full.kicad_prl` 是 KiCad 的本地 UI 状态，
 不是交付物：没有提交，已从工作区删除。
+
+已提交为 `03e22f7` 并推 `origin`（单命令级代理，未改配置）：
+
+```
+$ git push origin HEAD
+   c858167..03e22f7  HEAD -> workorders/2026-10-30-psdr-takeover-linux-build-kicad
+push rc=0
+
+$ git fetch origin <branch> && git rev-parse HEAD^{tree} origin/<branch>^{tree}
+8c75fe548b3ee2f56db346a536e10df036c92cd5   (local)
+8c75fe548b3ee2f56db346a536e10df036c92cd5   (remote，tree 相同 = 逐字节一致)
+ahead/behind = 0 0
+```
