@@ -1,0 +1,112 @@
+# Reproduce the Eclipse CDT Debug build of the F7 firmware on Linux.
+#
+# Source: PSDR_Rebuild @ b9c0629 (2021-01-27). Parameters transcribed from
+# Source/.cproject, Debug configuration:
+#   Cortex-M7 / Thumb / hard float / fpv5-sp-d16, -O0, --gc-sections,
+#   HSE_VALUE=26000000, defines DEBUG TRACE USE_FULL_ASSERT __FPU_PRESENT
+#   ARM_MATH_CM7 STM32F746xx USE_HAL_DRIVER.
+# The Debug sourceEntries exclude only DSP_Lib/Examples and src/TinyGPS.c;
+# unlike the F4 project, no HAL module is excluded. OPT defaults to -O0 and
+# can be overridden (e.g. OPT=-Os) for size comparisons.
+#
+# Deliberate differences from the Eclipse build (all visible, none silent):
+#   a) -fcommon: GCC 10+ defaults to -fno-common; this tree has tentative
+#      definitions in headers. Restores the original GCC 4.7 semantics.
+#   b) all three linker scripts are passed together (mem/libs/sections).
+#   c) .S sources get their own rule; arm_bitreversal2.S defines
+#      arm_bitreversal_32 needed by the FFT code.
+#   d) OS_INCLUDE_STARTUP_INIT_MULTIPLE_RAM_SECTIONS is applied only to
+#      _startup.c, matching the fileInfo override in .cproject.
+#   e) this branch head does not compile as-is with GCC 13: si5338.c lacked
+#      its HAL include and the extern for handleI2C, and frequency_control.c
+#      included hal_rcc_ex.h first, which trips the HAL circular include.
+#      Both include fixes are part of this branch.
+#
+# The committed Debug/PSDR.hex was last updated at 457c270 (2018-06-21) with
+# the 2018 toolchain, so it is not byte-comparable with GCC 13.2.1. Verified
+# against it: initial SP 0x20050000, reset vector into .after_vectors, and an
+# identical 118-entry vector pattern. Same-source sizes of that commit with
+# GCC 13: -O0 112344 B, -Og 93704 B, -O2 93268 B, -Os 89748 B, versus 76837 B
+# in the 2018 hex (which looks like an optimized build from an older GCC).
+
+TARGET=PSDR
+BUILD=build_linux_f7
+PREFIX=arm-none-eabi-
+CC=$(PREFIX)gcc
+CP=$(PREFIX)objcopy
+SZ=$(PREFIX)size
+CPU=-mcpu=cortex-m7 -mthumb -mfloat-abi=hard -mfpu=fpv5-sp-d16
+DEFS=-DDEBUG -D__FPU_PRESENT -DARM_MATH_CM7 -DUSE_FULL_ASSERT -DTRACE \
+     -DOS_USE_TRACE_SEMIHOSTING_DEBUG -DSTM32F746xx -DUSE_HAL_DRIVER -DHSE_VALUE=26000000
+INCS=-Iinclude -Isystem/include -Isystem/include/cmsis -Isystem/include/stm32f7-hal -Ildscripts
+OPT?=-O0
+CFLAGS=$(CPU) $(DEFS) $(INCS) -std=gnu99 $(OPT) -fcommon -ffunction-sections -fdata-sections \
+       -fsigned-char -ffreestanding -fno-move-loop-invariants -Wall --specs=nano.specs
+
+GC?=1
+LDSCRIPTS=-Tldscripts/mem.ld -Tldscripts/libs.ld -Tldscripts/sections.ld
+LDFLAGS=$(CPU) $(LDSCRIPTS) -nostartfiles
+ifeq ($(GC),1)
+LDFLAGS+=-Wl,--gc-sections
+endif
+LIBS=-lc -lm -lnosys
+
+SRC_EXCLUDE = src/TinyGPS.c
+
+# HEAD's .cproject includes every HAL source, but the MSP template defines the
+# same HAL_MspInit/HAL_MspDeInit symbols as src/stm32f7xx_hal_msp.c.
+HAL_EXCLUDE = system/src/stm32f7-hal/stm32f7xx_hal_msp_template.c
+
+DSP_DIRS = $(wildcard DSP_Lib/Source/*)
+
+C_SRCS  = $(filter-out $(SRC_EXCLUDE),$(wildcard src/*.c))
+C_SRCS += $(filter-out $(HAL_EXCLUDE),$(wildcard system/src/stm32f7-hal/*.c))
+C_SRCS += $(wildcard system/src/cmsis/*.c)
+C_SRCS += $(wildcard system/src/diag/*.c)
+C_SRCS += $(wildcard system/src/cortexm/*.c)
+C_SRCS += $(wildcard system/src/newlib/*.c)
+C_SRCS += $(wildcard $(addsuffix /*.c,$(DSP_DIRS)))
+
+ASM_SRCS = $(wildcard DSP_Lib/Source/TransformFunctions/*.S)
+
+VPATH = src:system/src/stm32f7-hal:system/src/cmsis:system/src/diag:system/src/cortexm:system/src/newlib:$(DSP_DIRS)
+OBJDIR=$(BUILD)/obj
+OBJS=$(addprefix $(OBJDIR)/,$(C_SRCS:.c=.o))
+OBJS+=$(addprefix $(OBJDIR)/,$(ASM_SRCS:.S=.o))
+
+$(OBJDIR)/system/src/newlib/_startup.o: CFLAGS += -DOS_INCLUDE_STARTUP_INIT_MULTIPLE_RAM_SECTIONS
+
+all: $(BUILD)/$(TARGET).elf $(BUILD)/$(TARGET).hex $(BUILD)/$(TARGET).bin
+
+$(OBJDIR)/%.o: %.c
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJDIR)/%.o: %.S
+	@mkdir -p $(dir $@)
+	$(CC) $(CPU) -c $< -o $@
+
+$(BUILD)/$(TARGET).elf: $(OBJS)
+	@mkdir -p $(BUILD)
+	$(CC) $(LDFLAGS) $(OBJS) $(LIBS) -Wl,-Map=$(BUILD)/$(TARGET).map -o $@
+
+$(BUILD)/$(TARGET).hex: $(BUILD)/$(TARGET).elf
+	$(CP) -O ihex $< $@
+	$(SZ) $<
+
+$(BUILD)/$(TARGET).bin: $(BUILD)/$(TARGET).elf
+	$(CP) -O binary $< $@
+
+REF?=Debug/PSDR.hex
+
+anchors: $(BUILD)/$(TARGET).elf
+	$(PREFIX)objcopy -O binary --only-section=.isr_vector $< $(BUILD)/$(TARGET).vectors.bin
+	@echo "initial SP / reset vector from ELF:"
+	@od -An -tx4 -N8 $(BUILD)/$(TARGET).vectors.bin
+	$(PREFIX)nm $< | grep -E "_estack|Reset_Handler"
+	@echo "reference hex: $(REF)"
+
+clean:
+	rm -rf $(BUILD)
+
+.PHONY: all clean anchors
