@@ -1431,3 +1431,31 @@ $ git fetch origin <branch> && git rev-parse HEAD^{tree} origin/<branch>^{tree}
 8c75fe548b3ee2f56db346a536e10df036c92cd5   (remote，tree 相同 = 逐字节一致)
 ahead/behind = 0 0
 ```
+
+2026-11-01 第五批（KiCad 10 铜层编号 + EDA 导入根因记录）：
+
+```
+tools/pads_asc_pcb.py                          M  内电层 1/2 → 4/6（KiCad 10 canonical），2 行
+dist/kicad/PSDR_2.6.1_pcb_spike_full.kicad_pcb M  仅 layer 声明 3 行；层数/网表/795 条 DRC/0 断点不变
+dist/kicad/drc_PSDR_2.6.1_pcb_spike_full.txt   M  重跑时间戳与条目排序，795 条 / 0 断点不变
+docs/WO-psdr-takeover.md                       M  §C-15 新增（+120 行）
+```
+
+已提交为 `108810b` 并推 `origin`（未碰 `upstream`）：
+
+```
+$ git push origin HEAD:refs/heads/workorders/2026-10-30-psdr-takeover-linux-build-kicad
+   e456e40..108810b  HEAD -> workorders/2026-10-30-psdr-takeover-linux-build-kicad
+
+$ git rev-parse HEAD^{tree} origin/<branch>^{tree}
+7b3d746a9cc4d6a6c03709b671f186b77616bacb   (local)
+7b3d746a9cc4d6a6c03709b671f186b77616bacb   (remote，tree 相同 = 逐字节一致)
+ahead/behind = 0 0
+
+$ git ls-remote upstream 'refs/heads/workorders/*'
+（空）
+```
+
+§C-15 记录了 KiCad → 嘉立创EDA Pro 导入的三处根因（铜层编号、网络名反斜杠、
+铺铜网络解析）；EDA 侧回读 4 铜层、278 网、391 器件、12 个铺铜边界与 67 段板框，
+铺铜重建 12/12（10 个有填充、2 个 0 填充记为差异）。
