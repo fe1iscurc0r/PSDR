@@ -2310,6 +2310,11 @@ $ sha256sum ../PSDR-build-artifacts/PSDR.bin Source/build_linux/PSDR.bin
 - 上面这些现在都能在新主线上重跑：`make -f Makefile.linux -j` 与
   `python tools/anchor_check_f7.py`。
 
+> **更正（2026-11-02 晚）**：`4dd2fca` 的提交信息里把 F7 线写成"CubeMX + FreeRTOS 重写"，
+> 这个说法不准确——F7 树里 **没有任何 FreeRTOS**（`xTaskCreate` 全树 0 处），两条线都是裸机
+> 超级循环，差别在 HAL 骨架、Si5338 频率合成与驱动分层。提交信息属历史不改，以
+> `docs/PSDR-firmware-survey.md` §1 为准。
+
 ### E-8 M2 推送结果（2026-11-02 上午）
 
 批准之后推送（单命令级代理，未改 git 配置）：
