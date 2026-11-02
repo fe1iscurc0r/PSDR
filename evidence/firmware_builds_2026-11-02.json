@@ -1,0 +1,31 @@
+{
+ "F4": {
+  "make_rc": 0,
+  "text": 133644,
+  "data": 2884,
+  "bss": 18152,
+  "log_sha256": "e96e7da372d67e77c13e1e3595635154463c9b37a0f565b693f7305505bd7917",
+  "anchor_check": "RESULT: PASS (initial SP 0x20030000, reset 0x080001B5 both match Debug/PSDR.hex)"
+ },
+ "F7": {
+  "make_rc": 0,
+  "text": 103324,
+  "data": 9144,
+  "bss": 17276,
+  "log_sha256": "9a8d48242cf57eefbf2f469cbd98c07fc93f382c6e697c11bd010d24b6dc1fd4",
+  "anchor_check": "tools/anchor_check_f7.py: SP 0x20050000 agrees with the 2018-06-21 reference hex and empty-slot pattern matches; reset value differs (0x080001D5 vs 0x080002F9) because it moves with the linker layout"
+ },
+ "artifacts": {
+  "F4_hex": "1c731aa599a49a8db4ec1ae591b37f9c47b093c88397430b69a66dff001a87a9",
+  "F4_bin": "1a824d1c1d47c0387f6c2cd6d5e09e5cbff991e1d1370a2ba87c67593829d9a7",
+  "F7_hex": "5ce8588611ce4e6f5408d2858b8def5060ce45a417cc1779056829bc6bdbc43e",
+  "F7_bin": "f2c5874b52f23edba5d4ad68270e0b746c881c0d0263df2a4bfdc8e3d3ab4eec"
+ },
+ "pre_merge_copy_hashes": {
+  "F4_hex": "1c731aa599a49a8db4ec1ae591b37f9c47b093c88397430b69a66dff001a87a9",
+  "F4_bin": "1a824d1c1d47c0387f6c2cd6d5e09e5cbff991e1d1370a2ba87c67593829d9a7",
+  "F7_hex": "5ce8588611ce4e6f5408d2858b8def5060ce45a417cc1779056829bc6bdbc43e",
+  "F7_bin": "f2c5874b52f23edba5d4ad68270e0b746c881c0d0263df2a4bfdc8e3d3ab4eec"
+ },
+ "claim": "both firmware lines build on the merged mainline and the images are byte-identical to the pre-merge builds"
+}

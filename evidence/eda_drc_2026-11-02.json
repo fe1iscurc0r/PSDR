@@ -1,0 +1,58 @@
+{
+ "_what": "EDA built-in DRC after the pour-precedence fix (same document/session as the readback above)",
+ "_command": "easyeda pcb drc --doc cf6546e2f1507a17",
+ "_doc": "docs/WO-psdr-takeover.md C-15 supplement, E-9",
+ "baseline_total_before_fix": 507,
+ "baseline_note": "the 507 baseline is recorded in section C-15; its raw file was not retained",
+ "passed": false,
+ "total": 513,
+ "groups": [
+  {
+   "errorObjType": "Device to TH Pad",
+   "errorType": "Clearance Error",
+   "count": 4
+  },
+  {
+   "errorObjType": "SMD Pad to Track",
+   "errorType": "Clearance Error",
+   "count": 19
+  },
+  {
+   "errorObjType": "Board Outline to Track",
+   "errorType": "Clearance Error",
+   "count": 12
+  },
+  {
+   "errorObjType": "Board Outline to SMD Pad",
+   "errorType": "Clearance Error",
+   "count": 20
+  },
+  {
+   "errorObjType": "TH Pad to Track",
+   "errorType": "Clearance Error",
+   "count": 18
+  },
+  {
+   "errorObjType": "SMD Pad to TH Pad",
+   "errorType": "Clearance Error in the same footprint",
+   "count": 14
+  },
+  {
+   "errorObjType": "Via Size",
+   "errorType": "Physical Error",
+   "count": 419
+  },
+  {
+   "errorObjType": "Copper Region(Filled)",
+   "errorType": "Connection Error",
+   "count": 6
+  },
+  {
+   "errorObjType": "Netlist Error",
+   "errorType": "Netlist Error",
+   "count": 1
+  }
+ ],
+ "delta": "+6 = the Copper Region(Filled) / Connection Error / No Connection group, all +3V3_FLIP_FLOP island copper on In1 (islands exist in the source pour)",
+ "reading_rule": "EDA DRC drifts until a rebuild settles; report only after save + reopen"
+}

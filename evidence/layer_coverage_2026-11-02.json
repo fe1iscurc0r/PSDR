@@ -1,0 +1,66 @@
+{
+ "_what": "bidirectional pixel coverage, CAM package vs our reproduced fab plot",
+ "_command": "python tools/kicad_layer_coverage.py 'Hardware/Gerbers/PSDR261 Main Board' dist/kicad/fab --pitch 40 --tol-mm 0.10",
+ "_doc": "docs/WO-psdr-takeover.md C-21",
+ "raster_px_per_mm": 40.0,
+ "tolerance_mm": 0.1,
+ "pairs": [
+  {
+   "layer_pair": "F.Cu",
+   "cam_segments": 47310,
+   "our_segments": 38221,
+   "cam_covered_by_ours_percent": 100.0,
+   "ours_covered_by_cam_percent": 72.23
+  },
+  {
+   "layer_pair": "In1.Cu",
+   "cam_segments": 39958,
+   "our_segments": 19076,
+   "cam_covered_by_ours_percent": 100.0,
+   "ours_covered_by_cam_percent": 71.81
+  },
+  {
+   "layer_pair": "In2.Cu",
+   "cam_segments": 49321,
+   "our_segments": 16680,
+   "cam_covered_by_ours_percent": 100.0,
+   "ours_covered_by_cam_percent": 74.61
+  },
+  {
+   "layer_pair": "B.Cu",
+   "cam_segments": 47220,
+   "our_segments": 25988,
+   "cam_covered_by_ours_percent": 100.0,
+   "ours_covered_by_cam_percent": 72.4
+  },
+  {
+   "layer_pair": "F.Mask",
+   "cam_segments": 4565,
+   "our_segments": 594,
+   "cam_covered_by_ours_percent": 100.0,
+   "ours_covered_by_cam_percent": 13.92
+  },
+  {
+   "layer_pair": "B.Mask",
+   "cam_segments": 5167,
+   "our_segments": 594,
+   "cam_covered_by_ours_percent": 100.0,
+   "ours_covered_by_cam_percent": 12.75
+  },
+  {
+   "layer_pair": "F.Silk",
+   "cam_segments": 11663,
+   "our_segments": 11430,
+   "cam_covered_by_ours_percent": 97.7,
+   "ours_covered_by_cam_percent": 20.25
+  },
+  {
+   "layer_pair": "B.Silk",
+   "cam_segments": 12956,
+   "our_segments": 12869,
+   "cam_covered_by_ours_percent": 97.41,
+   "ours_covered_by_cam_percent": 21.43
+  }
+ ],
+ "interpretation": "cam->ours is the 'did we lose anything' direction: 100% on all four copper layers and both mask layers; the silk residues are character-scale only (largest blob 1.05x1.07 mm F / 1.05x1.18 mm B), i.e. the stroke-font difference already recorded in C-17. ours->cam measures representation (we fill pours, PADS hatches) and is NOT a pass/fail metric."
+}

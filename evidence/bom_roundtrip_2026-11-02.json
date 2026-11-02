@@ -1,0 +1,26 @@
+{
+ "_what": "collateral-damage check on the LibreOffice .xls round-trip used by upstream PR #18",
+ "_command": "python bom_patch/audit_roundtrip.py <upstream .xls> <patched .xls>  (cell-level) + UTF-16 byte scan for embedded hyperlinks",
+ "_doc": "docs/WO-psdr-takeover.md C-7 supplement 2, E-10",
+ "sheets": [
+  "PSDR25BOM"
+ ],
+ "used_range": "100 x 16 both sides",
+ "non_empty_cells": {
+  "upstream": 1144,
+  "patched_after_dnp_notes": 1146
+ },
+ "merged_cells": {
+  "upstream": 0,
+  "patched": 0
+ },
+ "custom_number_formats": {
+  "upstream": 0,
+  "patched": 0
+ },
+ "hyperlinks_embedded": {
+  "count": 8,
+  "carries_the_SXB2089Z_mapping": true
+ },
+ "known_probe_limit": "the same script's notes/links probes mis-count (they are excluded here); hyperlink survival is evidenced by the UTF-16 scan above, not by them"
+}

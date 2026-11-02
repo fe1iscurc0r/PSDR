@@ -1,0 +1,74 @@
+{
+ "_what": "poured-list readback on PCB PSDR_2.6.1 (cf6546e2f1507a17), host 4.1.60, connector 1.15.0",
+ "_command": "easyeda pcb poured-list --doc cf6546e2f1507a17   (read twice, identical)",
+ "_doc": "docs/WO-psdr-takeover.md E-9; SOP in docs/SOP-eda-import-2.6.1.md step 6",
+ "non_empty_pours": 12,
+ "pour_count": 12,
+ "total_fills": 772,
+ "pours": [
+  {
+   "net": "+3V3",
+   "layer": "In1",
+   "fills": 1
+  },
+  {
+   "net": "+3V3",
+   "layer": "TOP",
+   "fills": 16
+  },
+  {
+   "net": "+3V3_CPU",
+   "layer": "In1",
+   "fills": 6
+  },
+  {
+   "net": "+3V3_CPU",
+   "layer": "TOP",
+   "fills": 1
+  },
+  {
+   "net": "+3V3_CPU",
+   "layer": "TOP",
+   "fills": 26
+  },
+  {
+   "net": "+3V3_FLIP_FLOP",
+   "layer": "In1",
+   "fills": 7
+  },
+  {
+   "net": "+5V_BOOST",
+   "layer": "TOP",
+   "fills": 19
+  },
+  {
+   "net": "BOOST_LOOP",
+   "layer": "TOP",
+   "fills": 10
+  },
+  {
+   "net": "GND",
+   "layer": "In2",
+   "fills": 26
+  },
+  {
+   "net": "GND",
+   "layer": "TOP",
+   "fills": 296
+  },
+  {
+   "net": "GND",
+   "layer": "BOTTOM",
+   "fills": 360
+  },
+  {
+   "net": "V_SUPPLY",
+   "layer": "TOP",
+   "fills": 4
+  }
+ ],
+ "notes": {
+  "boost_loop": "reads 10 here; section C-15 recorded 11 - one split-count difference, not a zero-copper regression; chasing it needs a pour rebuild (write)",
+  "flip_flop_islands": "7 regions = the 7 separate HATOUT regions in the source pour"
+ }
+}

@@ -1,0 +1,43 @@
+{
+ "_what": "2.6.1 paste masters matched against the SMD pad centres computed from the PADS source",
+ "_command": "python a1_paste_v4.py (scratch) ; frame convention reused from tools/kicad_gerber_compare.py: +1000 mil translation, no flip, 8 mil tolerance",
+ "_doc": "docs/WO-psdr-takeover.md C-20",
+ "top": {
+  "file": "top-paste.GTP",
+  "flashes": 194,
+  "within_8mil_of_top_pad": 188,
+  "percent": 96.9,
+  "median_offset_mil": 0.03,
+  "p90_mil": 0.05,
+  "max_mil": 160.87,
+  "top_pads_with_paste": "188/595"
+ },
+ "bottom": {
+  "file": "bot-paste.GBP",
+  "flashes": 170,
+  "within_8mil_of_bottom_pad": 170,
+  "percent": 100.0,
+  "median_offset_mil": 0.03,
+  "p90_mil": 0.04,
+  "max_mil": 0.05,
+  "bottom_pads_with_paste": "168/599"
+ },
+ "cross_check_layer_labels": {
+  "GTP_vs_bottom": "8/194",
+  "GBP_vs_top": "2/170",
+  "verdict": "layer labels are not swapped"
+ },
+ "unexplained_top_apertures": {
+  "count": 6,
+  "distinct_positions": 4,
+  "identification": "USB connector pins 6,7,8,9 shield tabs at (80.7,931.1) (169.3,931.1) (169.3,565.0) (80.7,565.0) mil",
+  "why_flagged": "USB is a bottom-side part in the source, so the top paste master opens for a bottom part; intent not decidable offline"
+ },
+ "package_observations": {
+  "paste_layers_produced_by": "gerbv 2.6A (second-hand export), every other layer by PADS 9.5",
+  "g36_regions_in_paste": 0,
+  "our_board_paste_modelled": false,
+  "our_kicad_default_paste_openings_per_side": 574,
+  "consequence": "the CAM paste masters are ~1/3 the opening count of a KiCad-default paste plot; they are not equivalent, so a stencil must come from the CAM package, not from our plot"
+ }
+}

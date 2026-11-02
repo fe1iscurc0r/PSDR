@@ -2649,3 +2649,55 @@ IMP_BRIDGE / AMP_SWITCH` 等前缀，**或**匿名网络（`$$$...`）连到射�
 
 本节记录"提案存在但未执行"这一状态本身，上游不需要知道，也不需要任何人来批准一个
 我们不打算做的实验。
+
+### E-11 现场数据归档、EDA 导入 SOP、杂务（2026-11-02）
+
+**为什么归档**：EDA 现场读数（12/12、DRC 513 构成）依赖一台开着 4.1.60、
+且按手工步骤导入过两次的宿主，**当时那一刻的数据不可再生**。它们原来只躺在板外
+`D:/my git/PSDR-build-artifacts/`，没备份也没入库。现在落进 `evidence/`：
+
+```
+evidence/README.md                        判读标准与三条必须知道的话
+evidence/eda_poured_2026-11-02.json       12/12、772 块、+3V3_FLIP_FLOP 孤岛 7 块（不可重跑）
+evidence/eda_drc_2026-11-02.json          总 513 = 73+14+419+6+1（不可重跑；507 基线原件未留，已注明）
+evidence/firmware_builds_2026-11-02.json  两条固件线尺寸/锚点/hex+bin sha256（可重跑，留作合并前对照）
+evidence/layer_coverage_2026-11-02.json   八层双向覆盖率（可重跑）
+evidence/paste_check_2026-11-02.json      锡膏配对 + 层标签 2×2 + 6 个 USB 屏蔽片开口（可重跑）
+evidence/bom_roundtrip_2026-11-02.json    PR #18 那份 .xls 重存的副作用核查
+```
+
+数字不是手打的：DRC 那份是从板外原始回读重新按分组求和算出来的（73+14+419+6+1=513，
+正好等于 §C-15 记的 513，也自证了"多的 6 条是孤岛铜 No Connection"那句）；
+构建那份现算 hex/bin sha256 并与合并前产物对比；覆盖率与锡膏两份是各自脚本重跑一遍
+取回的，两次跑的数字逐位相同。**归档里也写了我自己错在哪**：那个 .xls 审计脚本的
+notes/links 两个探针计数是坏的（notes 数成 1600=100×16、links 数成 0 与实测 8 条矛盾），
+所以明确声明这两个字段不作证据，超链接存活只按 UTF-16 字节扫描说话。
+
+**`docs/SOP-eda-import-2.6.1.md`**：把"重新导入一次 2.6.1 并拿到 12/12"写成显式清单，
+关键是把**新板直接导入会得到 10/12、且那不是回归**写在最前面，并逐条列出哪些步骤
+在宿主侧无接口、必须人工，同时重申不用 GUI 自动化顶替。验收给的是逐个铜皮块数的表，
+不是"看起来有铜"。
+
+**杂务**：删掉两条已并入的本地分支与一个遗留 worktree（都可按 sha 找回，
+且这两个 sha 本来就写在 §E-7/§E-8 里）：
+
+```
+$ git worktree remove "D:/my git/PSDR-build-artifacts/m2_merge"
+$ git branch -d m2/f7-as-source-f7 m2/untrack-build-artifacts
+Deleted branch m2/f7-as-source-f7      (was 2e19ad0)
+Deleted branch m2/untrack-build-artifacts (was dc084d1)
+```
+
+删之前先证过两条都是 `next` 的祖先（`git merge-base --is-ancestor` 两条都过），
+worktree 干净。留着的是三个还有用的：主树、PR #18 的 `bom_pr`、PR #17 的 `pr-kicad-sch`。
+远端 fork 上 `m2/untrack-build-artifacts` 与 `m2/f7-as-source-f7` 两个分支引用**没动**
+（删远端是对外可见的动作，要删你说一句）。
+
+**未收口**（写在这免得被 12/12 的漂亮数字盖住）：岛铜净间距仍只按 EDA 默认规则（0.6 mm 档）
+量过，**没按源里的 8 mil 复核**——纯离线几何活，还没做。
+
+### G-5 对外口径（用户 2026-11-02 定）
+
+上游会看 PR（维护实际只剩我们和 maintainer 两人），所以 PR 正文只放可核对的证据，
+不放意向。国产化/替代件这条线**不并入上游、不写进 PR**，在实测完成之前最多是个意见；
+而实测本身依赖硬件与仪器，可能长期不发生——§G-4 保持"提案 + 明确标注大概率不做"。
