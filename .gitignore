@@ -77,3 +77,24 @@ Hardware/Enclosure/~$paddle.SLDPRT
 Hardware/Enclosure/~$paddle_Mirrored.SLDPRT
 Source/build_linux/
 Source_F7/build_linux_f7/
+
+# Upstream Makefile-project build output, no longer tracked (history keeps every
+# byte).  Sources under TestingMakeFile*/ stay tracked; only object/listing/map/
+# image outputs are ignored.  `/Debug` was already ignored by the first line of
+# this file, so the root Eclipse output needs no new pattern.  The two anchor
+# references Source/Debug/PSDR.hex and Source_F7/Debug/PSDR.hex sit outside
+# these patterns and remain tracked.
+/TestingMakeFile/**/*.o
+/TestingMakeFile/**/*.d
+/TestingMakeFile/**/*.lst
+/TestingMakeFile/**/*.map
+/TestingMakeFile/**/*.elf
+/TestingMakeFile/**/*.hex
+/TestingMakeFile/**/*.bin
+/TestingMakeFile2/**/*.o
+/TestingMakeFile2/**/*.d
+/TestingMakeFile2/**/*.lst
+/TestingMakeFile2/**/*.map
+/TestingMakeFile2/**/*.elf
+/TestingMakeFile2/**/*.hex
+/TestingMakeFile2/**/*.bin

@@ -2164,12 +2164,14 @@ $ sha256sum ../PSDR-build-artifacts/PSDR.bin Source/build_linux/PSDR.bin
 `../PSDR-build-artifacts/f7_build.log`、`f4_build.log`（板外，不入库）。
 
 **上游自己的构建产物留在树里，这次没动。** `next` 上现在跟踪
-`Debug/` 141、`TestingMakeFile/` 1530、`TestingMakeFile2/` 813 个文件，其中
-`.o/.hex/.bin/.map/.lst` 共 **364** 个（`Debug` 140、`TestingMakeFile` 116、
-`TestingMakeFile2` 106、`Source/Debug/PSDR.hex` 与 `Source_F7/Debug/PSDR.hex` 各 1）。
-不在这次一并清理的理由：这两份 `Debug/PSDR.hex` 正是上面锚点自证的参考文件，
-`TestingMakeFile*` 是上游 Eclipse 工程的原始状态；把它们从版本控制里撤掉是一次
-独立的决定，混进 merge 提交会让「树逐字节搬」这句自证失效。已单独立项。
+`Debug/` 141、`TestingMakeFile/` 1530、`TestingMakeFile2/` 813 个文件。
+构建产物本身的准确数是 **474** 个（`.o` 247、`.d` 109、`.lst` 107、`.hex` 3、
+`.elf` 3、`.map` 3、`.bin` 2；根 `Debug/` 141 全是产物，`TestingMakeFile/` 174、
+`TestingMakeFile2/` 159）——先前记的 364 是没把 `.d` 依赖文件算进去。
+`TestingMakeFile*` 另有的 1284 份 `.c/.h/.s/.icf` 是 CubeMX 工程的源码，不是产物。
+不在这次一并清理的理由：这两份 `Source*/Debug/PSDR.hex` 正是上面锚点自证的参考文件，
+把它们从版本控制里撤掉是一次独立的决定，混进 merge 提交会让「树逐字节搬」这句自证失效。
+已单独立项（#32，后以 `m2/untrack-build-artifacts` 分支 + PR 交付）。
 
 `.gitignore` 这次只加了两条本次构建真正落地的目录（`Source/build_linux/`、
 `Source_F7/build_linux_f7/`），加完 `git status --porcelain` 干净。
@@ -2294,3 +2296,25 @@ typed actions:   pcb.import_changes（原理图网表→PCB）、pcb.import_auto
 + 本节这份现场 12/12 回读。人工在 EDA 里点这两下导入仍然是可行的，但那属于现场操作，
 不能当复现链的证据。#31 据此改写口径：工具侧完成，端到端自动化记 `unsupported`。
 
+
+### E-10 #32：把上游构建产物移出版本控制（`m2/untrack-build-artifacts`）
+
+做法与边界：
+
+- 只动索引，不动磁盘：`git rm --cached --pathspec-from-file`，474 个路径；
+  文件仍在本地工作树里，历史里一个字节都没丢（`git log -- Diff 仍可取回）。
+- 精确范围 = 根 `Debug/`（141，全是产物）+ `TestingMakeFile/` 174 + `TestingMakeFile2/` 159
+  里的 `.o/.d/.lst/.map/.elf/.hex/.bin`。
+- **不撤**的两份锚点参考：`Source/Debug/PSDR.hex`（F4，SP `0x20030000` /
+  reset `0x080001B5`）与 `Source_F7/Debug/PSDR.hex`（F7，SP `0x20050000` /
+  reset `0x080002F9`）——`git ls-files` 复测仍在册。
+- `TestingMakeFile*` 里的 1284 份 `.c/.h/.s/.icf` 继续跟踪：那是 CubeMX 工程源码，
+  不是产物；`.gitignore` 新块只按扩展名点掉产物。
+- 根 `Debug/` 不需要新规则：本文件第 1 行 `/Debug` 早就在忽略它，只是这 141 个文件
+  此前已被跟踪所以规则不生效；`git check-ignore -v` 两条都验过。
+- 顺带查实：根 `Debug/PSDR.hex`（268,490 B）与两份参考 hex 都不同，但它的向量锚点是
+  `SP=0x20050000 reset=0x080002F9`，即作者 F7 那批的又一次落盘；撤掉跟踪不丢证据，
+  因为 `Source_F7/Debug/PSDR.hex` 仍在册。
+
+验证：`git status --porcelain` 只有 474 条 `D` 加一条 `.gitignore` 的 `M`；
+文件还在盘上；两条 `check-ignore` 命中；KiCad 复现链与两条固件线都不读这些路径。
