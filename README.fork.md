@@ -62,6 +62,21 @@ As of 2026-11-02:
   "obsolete" is not verifiable from repository data (`OctopartBOM.csv` has no
   lifecycle column). All of it is upstream **PR #18** (3 commits); PR #17
   (KiCad schematic) is still open too.
+- **Firmware status (read-only survey, fork-local).** No source file was touched.
+  `docs/PSDR-firmware-survey.md` annotates every project module (~12k lines of
+  project code in `Source/`, ~11k in `Source_F7/`; the other 330k lines are ST HAL
+  and CMSIS-DSP) and lists what stands in the way. Two blocking defects are worth
+  stating here because they are invisible until the board boots:
+  `Source_F7/src/main.c:1021` has an unconditional debug `while(1)` that only
+  fills the screen, so the real main loop at line 1065 is unreachable in the
+  committed source; and `Source_F7/src/frequency_control.c:54` waits on the Si5338
+  over I2C in a loop with no timeout, so a missing synthesiser hangs the boot
+  before the display is initialised. Neither is fixed here on purpose -- this
+  fork does not modify firmware source. These findings are **not** proposed
+  upstream; they are recorded for whoever next has the board in hand.
+  `docs/PSDR-open-data-gaps.md` lists the datasheets still to obtain (HMC1023LP5E
+  on U287 is the one that blocks issue #16, and the firmware contains no reference
+  to the part at all) and the PCB revision/porting constraints.
 - **SMT placement table.** `tools/pads_asc_placement.py` emits
   `dist/fab/PSDR_2.6.1_placement.csv` (391 parts, Top 209 / Bottom 182) straight
   from the PADS `*PART*` records, with the board outline's lower-left corner as
