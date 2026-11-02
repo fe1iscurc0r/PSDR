@@ -80,8 +80,12 @@ section is §C-16.
   `+3V3_FLIP_FLOP`, which the source pour also has as 7 separate HATOUT
   regions. `tools/eda_epro2_pour_source.py` writes the source-derived
   `order`/`keepIsland` into a converted `.epro2` and now matches EDA's own
-  PADS-route output on all 12 pours; one full
-  convert → patch → import run is still unmeasured. See §C-15 supplement.
+  PADS-route output on all 12 pours. A fully automated
+  convert → patch → import run is **unsupported**: neither the typed action
+  catalog (167 actions) nor the MCP bridge exposes a KiCad board import or a
+  `.epro2` re-import, and GUI automation is not an acceptable substitute for a
+  reproduction step. What is measured: the live board reads 12/12 filled pours
+  twice in a row on the post-M2 mainline (§E-9).
   The silk gap is closed (§C-17): the GTO triangle and the GBO serial patch are
   PADS `COPPER` records, now emitted as inner-offset polygons, and the 10 mil
   silk band reconciles 100% GTO / 84.82% GBO (the rest is the stroke-font

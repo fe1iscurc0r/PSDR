@@ -1926,7 +1926,7 @@ $ git ls-remote upstream 'refs/heads/workorders/*'
 | 里程碑 | 内容 | 退出标准 |
 |---|---|---|
 | M0 建线（2026-11-01） | 推工单提交；打分叉 tag；建 `next`；写 `README.fork.md` | `origin/next` 与 tag 存在，tree 对账一致 |
-| M1 转换闭环（2–4 周） | ~~1.4 mm 丝印三角~~（§C-17）、~~一条命令复现 + SHA256 清单~~（§C-18）、~~EDA 两处零铜铺铜~~（§C-15 补充：keepIsland 假设被证伪，真因是转换器丢优先级 + EDA `order` 小者优先；现场 12/12 已达成，复现工具 `tools/eda_epro2_pour_source.py` 已进仓库） | 重跑 md5 不变（达成）；EDA 12/12 有填充（达成）；剩：走一次完整"转换→补丁→导入"实测（#31） |
+| M1 转换闭环（2–4 周） | ~~1.4 mm 丝印三角~~（§C-17）、~~一条命令复现 + SHA256 清单~~（§C-18）、~~EDA 两处零铜铺铜~~（§C-15 补充：keepIsland 假设被证伪，真因是转换器丢优先级 + EDA `order` 小者优先；现场 12/12 已达成，复现工具 `tools/eda_epro2_pour_source.py` 已进仓库） | 重跑 md5 不变（达成）；EDA 12/12 有填充（达成，§E-9 在新主线上连读两次复测）；「完整转换→补丁→导入」自动化记 `unsupported`（宿主无 KiCad/`.epro2` 导入接口，§E-9） |
 | M2 主线成型（1–2 个月） | 把 F7 构建线并入 `next`（目录隔离 `Source_F7/`），验证 F4/F7 构建与 KiCad 产物 | 两条固件线在同一主线可复现（达成，见 §E-7：两个 `make` 全 rc=0，产物与合并前逐字节相同）；冲突有记录（达成）；KiCad 产物在新主线上重跑复现链（达成，库内默认路径）；推送（达成，见 §E-8：`origin/next` = `1347d66`，tree 对账一致） |
 | M3 硬件验证（硬件到位后） | RF bring-up、#6/#8/#9 | 每项有实测数据；无实物则 SKIP |
 | M4 可制造/整机 | 以上游 `468dc41` Gerber 为生产基线 | 制造与整机验证记录 |
@@ -2226,3 +2226,71 @@ $ git -c http.proxy=http://127.0.0.1:7890 ls-remote upstream refs/heads/next 're
 M2 退出标准全部达成，E-3 表里那一行可以收掉。剩下的独立事项：
 #31（要在 EDA 宿主上跑一次完整「转换→补丁→导入→量 12/12」）和
 #32（上游那 364 个构建产物要不要撤出版本控制）。
+
+### E-9 M2 之后：现场铺铜在新主线上复测 + #31 的能力缺口（2026-11-02 上午）
+
+E-8 之后又推了一个文档提交，`origin/next` 的现头是 `b0f1422`：
+
+```
+$ git -c http.proxy=http://127.0.0.1:7890 push origin refs/heads/next
+   1347d66..b0f1422  next -> next
+push rc=0
+$ git rev-parse next^{tree} origin/next^{tree}
+4ddccb12948de1607366382f4b261fda3b81530d   (两边相同)
+$ git rev-list --left-right --count origin/next...next
+0 0
+```
+
+中间两次 `ls-remote` 撞上 `schannel: failed to receive handshake`（git 传输通道的 TLS
+抖动，不是凭据问题），所以改用 GitHub API 独立确认远端分支头：
+`list_commits(sha="next")` 返回的第一条是 `b0f1422`，往下依次 `1347d66`、`4dd2fca`；
+`list_branches` 在 `MichaelRColton/PSDR` 只列出 7 条分支、没有 `next`（上游仍未被写入）。
+
+**现场铺铜复测**（EDA 4.1.60 + connector 1.15.0，文档 = PCB `PSDR_2.6.1`
+`cf6546e2f1507a17`，就是 M1 那份 12/12 的文档；它的输入板子字节与合并后主线上
+`--check` 通过的 `dist/kicad` 完全相同）：
+
+```
+$ easyeda pcb poured-list --doc cf6546e2f1507a17      # 连读两次，结果逐个相同
+net                layer  铜皮块数
++3V3               In1      1
++3V3               TOP     16
++3V3_CPU           In1      6
++3V3_CPU           TOP      1
++3V3_CPU           TOP     26
++3V3_FLIP_FLOP     In1      7      ← M1 靠改优先级救回来的那个
++5V_BOOST          TOP     19
+BOOST_LOOP         TOP     10      ← §C-15 基线记的是 11，见下
+GND                In2     26
+GND               TOP     296
+GND               BOTTOM  360
+V_SUPPLY           TOP      4      ← M1 靠改优先级救回来的第二个
+non-empty pours: 12/12   total fills: 772
+```
+
+判读：**12/12 仍然成立**，`+3V3_FLIP_FLOP` 的 7 块孤岛铜也在（与源里 7 条 HATOUT 一致）。
+唯一和 §C-15 基线不同的是 `BOOST_LOOP`：那次记 11 块，现在两次连续读都是 **10** 块。
+差一块、且不是零铜那一类，所以不是优先级回归；最可能是宿主重启 + 铺铜重建后的
+一次重新连通/分裂计数漂移（§C-15 里已经记过「EDA 的 DRC 与铺铜读数在未 settle 时会漂」）。
+本轮没有为了追这一格去动写入——追它要做 `pour rebuild`，那是写操作，代价大于这一格的信息量。
+原始回取留档：`../PSDR-build-artifacts/eda_poured_next_mainline.json`（板外）。
+
+**#31 剩下的那半是能力缺口，不是没做。** 要把「转换→补丁→导入→量 12/12」全自动跑通，
+需要两个宿主侧文件动作；把 typed 目录（167 个 action）和通道 B 的
+`pcb_document_action` 枚举都翻过一遍，只有这些 import：
+
+```
+typed actions:   pcb.import_changes（原理图网表→PCB）、pcb.import_autoroute、
+                 project.export / project.export_source、pcb.silk.import_svg
+通道 B 的 import: import_changes / import_auto_route_json / import_auto_route_ses /
+                 import_auto_layout_json
+```
+
+**没有** KiCad→EDA 的板子导入，也**没有**把打过补丁的 `.epro2` 导入回 EDA 的动作。
+按 easyeda-agent 的硬红线，这两步不能用 GUI 自动化补，所以标 `unsupported`：
+从仓库一键到 EDA 现场的链路，缺的是宿主接口，不是脚本。能做且已做的是两侧的可复现部分——
+`tools/reproduce_kicad.py --check`（仓库内到 KiCad 产物）+
+`tools/eda_epro2_pour_source.py`（`.epro2` 字节级补丁，12 条值与 EDA 自己的 PADS 路线逐条相同）
++ 本节这份现场 12/12 回读。人工在 EDA 里点这两下导入仍然是可行的，但那属于现场操作，
+不能当复现链的证据。#31 据此改写口径：工具侧完成，端到端自动化记 `unsupported`。
+
