@@ -7,7 +7,7 @@
 
 | # | 对象 | 板上的证据 | 为什么必须查 |
 |---|---|---|---|
-| 1 | **HMC1023LP5E**（可编程低通滤波器） | `U287`，封装 `VARIABLE_FILTER_HMC1023`，**32 个焊盘、底面**；BOM 第 82 行 `1127-1662-ND`（DigiKey 有货，Rochester 现货 2） | 这是 issue #16 里 maintainer 说的"低通滤波 IC，需要配一堆寄存器"。**实测：两棵固件树里没有任何一处提到 HMC1023 或 LPF 配置**（`grep -rniE "hmc1023\|lpf" Source/src Source_F7/src` 只命中两条与菜单结构有关的 TODO）。没有数据手册的寄存器表，这条路径根本无法开工 |
+| 1 | **HMC1023LP5E**（可编程低通滤波器） | `U287`，封装 `VARIABLE_FILTER_HMC1023`，**32 个焊盘、底面**；BOM 第 82 行 `1127-1662-ND`（DigiKey 有货，Rochester 现货 2） | 这是 issue #16 里 maintainer 说的"低通滤波 IC，需要配一堆寄存器"。**实测：两棵固件树里没有任何一处提到 HMC1023 或 LPF 配置**（`grep -rniE "hmc1023\|lpf" Source/src Source_F7/src` 只命中两条与菜单结构有关的 TODO）。没有数据手册的寄存器表，这条路径根本无法开工。**引脚—网络—SPI 连接表已整理：`docs/PSDR-HMC1023-netlist.md`** |
 | 2 | **Si5338**（四路时钟合成） | `Source_F7/src/si5338.c` 695 行寄存器表；`frequency_control.c:41` 的 I2C Timing 常量作者自注"Not sure how this is calculated, taken from EVAL example" | 频率合成的正确性完全依赖这张表；另外 I2C 初始化无超时（§survey P0-2），需要手册确认"器件就绪"的判据与超时时间 |
 | 3 | **SXB-2089Z vs HMC482ST** | `U304`，封装名 `MMIC-AMP_HMC482ST`，实际买的是 RFMD `SXB-2089Z`（BOM 行内超链接证据，见 §G-3）；板上 3 个焊盘：`RFIN/GND/RFOUT`，偏置从输入侧注入（`RF_AMP_IN = BIAS.1 + C13.2 + L11.1 + U304.1`） | 封装名与实物不符时，偏置拓扑必须以**实物**手册为准；#16 的"灵敏度差 50 dB"首先要排除放大器是否真的加了偏置 |
 | 4 | **MASWSS0129**（DPDT） | `U16/U24/U30`，13 焊盘；控制脚 `V1/V2`，G1/G2 与 5 个脚接地；固件注释写"I think!"、"always reverse of above" | 控制真值表与极性未验证；固件里 `signalPath()` 的极性是猜的（§survey P1-4），这是 #16 的另一半 |
