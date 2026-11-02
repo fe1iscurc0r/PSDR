@@ -1891,6 +1891,38 @@ $ git ls-remote upstream 'refs/heads/workorders/*'
 
 ---
 
+### C-19 M4：SMT 贴装坐标表（2026-11-02）
+
+工厂回流焊要的贴装表我们此前没有产出过。新工具 `tools/pads_asc_placement.py`
+直接读 `*PART*`（经 `pads_asc_decal.parse_parts`）与 `*LINES*` 的 `BOARD` 记录，
+不经过 KiCad 或 Gerber 插值，输出 `dist/fab/PSDR_2.6.1_placement.csv`。
+
+约定（贴装表只有连约定一起才是对的，所以全写进工具文档字符串）：
+
+- 38100 单位 = 1 mil；PADS 的 Y 向上（KiCad 的 Y 向下），本表**保留 PADS 方向**；
+- 原点 = `BOARD` 多边形包围盒左下角，实测板框 **3937.00 x 2559.00 mil = 100.000 x 64.999 mm**，
+  所以 `MidX = MidY = 0` 就是板角；
+- `Side` 取 `*PART*` 的 mirror 位（`M` = Bottom），与 `psdr26.emn` 的 BOTTOM/TOP 标注一致
+  （U304 是 `M`/BOTTOM，U16/U24/U30 是 `N`/TOP）；
+- `Rotation` 是 PADS 存的 `ORI` 原值，不做底视翻转——底视换算是贴片机侧的事，
+  原值 + `MirrorFlag` 两列都在表里，转换不丢信息。
+
+对账两条，都是硬数：
+
+1. **与 BOM**（`--bom-csv`，把 Ref Des 单元按 `C3,10,13-17` / `R97-99` 规则展开）：
+   板上 391 件 = 采购件 332 + 单焊盘点位 42 + 螺钉孔/桨叶触点 11 + 基准点 6。
+   展开后 BOM 340 行给出 323 个带号位 + 16 行是按名字列的单件
+   （`USB`/`MICROSD`/`BOOT`/`ANT/VNA-IN`/`SPEAKER`/`EARPHONE`/`GPS_ANTENNA`/`RST`…）。
+   结论：**每一个采购件都被 BOM 覆盖，BOM 之外的一律是基准点、螺钉孔、单焊盘点位**；
+   另有 2 行 BOM 在本板上无对应件——`Battery connector`（线缆件）与 `Encoder`
+   （编码器是另一块板），这是解释不是缺口。
+2. **与已过 Gerber 验证的 KiCad 锚点**：391 个封装全比对，最大偏差 **0.0005 mm**
+   （M6 的 73.9175 被表按 3 位小数四舍五入），其余逐位相符。
+   板子本身的焊盘/钻孔已在 §C-13/§C-16 对过 2.6.1 CAM，所以这条链是**传递性地锚到制造数据**上的。
+
+面别分布 Top 209 / Bottom 182。表里保留 `PadX_mil`/`PadY_mil` 原始整数，
+便于以后按别的原点约定重算。
+
 ## 任务 E · 独立主线 `next`（2026-11-01）
 
 ### E-1 决定与依据

@@ -48,6 +48,27 @@ As of 2026-11-02:
 - **EDA import check.** JLCEDA Pro 4.1.60 read back 4 copper layers, 278 nets,
   391 parts and 12 pour outlines; 12/12 pours fill after the precedence fix
   described under known gaps (was 10/12 as imported).
+- **BOM and procurement.** Upstream issue #14 asked whether `C307,320` and
+  `R72,79` were deleted. They were not: extracted from the board, none of the four
+  is a series element (C307/C320 are shunts on U314 = AD8302; R72/R79 bridge the
+  mixer LO pairs on L41/L81), so **no 0 ohm jumper is needed** and fitting one
+  across the LO pair would short it. The reason the rows looked like missing data
+  is that `OPEN`/`DNS` sit in the *Value* column; the clarification goes into the
+  unlabelled remarks column the author already uses. Issue #13's two devices are
+  recorded too: U304 is `RF Micro Devices SXB-2089Z` (that row's own hyperlink is
+  `.../rfmd/SXB-2089Z/599-1068-1-ND/937042`, so the decal name `HMC482ST` is a
+  stale label) and the switches get `Mfg Part # = MASWSS0129TR` only, because that
+  row has no hyperlink -- no replacement part is proposed anywhere and
+  "obsolete" is not verifiable from repository data (`OctopartBOM.csv` has no
+  lifecycle column). All of it is upstream **PR #18** (3 commits); PR #17
+  (KiCad schematic) is still open too.
+- **SMT placement table.** `tools/pads_asc_placement.py` emits
+  `dist/fab/PSDR_2.6.1_placement.csv` (391 parts, Top 209 / Bottom 182) straight
+  from the PADS `*PART*` records, with the board outline's lower-left corner as
+  origin, PADS Y-up sense, and the raw mirror/ori fields kept. It reconciles
+  against the BOM (every purchased part covered; everything outside the BOM is a
+  fiducial, mounting hole or single-pad test point) and against the
+  Gerber-validated KiCad anchors (391/391, worst deviation 0.0005 mm = rounding).
 - **Tools.** `tools/` holds the parsers, the KiCad emitter, the
   Gerber/drill comparison script, `reproduce_kicad.py` and
   `anchor_check_f7.py` (the F7 vector-anchor gate); they use only the Python
@@ -109,6 +130,14 @@ The script wraps the individual steps (`tools/pads_asc_pcb.py`,
 `kicad-cli pcb drc`, `kicad-cli pcb export gerbers|drill`,
 `tools/kicad_gerber_compare.py`); §C-18 records what each manifest row covers
 and why the DRC report is not hashed.
+
+```bash
+# SMT placement table + BOM reconciliation (needs a CSV export of the BOM)
+python tools/pads_asc_placement.py Hardware/PSDR.asc \
+    --out dist/fab/PSDR_2.6.1_placement.csv --bom-csv PSDR2.6.1_BOM.csv
+# F7 vector anchors against the author's 2018-06-21 hex
+python tools/anchor_check_f7.py Source_F7/build_linux_f7/PSDR.hex Source_F7/Debug/PSDR.hex
+```
 
 KiCad 10.0 is required for the board format and the CLI flags. Firmware
 build steps are in `docs/WO-psdr-takeover.md` §B and
