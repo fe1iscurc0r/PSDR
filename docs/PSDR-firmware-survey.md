@@ -311,8 +311,8 @@ F4：14 个入口，含 `TIM3_IRQHandler` 等业务中断；F7：只有 fault �
 ### 6.1 复算统计
 
 ```bash
-python <本机脚本> fw_stats.py Source Source_F7        # 目录级行数（排除构建目录）
-python <本机脚本> fw_funcindex.py Source/src Source_F7/src   # 函数索引
+python tools/fw_stats.py Source Source_F7                 # 目录级行数（排除构建目录）
+python tools/fw_funcindex.py Source/src Source_F7/src      # 函数索引
 ```
 
 ### 6.2 函数索引摘要（每文件前几个）

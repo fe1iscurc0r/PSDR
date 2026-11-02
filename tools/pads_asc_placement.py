@@ -38,7 +38,7 @@ import sys
 
 sys.path.insert(0, __file__.rsplit("/", 1)[0])
 
-from pads_asc_decal import UNITS_PER_MIL, index, parse_parts  # noqa: E402
+from pads_asc_decal import UNITS_PER_MIL, parse_parts  # noqa: E402
 from pads_asc_pcb import parse_outline  # noqa: E402
 
 TOKEN = re.compile(r"^([A-Z]+)?(\d+)(?:-([A-Z]+)?(\d+))?$")
