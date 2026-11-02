@@ -2227,7 +2227,7 @@ $ git -c http.proxy=http://127.0.0.1:7890 ls-remote upstream refs/heads/next 're
 
 M2 退出标准全部达成，E-3 表里那一行可以收掉。剩下的独立事项：
 #31（要在 EDA 宿主上跑一次完整「转换→补丁→导入→量 12/12」）和
-#32（上游那 364 个构建产物要不要撤出版本控制）。
+#32（上游那 474 个构建产物要不要撤出版本控制）。
 
 ### E-9 M2 之后：现场铺铜在新主线上复测 + #31 的能力缺口（2026-11-02 上午）
 
@@ -2317,4 +2317,71 @@ typed actions:   pcb.import_changes（原理图网表→PCB）、pcb.import_auto
   因为 `Source_F7/Debug/PSDR.hex` 仍在册。
 
 验证：`git status --porcelain` 只有 474 条 `D` 加一条 `.gitignore` 的 `M`；
-文件还在盘上；两条 `check-ignore` 命中；KiCad 复现链与两条固件线都不读这些路径。
+两条 `check-ignore` 命中；KiCad 复现链与两条固件线都不读这些路径。
+
+**合并之后必须更正一句（2026-11-02，PR #1 已合并为 `4d4549f`）。**
+我在分支上写的「只动索引不动磁盘」「文件仍在盘上」只在**提交那一刻**成立：`git rm --cached`
+确实不碰盘上的文件。但任何检出这个提交的 `git checkout` / `git merge --ff-only`
+都会把这些「新版本里不再跟踪」的路径**从工作树删掉**。实测就是这样的：
+
+```
+$ git merge --ff-only origin/next
+ delete mode 100644 TestingMakeFile2/PSDR/build/usb_otg.lst
+ delete mode 100644 TestingMakeFile2/PSDR/build/usb_otg.o
+$ ls Debug
+ls: cannot access 'Debug': No such file or directory          ← 盘上没了
+$ git cat-file -s 568a079:Debug/PSDR.hex
+268490                                                          ← 历史里完好
+```
+
+准确的口径应该是：**历史不丢字节，工作树会丢**（对任何人重新检出都一样）；
+要拿回来用 `git checkout 568a079 -- Debug TestingMakeFile TestingMakeFile2`，
+或者从 `568a079` 那棵树单独取文件。
+影响面复核过：我们这几条链都不读这些路径，两份锚点参考
+`Source/Debug/PSDR.hex`、`Source_F7/Debug/PSDR.hex` 仍在册且在盘上，
+主线跟踪文件数 4008 → 3534（差 474），`git ls-files -o -i` 显示 531 个
+忽略项仍在盘上（我们自己的构建目录等）。
+这条更正同时说明：撤销这次变更不需要 revert，检出旧提交就能把文件拿回来——
+`git revert 4d4549f` 也在，只是没必要。
+
+### F 下一步规划（2026-11-02 定，按「不需要硬件就能验证」排序）
+
+现状盘点：M0/M1/M2 都在 `next` 上；上游 `PR #17`（KiCad 原理图）与 `PR #18`
+（BOM 位号修正）都还是 `OPEN`，上游最后一次合并是 2021-03-05 的 `#15`，
+实质停摆。M2 之后 `next` 里第一次有了 2.6/2.6.1 的 CAM 与 PADS 资料，
+所以下面 A 道才成立。
+
+**A 道：可制造基线里不需要硬件的那一半（建议下一个就做这个）。**
+库内 `Hardware/Gerbers/PSDR261 Main Board` 是完整的 15 文件包：
+`0 - drillfile.TXT`、`1/8 GTO/GBO`、`2/7 GTS/GBS`、`3/6 GTL/GBL`、
+`4 - L2.p.G1`、`5 - L3.G2`、`9 - fabnotes.GBR`、`top-paste.GTP`、`bot-paste.GBP`
+加 TOP/BOTTOM 预览与原始 zip。要做三件，都能纯离线证：
+
+1. **逐层核对制造包本身**：层类型/极性/单位/原点（这批 Gerber 带 +1000 mil 平移，
+   §C-13 已钉死）与四层铜、两层阻焊、两层丝印、两层锡膏、钻孔一一对齐；
+   现在 §C-13/§C-17 只核过铜、丝印、钻孔，**锡膏与 fabnotes 没核过**。
+2. **SMT 贴片机坐标表**：从 `Hardware/PSDR.asc` 的 `*PART*` 记录出 mid-X/mid-Y、
+   面别、角度、位号，和 PR #18 修好的 BOM 位号对账（391 个封装逐个能落）。
+   工厂回流焊要的是这张表，我们目前没产出过。
+3. **制造包 vs 我们复现的 `dist/kicad/fab` 逐层比对**：把 §C-18 那条命令的对账
+   范围从「焊盘 + 钻孔」扩到全部 8 个铜/阻焊/丝印层，锡膏层另列（我们的
+   板子没生成锡膏层，这是已知差项，要么补生成、要么如实记为不覆盖）。
+
+   验收口径：每条都能给出「命中/未命中」的计数和残差位置，不许用综合分代替。
+
+**B 道：M3 硬件相关，缺实物就 SKIP，不许假完成。**
+现在能先做的是把「插上就能跑」的准备做完：电源/电流测点清单、显示屏与编码器
+冒烟步骤、`#6/#8/#9` 那几条射频问题的**观测方法**（不是修法——按边界我不改射频逻辑），
+写成一份带判据的检查表。真板到位再按表跑，跑不了的项目逐条记 SKIP 与原因。
+
+**C 道：对外。**
+`#17`/`#18` 无人回应是常态（上游 2021 年后没动过），不催、不重开新 issue（边界）；
+`#14` 只在有实质新证据时补一条。有实质新证据的那件事是：`next` 现在能同时构建
+F4/F7 两条固件线，并且 2.6.1 的 CAM 包进了主线——这直接影响「这个 fork 能不能
+拿去下单」，值不值得写进 `#14` 由你定，我不擅自发。
+
+**D 道：明确不做。**
+不动上游 `PSDR_F7`/`PSDR_Rebuild` 分支；不修射频前端；不试图转换
+`Hardware/Enclosure/` 的 SolidWorks 文件；不在云服务落盘源码；
+EDA 侧不用 GUI 自动化补那个导入接口缺口（§E-9）。
+
