@@ -3512,3 +3512,23 @@ README 的答案 schema 同时改成**接受两种列序**（前导 anchor 或�
 
 **5) 遗留**：重生成后 `delegation/MANIFEST.csv` 全部哈希已变 ⇒ KB 里那 59 份输入件已过期，
 若再派活必须重传合并件（不要再传散文件）。仍缺原厂 PDF 的 6 只件由 §K-8-B 的另一路在追。
+
+### K-10 原件补齐 + #16 更正落地（2026-11-03 22:35）
+
+外部答案里的 `镜像` 级结论，这一轮能用原件修的都修了：我方独立下载并核对
+**7 份原厂 PDF，sha256 与对方表逐字节一致**（AD8302 / SY10EP52V / CBTLV3253 / CB3Q3253 /
+TPA0253 / AP3417C / ADE-2ASK），另取到 **FAN4174 现行合册 Rev 4**（旧路径已被 onsemi 撤下，
+真浏览器也拿不到）与 **TE 的 RXM-GPS-RM-T 数据指南**（DDEController 只认浏览器会话，curl 只得查看器 HTML）。
+取不到的四类都记了失败特征，其中两条是**撤档而非网络**：
+`cdn.macom.com/datasheets/MASWSS0143.pdf` 与 `MASWSS0202.pdf` 均 200，唯独 MASWSS0129 是 404；
+Qorvo 产品页 404 + 旧 `rfmd.com` 路径 302 回首页 + 本机出口够不到 Wayback。
+⇒ **SXB-2089Z 的 5–2500 MHz 与 PCN 19-0122 停在 `镜像` 级**，不升级、不当新结论用。
+
+对外只做了用户批准的一件事：**#16 追加更正评论**
+（`https://github.com/MichaelRColton/PSDR/issues/16#issuecomment-6606601865`）。
+发法与核验：MCP `add_issue_comment` 回 `-32602 required property 'result'`（已知假外壳）⇒
+**不重放**，改用 REST 读评论表复算：14 → **15 条**，最后一条作者 `fe1iscurc0r`、3,802 字节、
+`2026-11-03T14:35:25Z` ⇒ 恰好一次。内容是三件自我更正（50-850 MHz 归错件、R6 值来源、
+`+3V3_CPU` 实算 2.90/3.01 V 而开关要求 ≥2.9 V）加一条文件级开源指针
+（`uhsdr_hmc1023.c`，commit `c447c2e4`，我用 GitHub API 自己核过——线程里 2021 年只给过目录链接）。
+没有附 PR、没有改固件、没动 #19/#20、没碰上游分支。
