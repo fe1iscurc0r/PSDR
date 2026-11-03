@@ -110,15 +110,65 @@ def neighbours_index(nets: dict) -> dict:
     return out
 
 
-def fmt_neighbours(others: list, types: dict, limit: int = 14) -> str:
+def load_values(path: str) -> dict:
+    """{refdes: (asc_value, bom_value, contested)} from tools/bom_refdes_crosscheck.py output.
+
+    The delegate's TASK C answers fell to "信息不足" on dozens of rows purely because our
+    pack quoted the PADS *type* (`RES_0603`) and never the value. The value is in the board
+    file and in the BOM; where the two disagree we say so explicitly instead of picking one.
+    """
+    out = {}
+    if not os.path.exists(path):
+        return out
+    with open(path, encoding="utf-8", newline="") as fh:
+        for row in csv.DictReader(fh):
+            asc, bom = row["asc_value"].strip(), row["bom_2_6_1"].strip()
+            flags = row.get("flags", "")
+            out[row["refdes"]] = (asc, bom, "ASC!=BOM2.6.1" in flags)
+    return out
+
+
+def value_tag(ref: str, values: dict) -> str:
+    v = values.get(ref)
+    if not v or (not v[0] and not v[1]):
+        return ""
+    asc, bom, contested = v
+    if contested:
+        return f"=VALUE CONTESTED: BOM {bom or '-'}, board file {asc or '-'}"
+    return "=" + (asc or bom)
+
+
+def fmt_neighbours(others: list, types: dict, values: dict = {}, limit: int = 14) -> str:
     if not others:
         return "-"
-    shown = [f"{q['refdes']}({types.get(q['refdes'], '?')}).{q['pin']}" for q in others[:limit]]
+    shown = []
+    for q in others[:limit]:
+        tag = value_tag(q["refdes"], values)
+        shown.append(f"{q['refdes']}({types.get(q['refdes'], '?')}{tag}).{q['pin']}")
     tail = "" if len(others) <= limit else f" ...(共 {len(others)} 脚)"
     return " ".join(shown) + tail
 
 
-def write_ic_context(ctx_dir: str, nb: dict, types: dict) -> tuple[int, list]:
+def unconnected_pins(ref: str, types: dict, parttypes: dict, decals: dict, nb: dict) -> list:
+    """Terminal numbers the footprint declares for this part that appear on no net.
+
+    Without this, a consumer reads a 12-row table for a 13-pin part and reports
+    "the table is missing a row" - which is a question about our pack, not about the board.
+    Pin numbers come from the decal's `T` (terminal) records; the `PAD` blocks are keyed by
+    pad-shape index, not by pin, so they cannot answer this question.
+    """
+    decal = parttypes.get(types.get(ref, ""), "")
+    block = decals.get(decal, {})
+    declared = {t[0] for t in block.get("terminals", [])}
+    if not declared:
+        return []
+    connected = {row[0] for row in nb.get(ref, [])}
+    missing = declared - connected
+    return sorted(missing, key=lambda x: (int(x) if x.isdigit() else 10_000, x))
+
+
+def write_ic_context(ctx_dir: str, nb: dict, types: dict, values: dict,
+                     parttypes: dict, decals: dict) -> tuple[int, list]:
     os.makedirs(ctx_dir, exist_ok=True)
     # stale files would keep asking a question for a designator we have since removed
     for stale in os.listdir(ctx_dir):
@@ -144,9 +194,14 @@ def write_ic_context(ctx_dir: str, nb: dict, types: dict) -> tuple[int, list]:
             fh.write("| pin | pin name | net | other pins on the same net (refdes(part_type).pin) |\n")
             fh.write("|---|---|---|---|\n")
             for pin, pin_name, net, others in rows:
-                fh.write(f"| {pin} | {pin_name or '-'} | `{net}` | {fmt_neighbours(others, types)} |\n")
+                fh.write(f"| {pin} | {pin_name or '-'} | `{net}` | {fmt_neighbours(others, types, values)} |\n")
+            for pin in unconnected_pins(ref, types, parttypes, decals, nb):
+                fh.write(f"| {pin} | - | *no net in the board file (pad exists, nothing connected)* | - |\n")
             fh.write("\nNets named `$$$...` are unnamed wires in PADS: the label carries no\n")
             fh.write("meaning, it only says these pads are one electrical node.\n")
+            fh.write("A neighbour shown as `C13(CAP_0603=100n).1` carries its value from the\n")
+            fh.write("board file; `=VALUE CONTESTED: ...` means the 2.6.1 BOM and the board\n")
+            fh.write("file disagree - report both, do not pick one.\n")
     return len(IC_TOPICS), missing
 
 
@@ -224,7 +279,15 @@ python tools/make_delegation_pack.py
 
 Sources: `Hardware/PSDR.asc` (part types, decals, placement),
 `dist/netlist/PSDR_2.6.1_netlist.json` (pin/net + part types),
-`Hardware/BOMs/PSDR_2.6.1/OctopartBOM.csv` (DigiKey-numbered BOM rows).
+`Hardware/BOMs/PSDR_2.6.1/OctopartBOM.csv` (DigiKey-numbered BOM rows),
+`Hardware/BOMs/PSDR_2.6.1/BOM_refdes_crosscheck.csv` (each part's value - regenerate
+it first with `python tools/bom_refdes_crosscheck.py`).
+
+**Values are in the pack now.** A neighbour reads `C13(CAP_0603=100n).1`; the value comes
+from the board file. Where the 2.6.1 BOM and the board file disagree the cell reads
+`R68(RES_0603=VALUE CONTESTED: BOM 0R, board file 1k0).1` - report both, pick neither.
+A row marked `*no net in the board file (pad exists, nothing connected)*` is a fact about
+the board (that pin is unused), not a gap in this pack.
 
 Units: PADS ASCII coordinates are integers, **38100 units = 1 mil** (derived from
 the board outline, not stated in the file).
@@ -254,21 +317,26 @@ pair a file name with the wrong body. Two defences, both mechanical:
 
 ## Answer schema (this repo machine-checks against it)
 
-One row per question, 8 columns - the 7 working columns plus a leading anchor so the
-result is verifiable line by line:
+One row per question, 8 columns - the 7 working columns plus an anchor so the result
+is verifiable line by line:
 
 ```
 anchor | IC/件 | 引脚或功能 | 手册公式或规格(原文) | 手册推荐条件 | 板上实际值 | 判定 | 出处与依据强度
 ```
 
-- `anchor` = `<merged file>:<section>` e.g. `TASK_C_ic_context_all.md:U314`, or
-  `MANIFEST.csv` row for census/BOM answers.
+- The anchor may be the **leading** column above, or a **trailing** `<file>:<section>`
+  column - the checker keys on column names, not position. What is not accepted is no
+  anchor at all. Use the merged file plus its `## <ref>` heading as the anchor; never a
+  per-designator file name (see the mislabelling warning above).
 - `判定` in `一致 / 不一致 / 信息不足`. `出处与依据强度` = document + revision + page or
   table, marked `手册原文` / `厂商页` / `第三方`, and must carry a short verbatim English quote.
 - Anything not read from official material: write `unverified` in that cell. Never fill a
   gap with a typical value or usual practice. Distributor text is a lead, not evidence.
 - If official material contradicts the premise stated in the file, say so in `判定`
   rather than working around it.
+- Board values are now in the pack (`=100n`, or `=VALUE CONTESTED: ...`). If you still
+  cannot find a value for a refdes, name the refdes in `判定` - do not write a bare
+  "值未知".
 - Answer only the question at the head of each section. No design proposals.
 
 Verification on our side: rows are re-checked by re-decoding the decals with
@@ -284,7 +352,7 @@ def merged_ic_sections(nb: dict, types: dict):
 
 
 def write_merged(out: str, nb: dict, types: dict, lines: list, parts: dict,
-                 parttypes: dict, decals: dict) -> None:
+                 parttypes: dict, decals: dict, values: dict) -> None:
     # Task C: all IC contexts in one file.
     with open(os.path.join(out, "TASK_C_ic_context_all.md"), "w", encoding="utf-8", newline="\n") as fh:
         fh.write("# TASK C - external parts vs the datasheet formulas\n\n")
@@ -306,9 +374,14 @@ def write_merged(out: str, nb: dict, types: dict, lines: list, parts: dict,
             fh.write("| pin | pin name | net | other pins on the same net (refdes(part_type).pin) |\n")
             fh.write("|---|---|---|---|\n")
             for pin, pin_name, net, others in rows:
-                fh.write(f"| {pin} | {pin_name or '-'} | `{net}` | {fmt_neighbours(others, types)} |\n")
-            fh.write("\nNets named `$$$...` are unnamed wires in PADS: one electrical node, no meaning.\n\n")
-        fh.write(f"TOTALS: sections={n} (expected {len(IC_TOPICS)})\n")
+                fh.write(f"| {pin} | {pin_name or '-'} | `{net}` | {fmt_neighbours(others, types, values)} |\n")
+            for pin in unconnected_pins(ref, types, parttypes, decals, nb):
+                fh.write(f"| {pin} | - | *no net in the board file (pad exists, nothing connected)* | - |\n")
+            fh.write("\nNets named `$$$...` are unnamed wires in PADS: one electrical node, no meaning.\n")
+            fh.write("Neighbours shown as `C13(CAP_0603=100n).1` carry the board-file value;\n")
+            fh.write("`=VALUE CONTESTED: BOM 0R, board file 1k0` means the two sources disagree.\n\n")
+        fh.write(f"TOTALS: sections={n} (expected {len(IC_TOPICS)}) "
+                 f"values_available={len(values)}\n")
 
     # Task F: all decal blocks in one file.
     refs = [r for r in IC_TOPICS if r in parts]
@@ -377,6 +450,9 @@ def main() -> int:
     ap.add_argument("--asc", default="Hardware/PSDR.asc")
     ap.add_argument("--netlist", default="dist/netlist/PSDR_2.6.1_netlist.json")
     ap.add_argument("--bom", default="Hardware/BOMs/PSDR_2.6.1/OctopartBOM.csv")
+    ap.add_argument("--crosscheck",
+                    default="Hardware/BOMs/PSDR_2.6.1/BOM_refdes_crosscheck.csv",
+                    help="output of tools/bom_refdes_crosscheck.py; carries each part's value")
     ap.add_argument("--out", default="delegation")
     a = ap.parse_args()
 
@@ -390,6 +466,11 @@ def main() -> int:
         nl = json.load(fh)
     types = nl["parts"]
     nb = neighbours_index(nl["nets"])
+    values = load_values(a.crosscheck)
+    if not values:
+        print("WARNING no value table at " + a.crosscheck +
+              " - run tools/bom_refdes_crosscheck.py first, or the pack will ask the"
+              " same 'what is the value' questions it asked last time")
 
     bad = [(r, EXPECT[r], types.get(r, "MISSING"))
            for r in EXPECT if EXPECT[r] not in types.get(r, "")]
@@ -401,14 +482,14 @@ def main() -> int:
 
     os.makedirs(a.out, exist_ok=True)
     ctx_dir = os.path.join(a.out, "ic_context")
-    n_ctx, missing = write_ic_context(ctx_dir, nb, types)
+    n_ctx, missing = write_ic_context(ctx_dir, nb, types, values, parttypes, decals)
     write_parts_census(os.path.join(a.out, "parts_census.csv"), types)
     n_decal = write_decal_pack(os.path.join(a.out, "decal_raw"), lines, parts,
                                parttypes, decals, types)
     n_bom = write_bom_rows(a.bom, os.path.join(a.out, "bom_rows.csv"))
     with open(os.path.join(a.out, "README.md"), "w", encoding="utf-8", newline="\n") as fh:
         fh.write(README)
-    write_merged(a.out, nb, types, lines, parts, parttypes, decals)
+    write_merged(a.out, nb, types, lines, parts, parttypes, decals, values)
     n_manifest = write_manifest(a.out)
 
     # Self-check the merged files: what they claim to contain must be what they do contain.

@@ -8,7 +8,15 @@ python tools/make_delegation_pack.py
 
 Sources: `Hardware/PSDR.asc` (part types, decals, placement),
 `dist/netlist/PSDR_2.6.1_netlist.json` (pin/net + part types),
-`Hardware/BOMs/PSDR_2.6.1/OctopartBOM.csv` (DigiKey-numbered BOM rows).
+`Hardware/BOMs/PSDR_2.6.1/OctopartBOM.csv` (DigiKey-numbered BOM rows),
+`Hardware/BOMs/PSDR_2.6.1/BOM_refdes_crosscheck.csv` (each part's value - regenerate
+it first with `python tools/bom_refdes_crosscheck.py`).
+
+**Values are in the pack now.** A neighbour reads `C13(CAP_0603=100n).1`; the value comes
+from the board file. Where the 2.6.1 BOM and the board file disagree the cell reads
+`R68(RES_0603=VALUE CONTESTED: BOM 0R, board file 1k0).1` - report both, pick neither.
+A row marked `*no net in the board file (pad exists, nothing connected)*` is a fact about
+the board (that pin is unused), not a gap in this pack.
 
 Units: PADS ASCII coordinates are integers, **38100 units = 1 mil** (derived from
 the board outline, not stated in the file).
@@ -38,21 +46,26 @@ pair a file name with the wrong body. Two defences, both mechanical:
 
 ## Answer schema (this repo machine-checks against it)
 
-One row per question, 8 columns - the 7 working columns plus a leading anchor so the
-result is verifiable line by line:
+One row per question, 8 columns - the 7 working columns plus an anchor so the result
+is verifiable line by line:
 
 ```
 anchor | IC/件 | 引脚或功能 | 手册公式或规格(原文) | 手册推荐条件 | 板上实际值 | 判定 | 出处与依据强度
 ```
 
-- `anchor` = `<merged file>:<section>` e.g. `TASK_C_ic_context_all.md:U314`, or
-  `MANIFEST.csv` row for census/BOM answers.
+- The anchor may be the **leading** column above, or a **trailing** `<file>:<section>`
+  column - the checker keys on column names, not position. What is not accepted is no
+  anchor at all. Use the merged file plus its `## <ref>` heading as the anchor; never a
+  per-designator file name (see the mislabelling warning above).
 - `判定` in `一致 / 不一致 / 信息不足`. `出处与依据强度` = document + revision + page or
   table, marked `手册原文` / `厂商页` / `第三方`, and must carry a short verbatim English quote.
 - Anything not read from official material: write `unverified` in that cell. Never fill a
   gap with a typical value or usual practice. Distributor text is a lead, not evidence.
 - If official material contradicts the premise stated in the file, say so in `判定`
   rather than working around it.
+- Board values are now in the pack (`=100n`, or `=VALUE CONTESTED: ...`). If you still
+  cannot find a value for a refdes, name the refdes in `判定` - do not write a bare
+  "值未知".
 - Answer only the question at the head of each section. No design proposals.
 
 Verification on our side: rows are re-checked by re-decoding the decals with

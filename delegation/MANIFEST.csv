@@ -1,7 +1,7 @@
 path,bytes,sha256,first_line
-README.md,3040,a29822463cf735fb6ae7a5cc93096361ca6e9246c95a1446bb8c7d8c08a70a56,# Delegation input pack
+README.md,3971,63d6ef6596caac6cb37516e839eb9de9c349c2136d0ac1328c6383b4e02ae4ca,# Delegation input pack
 TASK_ABE_census_and_bom.md,12912,9802ae085078507a8feba89d37c00a24410ea1ba5546170f50085ac9025a640b,"# TASKS A/B/E - every distinct part on the board, and the DigiKey-numbered BOM rows"
-TASK_C_ic_context_all.md,80551,4235ddcca5ab43a54a4915612da7d8331f4fdf371ee1529bc695bbc0f35273bc,# TASK C - external parts vs the datasheet formulas
+TASK_C_ic_context_all.md,95082,082109173e5ff76510ddfde673f60b49439e4cbcdf98775be5cb8f16327112f0,# TASK C - external parts vs the datasheet formulas
 TASK_F_decal_raw_all.md,48787,648b8b5b3d6cf4bc8c4a57e6f54d6fa6e960c1b647e377d157e70545109a62e0,"# TASK F - board footprint as drawn, verbatim, vs the vendor's recommended land pattern"
 bom_rows.csv,8297,f37cd2e883d6304d0e6f61cef9aa7f4bcb7d571bcb2a89b219d4e1583ea4ac7d,"qty,digikey,vendor,mpn,octopart_url"
 decal_raw/74CBTLV3253.txt,1733,ea9011bc2dd0fd5bed091f059e91e08d45576ff0b3b12e728be41f630e87a750,74CBTLV3253      M 0     0      8 16 1 0 2
@@ -28,40 +28,40 @@ decal_raw/STM32F429_LQFP100.txt,11893,eeaa03984a02ca413239b341fee53bbbe28435d387
 decal_raw/SY10EP52V.txt,1422,23e12df0c069c74d4da0ccd6c6320b83164e988e9250f75cf01e9668ea337d07,SY10EP52V        I 0     0      8  8 1 0 2
 decal_raw/VARIABLE_FILTER_HMC1023.txt,4368,e5cbb933a74d20431522dd726784d0ed9fb3c0e8f92bfc4c2057435031bf190c,VARIABLE_FILTER_HMC1023 M 0     0      7 33 18 0 2
 decal_raw/_index.csv,3001,739cebc1aa56ba7d13adffc64cf51e2ad97596c386316b2ebe4ede9e7ad0161e,"refdes,netlist_part_type,placement_type,decal,terminals,block_file"
-ic_context/L39.md,1300,0d2c73d058f92454a2745493ec86c785d1e8dbdf8b944940448fc07e4a935209,# L39 - pin/net context
-ic_context/L41.md,1170,da99e006b34204e88b9291b05d2d5056eb3faa3edc2b4bedb65122396ca32a08,# L41 - pin/net context
-ic_context/L81.md,1172,b5f5a880fc8863b5c2acf5769cf35d9bb88312040fada1d9ec398b84efafe231,# L81 - pin/net context
-ic_context/L82.md,1080,7c3218d9b27066922e52a5072fc18622ef149a25c1c397b4adbdcd1e68c54e9d,# L82 - pin/net context
-ic_context/U114.md,1608,d50d22fe24a2b079d845bfb9108eabe1d12673f2616c536c9f5aedb50d22489b,# U114 - pin/net context
-ic_context/U121.md,11203,8b8636778d0a3aeed39b3009846d6588dae4b83237b844fb0d7f86175ab7be25,# U121 - pin/net context
-ic_context/U131.md,1391,dbeba9846e840ce80ba9fb6b0bdd861255574afbd9eddf952d976f138a02b407,# U131 - pin/net context
-ic_context/U15.md,1707,0e80a5bdc9e9f349ade3327a0a76b3fa53aa334c54f574ef2848409e9bd64fd1,# U15 - pin/net context
-ic_context/U16.md,3100,745de47a4a6edb0c541fde58ca581cd903d778427a4ae1152a7fde17b2d96c0e,# U16 - pin/net context
-ic_context/U161.md,4749,94579de7156c6842000b9794642d64788b5d160aeaa2e3e278a4380f041ccae3,# U161 - pin/net context
-ic_context/U18.md,1903,49882d153571dd363d6f838491f4e2a865ffc31ff04207272756cefa10665eee,# U18 - pin/net context
-ic_context/U185.md,2323,40ebdfb930e6ae1269c45e77c5f160588b165b0045b5b9cfca80ca1946638a16,# U185 - pin/net context
-ic_context/U189.md,1637,4663197fca5762196e49cf601f0a3fead22dc9e4b9c46da46a427fe37331b65e,# U189 - pin/net context
-ic_context/U199.md,1844,9b158a8384c9e8d762ef31dc090c36e585a1536fa2d68d601839610113364298,# U199 - pin/net context
-ic_context/U211.md,2591,9898633ef7c8d7066348e1e51c3f7ae4ae76ec13067b54c3eda580f48114a41d,# U211 - pin/net context
-ic_context/U216.md,1394,d334b6539403e279f17374b86619bdb580b98c58b1172f75021ae5889081ecc2,# U216 - pin/net context
-ic_context/U24.md,3113,eb7cdc44c0a14216ae1f15496ff573199a39ce098bcd2473c436ccdd004c15b0,# U24 - pin/net context
-ic_context/U241.md,4032,5fe4c370afed78f0ccfb0f24468dfe92a7615aa42c81fb7f35f65f889748d271,# U241 - pin/net context
-ic_context/U253.md,1706,db03559944328af033865be6a69bc429cb97461d3361b842a782fb248f32ddc5,# U253 - pin/net context
-ic_context/U255.md,1839,d3f2e28f3db2850b5b99a711c42d1479a2080419efbddab50a31809fe4f86b7b,# U255 - pin/net context
-ic_context/U260.md,1706,7cf036aaf175c143b3082f6365048faa96c7c04108c743fa8c23d71e04f2c0bb,# U260 - pin/net context
-ic_context/U272.md,1843,a2f2f27f5bd4212d2307a75b4764babb247d11fced4ceef5e8cf7a45dc4162ca,# U272 - pin/net context
-ic_context/U279.md,1654,7c6320d3b50251d58ab1c5fa42a364a4a401c719b5bca357d64c06e9c7d53cab,# U279 - pin/net context
-ic_context/U280.md,1654,0baba615dc1c07007c81e7f1e1007b4487425e79e8fbb6c0d37e0f0f55c4b91e,# U280 - pin/net context
-ic_context/U287.md,6746,2fdb4a880d440f4c7db322e82cd44a11b0e2f4e6b2dbedc47ad6eab692ee8462,# U287 - pin/net context
-ic_context/U298.md,2589,c6be5fb8a0cf9bab81186e17d1ca5a7b3557b4a1c1ef393b825bdc199e02a9d1,# U298 - pin/net context
-ic_context/U30.md,3063,ae8269dc0352ed9cfbc653cbe58db7d37e4f0b7a06287301d810fefa8d6b43ac,# U30 - pin/net context
-ic_context/U304.md,1064,d9ed32ad31f3090b5a73cf404e42cbae2e718ac97d76beb514b422c47aac3080,# U304 - pin/net context
-ic_context/U314.md,1740,43e8677655940d0538eeff4545623160142b399b5854b5403c0b70f2cd87d3d2,# U314 - pin/net context
-ic_context/U32.md,1551,a0ddea5775e1f9c4210f668b12f5cbc3c7795fea9467c4ed99ea505f816e05ca,# U32 - pin/net context
-ic_context/U37.md,1443,71e78cff95bea3a50a0e7338a9ab8be567aa2ed3ef021d2139276dfb2c0a327e,# U37 - pin/net context
-ic_context/U4.md,1903,6aaa89c1530a93afec348a45942cf5aa6f385950a446414ad5fe9cbd0ed8c9da,# U4 - pin/net context
-ic_context/U47.md,1385,66a4fa86cde23f3f217149bcf724085ad532188e209a0901b10568ecea42529e,# U47 - pin/net context
-ic_context/U58.md,1385,f7d1a42989f9f441f229984c9f833a855ba87a99eab82b3610de0fefdee0c773,# U58 - pin/net context
-ic_context/U85.md,1797,889e44dd05dafe30ee67c18d92d5c4c46069a6553b2cc84a7cb09e2cdbf1177b,# U85 - pin/net context
-ic_context/U86.md,1901,f9f23a1f13cf70a5287f2926c298c38bf66acd2a4ecb4a79cca112a1f72e9fef,# U86 - pin/net context
+ic_context/L39.md,1672,1059c528691e4a9a9426420103cbfc399d38a8bf47afe253ebd2e7803c59f0be,# L39 - pin/net context
+ic_context/L41.md,1486,161f705e09ec8cde1ec4bccd6af7930c07229748dfb61db12b52c250905658a1,# L41 - pin/net context
+ic_context/L81.md,1488,4abd6ba986854db230aa9e42f1c4236bab9b5dcae87e29ad49690ef2a6c1233c,# L81 - pin/net context
+ic_context/L82.md,1389,9d56d7304526af61fb746c8eff2cd53b5fe85884fd1f9b25dcb3a8c9c51061ba,# L82 - pin/net context
+ic_context/U114.md,1916,ee67c54dc941c90c780635da692789d8d31fecbe8a806bee10d29cd2b6644de8,# U114 - pin/net context
+ic_context/U121.md,12129,e93c9476fb4b68d5f4ea16375f7d41ac4a7ec040c251b866a638a7bb66bde37c,# U121 - pin/net context
+ic_context/U131.md,1693,a31bc3ea792a23bef2ce9e61f01e472336699fb62b3ad65218bfc6167bc19411,# U131 - pin/net context
+ic_context/U15.md,2072,ed1ca4adc0ffc1bdca0cef7c93310f503c21ccbed1797c9410c1bd5bf025fd87,# U15 - pin/net context
+ic_context/U16.md,3566,aff7476708a525ed5d3de7a0aa57e8eb995d71bf07f457a4dd1ff574f73f5b38,# U16 - pin/net context
+ic_context/U161.md,5465,47c0b2c8ef396a3034831baf7133440aa746b5a8d78d989b49e21069520512f8,# U161 - pin/net context
+ic_context/U18.md,2227,4d034a363c2b4d23cc046595495de30cedad26bcccae6e74695ed203c0406543,# U18 - pin/net context
+ic_context/U185.md,3505,d205e026642be68b221e285e8037d7578be710fa42a4dd5b1f4386a88de88e17,# U185 - pin/net context
+ic_context/U189.md,1943,9f6b9b54d723e648f41483d16aab0806e1ad31a9b38ed849c61adad832b26fc3,# U189 - pin/net context
+ic_context/U199.md,2160,5fa95f0ccf7c93231d1ec3467cceee2cce9ecb383145a5cde559eaf73b3af132,# U199 - pin/net context
+ic_context/U211.md,2954,1f7e7b72e7538da79825f1939c2908106edfd2d730c6858093f74d4ab44004e1,# U211 - pin/net context
+ic_context/U216.md,1696,a5648654f289ee33127334c7747449d86f18eeaa36cf46be67890a7f562712a3,# U216 - pin/net context
+ic_context/U24.md,3579,0882cc0be6fd7972ff9c74e15cfb40d7d5e7813a10ca9df5ec3ed4fd45013706,# U24 - pin/net context
+ic_context/U241.md,5210,4f7e2bbd7d4d133cf9dde344624c88799f40fcc375caf869fa21689984d4244e,# U241 - pin/net context
+ic_context/U253.md,2139,1e00e582ea7fb1cb655bf04db0df32bf801403e3acf8f294f2d61a22bfc0818a,# U253 - pin/net context
+ic_context/U255.md,2179,d3847a2c28dd48c88e244c1ce7c72a355ad7353236cfd32f638e3330dd59c433,# U255 - pin/net context
+ic_context/U260.md,2139,20b172e8a787f469dbebac25d6b0696308dc43dd6f3742f874c3d019b36b933a,# U260 - pin/net context
+ic_context/U272.md,2183,1799c1491deb0108048b1acc1e2d1e4a323d56c00381bd4594e3e46051503312,# U272 - pin/net context
+ic_context/U279.md,2184,784485e36dd783616424f29e99a3a8a80e0c12f9bcd56ad4257628562cb8f37f,# U279 - pin/net context
+ic_context/U280.md,2184,caa8f994d05405cb8ffca3347f418ace8a62a3ddb4147b9f99379d38fa5e0af7,# U280 - pin/net context
+ic_context/U287.md,7609,0778b652fca7a38b9aa762110d3f745aedab326d8d085d95d78cd601548ec347,# U287 - pin/net context
+ic_context/U298.md,2952,7fe8bade03cbff8c0124299a214564f941a57334b4591269eca26e2544615027,# U298 - pin/net context
+ic_context/U30.md,3599,8a5b3367f3449d02843a8bb835a356eb0230e0b8057566bde7bb51959d28788a,# U30 - pin/net context
+ic_context/U304.md,1298,758eeabb11ab52c4c62367c32654ab4c8e480fba9e088b17de8867b5f4cf8431,# U304 - pin/net context
+ic_context/U314.md,2125,f50502ab93e99e641f661419acac54977b70541dfc05025c412fb444ff481a70,# U314 - pin/net context
+ic_context/U32.md,1872,d2c49a26dd6daa1d90db9386d6db576b771edcb9fa6503e80d0be351a8f21ace,# U32 - pin/net context
+ic_context/U37.md,1727,662fe48d087b4998f926e2151bb2202ce1fd23a6853e43243b9ed3343072cd4f,# U37 - pin/net context
+ic_context/U4.md,2227,025d7af5dfd0aef8d611af0dee7cf2fd633ccf6da03826c044f1a1c781d1d7e3,# U4 - pin/net context
+ic_context/U47.md,1687,e44e6f7ec5345f75715a3a469090de04ac7052268c983587249101faf95bd2a8,# U47 - pin/net context
+ic_context/U58.md,1687,2ce94eaac93c147c108f1cacf42c3c1df0c03541a91ab6d437751e5468b41126,# U58 - pin/net context
+ic_context/U85.md,2094,8a9b78af6987db0db5029ce0864b8e1c2f1ba96e32494b01e75d9fdc4d025822,# U85 - pin/net context
+ic_context/U86.md,2237,77d05edc4eb86d02530e426f3331a9f13c3fe10af5f4ff00ba4ea3fe920cfb26,# U86 - pin/net context
 parts_census.csv,2965,1460679f7c91a07c6cb55946d5f9ea2d8c0993c0d74feb1be35e4a58b27f1cba,"part_type,qty,category,designators"

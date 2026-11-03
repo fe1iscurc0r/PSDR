@@ -3458,3 +3458,57 @@ node "$TEMP/kb.cjs" dl "$TEMP/ansmap.json" .../psdr_answers    # get_media_info 
 
 本轮只新增 `docs/PSDR-external-findings-2026-11-03.md` 与这段记录；
 `delegation/`、`tools/`、`Source*/`、`dist/` 未改；答案副本与 PDF 留在仓外临时目录（清单见该文 §6）。
+
+### K-9 "信息不足"的消解：值三方对账 + 包重做 + 判定自算（2026-11-03）
+
+§K-8 指出外部答案里大量判定落在"值未知"，根因是**我们的包只给了 PADS 类型名、没给值**，
+而值其实在 `.asc` 的 `PART <位号> { Value }` 块里。这一轮把它补完。
+
+**1) 新工具 `tools/bom_refdes_crosscheck.py`**（板文件 × 2.6 BOM × 2.6.1 BOM，位号组展开 + EIA 记数归一）：
+
+```
+$ python tools/bom_refdes_crosscheck.py
+designators joined : 339
+asc == 2.6.1 BOM   : 255
+asc != 2.6.1 BOM   : 11
+value only in asc  : 0   only in BOM: 1   neither: 72
+```
+
+两份 `.xls` 先用 office-excel 导入器展平成 `PSDR2.6_BOM_flat.csv`（89 件号行）与
+`PSDR2.6.1_BOM_flat.csv`（86 行）入库，文件头写明源 BIFF 版本（`2357da76…` / `1c032a2c…`），
+以后对账不再依赖二进制。⇒ 顺带更正本文与 gaps 里"BOM 86 行 vs 88 行"的旧数（没展平数的）。
+
+**2) 包重做**（`tools/make_delegation_pack.py` + 重生成 `delegation/`）：
+邻位带值 **336 处**（`C13(CAP_0603=100n).1`）；值冲突显式 **56 处**
+（`R68(RES_0603=VALUE CONTESTED: BOM 0R, board file 1k0).1`，并规定"两个都报、不许挑"）；
+**未连接脚单独成行 26 处**（`unconnected_pins()` 用 decal 的 `T` 端子记录，
+不是 `PAD` 块——`PAD` 键是图形序号不是脚号，第一版在这里写错过）。
+自证：U30 恰好补出 `pin 6`、U287 恰好补出 `pin 29`（与"VBG 悬空"互证）、U121 零行（100 端子全有网）。
+README 的答案 schema 同时改成**接受两种列序**（前导 anchor 或末列 `<file>:<row>`）——
+外部执行方用的是末列式，我们原来只写了一种，属于自己制造返工。
+
+**3) 用对方抄来的手册公式 × 我们补上的值，自己把判定算出来**（全部写进
+`docs/PSDR-external-findings-2026-11-03.md` §7.2，此处只记最重的三条）：
+
+- **`+3V3_CPU` 其实不是 3.3 V**：U114 上臂 R113（`+3V3_CPU`→FB）、下臂 R112=100K→GND，
+  `VOUT=0.6×(1+R_top/R_bot)` ⇒ 板文件 383K 得 **2.898 V**、BOM 402K 得 **3.012 V**，
+  而手册 Table 1 给 3.3 V 用的是 450K/100K。连带：**三只 MASWSS0129 要求控制高电平 ≥ +2.9 V，
+  余量可能只有 0.1 V**，这直接决定 #16 里"开关档位到底切没切"能不能断言。
+- **`+5V_BOOST` = 4.94 V**（R90=30K/R92=10K，`1.235×(1+3)`；FREQ 接地 ⇒ 650 kHz；L84=4.7 µH 在 4.7–22 µH 下界）。
+- **AD8302 斜率完全未修正**：R310/R311/R312/R313 全 0R ⇒ 30 mV/dB、±30 dB、中心 900 mV；
+  R319=0R ⇒ VPOS 直送；**C307/C320=OPEN**（.asc 与 2.6.1 BOM 一致，BOM 备注 "DNP by design"）
+  ⇒ MFLT/PFLT 无外接电容，手册"≥1 pF"不满足。
+  同类还有 SSM2167（R190=15K ⇒ 压缩比 2:1；R187=5K ⇒ 门限 −55 dBV，且手册 ">5 kΩ 不推荐" 正压线）、
+  TPA0253（RI=12K1 ⇒ SE 5.17 / BTL 10.33 V/V，**模式经 R144=100K 挂在 `\EARPHONE_INSERTED` 上，是运行时切换**——
+  这句的依据是我们自己取的 TI 原厂 PDF，sha256 `668fed94…` 与对方一致，**第 5 份独立复算**）。
+
+**4) 又抓到两处口径错误**：
+
+- "**2.6→2.6.1 实质差异只有 R164**"作废：展开后 **R6 100R→180R、R14 100R→68R** 也是同批改动，
+  且板文件三处都停留在 2.6 值。之前漏看的原因是只比了 BOM 的合并格文本、没展开位号。
+- 11 个位号是**板文件与 BOM 直接矛盾**（不是版本差异）：`R6 R14 R164 R113 R68 R69 R72 R75 R76 R79 R268`，
+  已按"量出来等于哪边、口径就归哪边"写成 M3 的优先测点
+  （`docs/PSDR-bringup-checklist.md` 新增附节：11 个电阻 + 两条轨 + 判读规则）。
+
+**5) 遗留**：重生成后 `delegation/MANIFEST.csv` 全部哈希已变 ⇒ KB 里那 59 份输入件已过期，
+若再派活必须重传合并件（不要再传散文件）。仍缺原厂 PDF 的 6 只件由 §K-8-B 的另一路在追。
