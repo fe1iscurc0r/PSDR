@@ -3182,7 +3182,7 @@ P0-2 仍在，位置 `src/main.c:1031-1032`。survey 顶部加了"基线变更�
 `README.fork.md`、`tools/anchor_check_f7.py` 的引用路径与数字同步更新。
 
 **提交**：`29aa887`（改基本体 + dist/reference + Makefile 头部 + 工具 docstring + README.fork）。
-**待办**：并回 `next` 与推送需要点头（回滚点 `4ce4540`）；F4 那侧不受影响。
+**并回 `next` 与推送已完成**（见 §I-10 末：`next = 9aad812`）；F4 那侧不受影响。
 
 ### I-10 起草对外评论时自查出的两处 Makefile 头部假话（2026-11-03）
 
@@ -3215,8 +3215,46 @@ PSDR_F7 @ ab2c8fd，GCC 13.2.1，make -f Makefile.linux -j4
 **教训（写死）**：改基时**注释比代码更容易变成假话**——代码错了编不过，注释错了没人报警。
 以后凡是"照 X 的构建配置"这类话，必须当场把 X 的配置文件 grep 一遍再落笔。
 
-**落地**：`next` 已推到 `239fe23`（`4ce4540..239fe23`，远端 tree 与本地一致、ahead/behind 0/0、
-upstream 无 `next` 未被写入）；本次头部更正与其后的 #19 评论单列提交。
+**落地**：`next` 已推到 `9aad812`（含 `29aa887` 改基、`239fe23` 记录、`9aad812` 头部更正；
+远端 sha 与本地一致、ahead/behind 0/0、upstream 无 `next` 未被写入；回滚点 `4ce4540`）。
+#19 的"改基后零成本 + 三种排除口径实测"评论也已发（回帖数 2→3 核实，链接三条 API 回 200）。
+
+## 任务 J · 委派输入包（给无仓库上下文的执行方，2026-11-03）
+
+用户要把耗时机械的活派给虚拟机里的另一个 agent（它接不到本仓库），要求"能派就派、回来我能验"。
+所以这里出的不是提示词，是**可重跑的输入包生成器**：数据一律由脚本从库内派生，不手抄。
+
+```
+$ python tools/make_delegation_pack.py            rc=0（无 WARNING 即前提自洽）
+ic_context: 36 files (netlist has 391 designators)
+decal_raw : 23 distinct decals for the IC list
+parts_census: 57 part types
+bom_rows: 86 rows with a DigiKey number
+$ du -sh delegation  ->  293K
+打包件 C:/Users/ASUS/psdr_delegation_pack.zip  sha256 d9f9ee053c1ad239905e7e1ee78326202eaf245b195cdebd120834b5886d1bcc
+```
+
+内容：`ic_context/<位号>.md`（每脚→网络→同网其它引脚，被动件的值就编码在 `part_type` 里，
+如 `CSM-X5R-22U-20P-10V-1210`）、`decal_raw/<封装>.txt`（**原样 `*PARTDECAL*` 块**，
+不给我解码后的数字，免得执行方被我对口列名的猜测带偏）、`parts_census.csv`、`bom_rows.csv`，
+外加答案 schema 与四条硬规则（无出处不作答、查不到写 `未证实`、第三方转述只当线索、
+与前提矛盾要直说）。对应任务：A 生命周期普查 / B 立创 SMT / C 外围件 vs 手册公式 /
+E 手册正本清单 / F 焊盘 vs 厂商推荐 footprint。
+
+**两个自己抓到的位号错配**（差点把错问题派出去）：`U114` 我当 SSM2167，其实是 **AP3417C 降压**
+（SSM2167 是 `U189`）；`MIC` 我当 MEMS 麦克风，其实只是 `PAD_1MM` 焊盘（麦克风是 `U32`）。
+⇒ 生成器现在带 `EXPECT` 守卫：每位号断言 `part_type` 含指定子串，不符就 **rc=2 不出包**；
+每个上下文文件顶部也写明"本问题假定该件是 X，若 part_type 不符请停止并报矛盾"。
+另外重生成会**先清 `ic_context/*.md` 与 `decal_raw/*.txt`**——第一版残留过 `MIC.md`，
+删了条目但文件还在，等于把已知的错问题继续派出去。
+
+一处口径提醒（写进包内 README）：decal 名会**沿用/共用**——`U121` 的 `part_type` 是
+`STM32F746_LQFP100`，但它用的 `*PARTDECAL*` 组名是 `STM32F429_LQFP100`（100 端）。
+判"哪只脚属于哪只芯片"只能走 `_index.csv`，不许从封装名反推。
+
+**验收口径**（等答案回来执行）：随机抽 10 行复算；封装类答案用 `tools/pads_asc_decal.py`
+重新解码比对；手册类答案按给的页码/版本反查原文；**任一行不过，整批退回**，不挑能用的收。
+外部断言在核完之前不进任何对外文本（尤其 #16 已经公开说过 U304 的带宽）。
 
 ### I-5 对主线计划的实际影响（要你拍板）
 

@@ -26,3 +26,6 @@
   放这里是因为 `Source_F7/.gitignore` 的 `/Debug` 会把它们挡在版本控制外（2026-11-03 改基时差点丢）。
 - `dist/fab/PSDR_2.6.1_placement.csv`：SMT 贴装表（391 件），与 BOM 和 KiCad 锚点双向对账过。
 - `tools/`：解析器、KiCad 生成器、Gerber 对拍、层覆盖率、固件统计（`fw_stats.py` / `fw_funcindex.py`）。
+- `delegation/` + `tools/make_delegation_pack.py`：**派给外部执行方的自包含输入包**
+  （36 只 IC 的引脚/网络上下文、23 个封装的原始 `*PARTDECAL*` 块、件数普查、带 DigiKey 号的 BOM 行），
+  含答案 schema 与"无出处不作答"的硬规则；重跑一条命令，位号错配由 `EXPECT` 守卫挡住。
