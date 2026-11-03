@@ -1,13 +1,15 @@
 # Reproduce the Eclipse CDT Debug build of the F7 firmware on Linux.
 #
-# Source: PSDR_Rebuild @ b9c0629 (2021-01-27). Parameters transcribed from
-# Source/.cproject, Debug configuration:
+# Source: PSDR_F7 @ ab2c8fd (2018-07-31), the branch the maintainer named as the
+#   firmware base on 2026-11-03 (#19). Re-based from PSDR_Rebuild on 2026-11-03;
+#   the port cost was zero -- this file is byte-identical to the one that built
+#   the Rebuild tree, and it builds PSDR_F7 as-is (rc=0, 0 errors).
+#   Parameters transcribed from Source/.cproject, Debug configuration:
 #   Cortex-M7 / Thumb / hard float / fpv5-sp-d16, -O0, --gc-sections,
 #   HSE_VALUE=26000000, defines DEBUG TRACE USE_FULL_ASSERT __FPU_PRESENT
-#   ARM_MATH_CM7 STM32F746xx USE_HAL_DRIVER.
-# The Debug sourceEntries exclude only DSP_Lib/Examples and src/TinyGPS.c;
-# unlike the F4 project, no HAL module is excluded. OPT defaults to -O0 and
-# can be overridden (e.g. OPT=-Os) for size comparisons.
+#   ARM_MATH_CM7 STM32F746xx USE_HAL_DRIVER. The Debug sourceEntries exclude
+#   only DSP_Lib/Examples and src/TinyGPS.c; unlike the F4 project, no HAL
+#   module is excluded. OPT defaults to -O0 and can be overridden (OPT=-Os).
 #
 # Deliberate differences from the Eclipse build (all visible, none silent):
 #   a) -fcommon: GCC 10+ defaults to -fno-common; this tree has tentative
@@ -17,17 +19,23 @@
 #      arm_bitreversal_32 needed by the FFT code.
 #   d) OS_INCLUDE_STARTUP_INIT_MULTIPLE_RAM_SECTIONS is applied only to
 #      _startup.c, matching the fileInfo override in .cproject.
-#   e) this branch head does not compile as-is with GCC 13: si5338.c lacked
-#      its HAL include and the extern for handleI2C, and frequency_control.c
-#      included hal_rcc_ex.h first, which trips the HAL circular include.
-#      Both include fixes are part of this branch.
+#   e) (historical) while this harness built the PSDR_Rebuild mirror it needed
+#      two include fixes in src/si5338.c and src/frequency_control.c to compile
+#      under GCC 13. Those files do not exist on PSDR_F7 (the Si5338 driver is
+#      inside the 825-line src/i2c.c there), so after the 2026-11-03 re-base
+#      there are **no source edits at all** in Source_F7 except this makefile
+#      and the two .gitignore lines.
 #
-# The committed Debug/PSDR.hex was last updated at 457c270 (2018-06-21) with
-# the 2018 toolchain, so it is not byte-comparable with GCC 13.2.1. Verified
-# against it: initial SP 0x20050000, reset vector into .after_vectors, and an
-# identical 118-entry vector pattern. Same-source sizes of that commit with
-# GCC 13: -O0 112344 B, -Og 93704 B, -O2 93268 B, -Os 89748 B, versus 76837 B
-# in the 2018 hex (which looks like an optimized build from an older GCC).
+# Measured with GCC 13.2.1 on the re-based tree (2026-11-03):
+#   text 114068 / data 18488 / bss 18260, build_linux_f7/PSDR.hex 372,928 B.
+#   Anchor gate passes against both committed references now kept in
+#   dist/reference/ -- initial SP 0x20050000 and empty-slot pattern
+#   [7, 8, 9, 10, 13, 95]; reset values are reported, not gated (the layout
+#   moves), and only 7/118 vector words match, which is the expected
+#   old-toolchain-vs-GCC-13 difference, not a mis-build.
+#   For the previous baseline: the same source built from PSDR_Rebuild gave
+#   -O0 112,344 B (-Og 93,704, -O2 93,268, -Os 89,748) versus 76,837 B in the
+#   2018-06-21 hex, which looks like an optimized build from an older GCC.
 
 TARGET=PSDR
 BUILD=build_linux_f7

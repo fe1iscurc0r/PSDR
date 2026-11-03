@@ -18,7 +18,6 @@
 #include <stm32f7xx_hal_spi.h>
 #include <stm32f7xx_hal_gpio.h>
 #include <stm32f7xx_hal.h>
-#include <stm32f7xx_hal_rcc.h>
 #endif
 
 void spi_init(void)
@@ -26,7 +25,7 @@ void spi_init(void)
     //SPI_InitTypeDef  spiInitStructure;
     GPIO_InitTypeDef gpioInitStructure;
 
-
+    HAL_SPI_MspInit(&SpiHandle);
 
     __SPI1_CLK_ENABLE();
 
@@ -71,27 +70,6 @@ void spi_init(void)
 //    HAL_GPIO_Init(LCD_NSS.port, &gpioInitStructure);
 //    //HAL_GPIO_WritePin(LCD_NSS.port, LCD_NSS.pin, 1);       // TBD - should this be before init?
 
-    //Configure NVIC if needed.
-
-    //Configure DMA
-
-//    DMA_HandleTypeDef DmaHandle;
-//    DMA_InitTypeDef dmaInitStructure;
-//
-//    HAL_DMA_DeInit(DMA2_Stream3);
-//
-//    dmaInitStructure.Channel = DMA_CHANNEL_3;
-//    dmaInitStructure.Direction =
-
-    //Already enabled in the peripheral power function.....
-    //__DMA1_CLK_ENABLE;
-    //__DMA2_CLK_ENABLE; //
-    //__HAL_RCC_DMA1_CLK_ENABLE;
-    //__HAL_RCC_DMA2_CLK_ENABLE;
-
-    //DmaHandle.Init.
-
-    //HAL_SPI_MspInit(&SpiHandle);
 
     SpiHandle.Instance 				  = SPI1;
     SpiHandle.Init.Direction 		  = SPI_DIRECTION_2LINES;
@@ -100,13 +78,11 @@ void spi_init(void)
     SpiHandle.Init.CLKPolarity 		  = SPI_POLARITY_HIGH;
     SpiHandle.Init.CLKPhase			  = SPI_PHASE_2EDGE;
     SpiHandle.Init.NSS                = SPI_NSS_SOFT; //SPI_NSS_SOFT;
-    SpiHandle.Init.BaudRatePrescaler  = SPI_BAUDRATEPRESCALER_2; //SPI_BAUDRATEPRESCALER_2;
+    SpiHandle.Init.BaudRatePrescaler  = SPI_BAUDRATEPRESCALER_2;
     SpiHandle.Init.FirstBit           = SPI_FIRSTBIT_MSB;
     SpiHandle.Init.CRCCalculation 	  = SPI_CRCCALCULATION_DISABLED;
     SpiHandle.Init.TIMode 			  = SPI_TIMODE_DISABLED;
     SpiHandle.Init.CRCPolynomial      = 7;
-
-
 
     if(HAL_SPI_Init(&SpiHandle) != HAL_OK)
     {
@@ -148,10 +124,9 @@ void spi_readWrite(SPI_HandleTypeDef SpiH, uint16_t* rxBuf, uint16_t* txBuf, uin
 	txTmp[1] = txBuf[0] & 0xFF;
 
 	//HAL_SPI_TransmitReceive(&SpiHandle, txBuf, rxBuf, cnt, 1000);
-	//HAL_SPI_Transmit(&SpiHandle, txTmp, 2 /*cnt * 2*/, 1);
+	HAL_SPI_Transmit(&SpiHandle, txTmp, 2 /*cnt * 2*/, 1);
 	//while(HAL_SPI_GetState(&SpiH) != HAL_SPI_STATE_READY);
-	HAL_SPI_Transmit_DMA(&SpiH, txTmp, cnt);
-	while(SpiHandle.State != HAL_SPI_STATE_READY);
+	//HAL_SPI_Transmit_DMA(&SpiH, txBuf, cnt);
 	//while(HAL_SPI_GetState(&SpiH) != HAL_SPI_STATE_READY);
 
 //	//High, second edge

@@ -65,7 +65,6 @@
 //   int  _height = ILI9340_TFTHEIGHT; //320
 	uint16_t rxBuf[10];
 	uint16_t txBuf[2];
-  //uint8_t txBuf2[320 * 240 * 2];
 
 // Constructor when using hardware SPI.  Faster, but must use SPI pins
 // specific to each board type (e.g. 11,13 for Uno, 51,52 for Mega, etc.)
@@ -128,8 +127,8 @@ void Adafruit_ILI9340_writecommand(uint16_t c) {
 	txBuf[0] = c; // & 0xFF;
 	//spi_readWrite(SpiHandle, rxBuf, txBuf, 1);
 	HAL_SPI_Transmit(&SpiHandle, txBuf, 1 /*cnt * 2*/, 1);
-	//HAL_SPI_Transmit_DMA(&SpiHandle, txBuf, 1);
-	//while(SpiHandle.State ==  HAL_SPI_STATE_BUSY_TX);
+
+	//HAL_SPI_TransmitReceive(&SpiHandle, (uint8_t*)txBuf, (uint8_t *)rxBuf, 1, 1000);
 
   //SET_BIT(csport, cspinmask);
 	HAL_GPIO_WritePin(LCD_NSS.port, LCD_NSS.pin, 1);
@@ -152,8 +151,7 @@ void Adafruit_ILI9340_writedata(uint16_t c) {
 	txBuf[0] = c; // & 0xFF;
 	//spi_readWrite(SpiHandle, rxBuf, txBuf, 1);
 	HAL_SPI_Transmit(&SpiHandle, txBuf, 1 /*cnt * 2*/, 1);
-	//HAL_SPI_Transmit_DMA(&SpiHandle, txBuf, 1);
-	//while(SpiHandle.State ==  HAL_SPI_STATE_BUSY_TX);
+	//HAL_SPI_TransmitReceive(&SpiHandle, (uint8_t*)txBuf, (uint8_t *)rxBuf, 1, 1000);
 
   //digitalWrite(_cs, HIGH);
   //SET_BIT(csport, cspinmask);
@@ -416,12 +414,8 @@ void Adafruit_ILI9340_pushColor(uint16_t color) {
 	//uint16_t rxBuf[10];
 	//uint16_t txBuf[2] = {color >> 8, color};
 	txBuf[0] = color;
-	uint8_t txBuf3[2];
-	txBuf3[1] = color & 0xFF;
-	txBuf3[0] = color >> 8;
-	//spi_readWrite(SpiHandle, rxBuf, txBuf, 1);
-	HAL_SPI_Transmit(&SpiHandle, txBuf3, 2 /*cnt * 2*/, 1);
-	//while(SpiHandle.State != HAL_SPI_STATE_READY);
+	spi_readWrite(SpiHandle, rxBuf, txBuf, 1);
+
 
 
   //SET_BIT(csport, cspinmask);
@@ -448,8 +442,7 @@ void Adafruit_ILI9340_drawPixel(int16_t x, int16_t y, uint16_t color) {
 	//uint8_t rxBuf[10];
 	//uint8_t txBuf[2] = {color >> 8, color};
   txBuf[0] = color;
-	//spi_readWrite(SpiHandle, rxBuf, txBuf, 1);
-	HAL_SPI_Transmit(&SpiHandle, txBuf, 1 /*cnt * 2*/, 1);
+	spi_readWrite(SpiHandle, rxBuf, txBuf, 1);
 
   //SET_BIT(csport, cspinmask);
 	HAL_GPIO_WritePin(LCD_NSS.port, LCD_NSS.pin, 1);
@@ -472,8 +465,7 @@ void Adafruit_ILI9340_drawNextPixel(uint16_t color) {
 		//uint8_t rxBuf[10];
 		//uint8_t txBuf[2] = {color >> 8, color};
 	  txBuf[0] = color;
-		//spi_readWrite(SpiHandle, rxBuf, txBuf, 1);
-		HAL_SPI_Transmit(&SpiHandle, txBuf, 1 /*cnt * 2*/, 1);
+		spi_readWrite(SpiHandle, rxBuf, txBuf, 1);
 
 	  //SET_BIT(csport, cspinmask);
 		HAL_GPIO_WritePin(LCD_NSS.port, LCD_NSS.pin, 1);
@@ -508,8 +500,7 @@ void Adafruit_ILI9340_drawFastVLine(int16_t x, int16_t y, int16_t h,
 	//txBuf[0] = hi;
 	//txBuf[1] = lo;
 txBuf[0] = color;
-	//spi_readWrite(SpiHandle, rxBuf, txBuf, 1);
-	HAL_SPI_Transmit(&SpiHandle, txBuf, 1 /*cnt * 2*/, 1);
+	spi_readWrite(SpiHandle, rxBuf, txBuf, 1);
   }
   //SET_BIT(csport, cspinmask);
   HAL_GPIO_WritePin(LCD_NSS.port, LCD_NSS.pin, 1);
@@ -539,8 +530,7 @@ void Adafruit_ILI9340_drawFastHLine(int16_t x, int16_t y, int16_t w,
 	//txBuf[0] = hi;
 	//txBuf[1] = lo;
 	  txBuf[0] = color;
-	//spi_readWrite(SpiHandle, rxBuf, txBuf, 1);
-	HAL_SPI_Transmit(&SpiHandle, txBuf, 1 /*cnt * 2*/, 1);
+	spi_readWrite(SpiHandle, rxBuf, txBuf, 1);
   }
   //SET_BIT(csport, cspinmask);
   HAL_GPIO_WritePin(LCD_NSS.port, LCD_NSS.pin, 1);
@@ -571,112 +561,18 @@ void Adafruit_ILI9340_fillRect(int16_t x, int16_t y, int16_t w, int16_t h,
   HAL_GPIO_WritePin(LCD_NSS.port, LCD_NSS.pin, 0);
   //digitalWrite(_cs, LOW);
 
-  //for(y=h; y>0; y--) {
-  //  for(x=w; x>0; x--) {
+  for(y=h; y>0; y--) {
+    for(x=w; x>0; x--) {
       //spiwrite(hi);
       //spiwrite(lo);
   	//txBuf[0] = hi;
   	//txBuf[1] = lo;
-  uint32_t totalPixels = h * w;
-  uint8_t	txBuf2[totalPixels * 2];
-  //uint16_t txBuf2[totalPixels];
+    	txBuf[0] = color;
 
-    //while(SpiHandle.State != HAL_SPI_STATE_READY);
-    	for(uint32_t i = (totalPixels * 2); i > 0; i-=2)
-    	  {
-    	    //txBuf2[i] = color;
-    	    txBuf2[i] = (color & 0xFF00) >> 8;
-    	    txBuf2[i + 1] = color & 0xFF;
-    	  }
-
-    	static int errors = 0;
-      for(uint32_t i = (totalPixels * 2); i > 0; i-=2)
-        {
-          //txBuf2[i] = color;
-          if (txBuf2[i] != ((color & 0xFF00) >> 8) || txBuf2[i + 1] != (color & 0xFF))
-            errors++;
-
-        }
-
-
-
-//      for(uint32_t i = totalPixels; i > 0; i--)
-//        {
-//          //txBuf2[i] = color;
-//          txBuf2[i] = color; // & 0xFF00) >> 8;
-//          //txBuf2[i + 1] = color & 0xFF;
-//        }
-
-//    	for(uint32_t i = (totalPixels * 2); i > 0; i--)
-//    	  {
-//    	    if txBuf2[i] != color
-//    	  }
-
-    	//uint32_t txBuf2Address = &txBuf2;
-    	//uint32_t txBuf2AddressEnd = txBuf2Address + (320 * 240* 2);
-
-    	//for()= color;
-
-    	//txBuf2[153000] = 0xFF;
-    	//txBuf2[150000] = 0xFF;
-
-
-  	//spi_readWrite(SpiHandle, rxBuf, txBuf, 1);
-    	//hdma_tx.Init.MemInc = DMA_MINC_DISABLE;
-    	//HAL_DMA_Init(&hdma_tx);
-
-    	//uint32_t pixelsWritten = 0;
-    	//utin16_t pixelsInBurst = 0;
-    	//uint16_t fullPasses = (totalPixels * 2) / 0xFFFF;
-    	//uint16_t partialPass = (totalPixels * 2) % 0xFFFF;
-      uint16_t fullPasses = sizeof(txBuf2) / 0xFFFF;
-      uint16_t partialPass = sizeof(txBuf2) % 0xFFFF;
-    	uint32_t offset = 0;
-    	while(fullPasses > 0)
-      {
-          for(uint32_t i = (totalPixels * 2); i > 0; i-=2)
-            {
-              //txBuf2[i] = color;
-              if (txBuf2[i] != ((color & 0xFF00) >> 8) || txBuf2[i + 1] != (color & 0xFF))
-                errors++;
-
-            }
-    	  while(HAL_SPI_GetState(&SpiHandle) != HAL_SPI_STATE_READY);
-        HAL_SPI_Transmit_DMA(&SpiHandle, txBuf2 + offset, 0xFFFF);  //txBuf2 or &txBuf2 doesn't seem to make a difference
-        fullPasses--;
-        offset+=0xFFFF;
-        //__IO HAL_DMA_StateTypeDef dmaState = HAL_DMA_GetState(&hdma_tx);
-        //if(dmaState = 0x01) dmaState++;
-        //while(HAL_DMA_GetState(&SpiHandle) !=
-
-
-        //while(SpiHandle.State != HAL_SPI_STATE_READY);
-        //hal_delay_ms(1000);
-//        int temp = millis;
-//        while (millis < temp + 1000);
-      }
-    	if(partialPass > 0)
-    	  {
-    	    while(SpiHandle.State != HAL_SPI_STATE_READY);
-          for(uint32_t i = (totalPixels * 2); i > 0; i-=2)
-            {
-              //txBuf2[i] = color;
-              if (txBuf2[i] != ((color & 0xFF00) >> 8) || txBuf2[i + 1] != (color & 0xFF))
-                errors++;
-
-            }
-          HAL_SPI_Transmit_DMA(&SpiHandle, txBuf2 + offset, partialPass);  //txBuf2 or &txBuf2 doesn't seem to make a difference
-          while(SpiHandle.State != HAL_SPI_STATE_READY);
-//          int temp = millis;
-//          while (millis < temp + 1000);
-    	  }
-    	//HAL_Delay(1000);
-
-
-      //hdma_tx.Init.MemInc = DMA_MINC_ENABLE;
-      //HAL_DMA_Init(&hdma_tx);
-    //}
-  //}
+  	spi_readWrite(SpiHandle, rxBuf, txBuf, 1);
+  	//HAL_SPI_TransmitReceive(&SpiHandle, (uint8_t*)txBuf, (uint8_t*)rxBuf, 2, 1000);
+    }
+  }
   //digitalWrite(_cs, HIGH);
   //SET_BIT(csport, cspinmask);
   HAL_GPIO_WritePin(LCD_NSS.port, LCD_NSS.pin, 1);

@@ -22,11 +22,10 @@
 
 
 //#ifdef PSDR257
+  #include "stm32f746xx.h"
+#include "stm32f7xx.h"
 #include "stm32f7xx_hal.h"
-  //#include "stm32f746xx.h"
-//#include "stm32f7xx.h"
-#include "stm32f7xx_hal.h"
-//#include <stm32f7xx_hal_spi.h>
+#include <stm32f7xx_hal_spi.h>
 //#endif
 
 //SPI_HandleTypeDef SpiHandle;

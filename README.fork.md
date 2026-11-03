@@ -27,11 +27,15 @@ As of 2026-11-02:
 - **Firmware builds.** Both lines build on Linux with `arm-none-eabi-gcc` 13.2.1
   from the same mainline. F4 (`Source/`): 0 errors, anchors `_estack=0x20030000`
   and Reset `0x080001B5` match the 2016-05 upstream hex (`anchor_check.py` PASS).
-  F7 (`Source_F7/`, merged in M2 as `4dd2fca`): 0 errors, initial SP
-  `0x20050000` matches the 2018-06-21 upstream hex `457c270:Source/Debug/PSDR.hex`
-  and the empty-slot pattern is identical; reset-vector *values* move with the
-  GCC/linker layout, as on F4. Both outputs are byte-identical to the binaries
-  built before the merge (§E-7).
+  F7 (`Source_F7/`): 0 errors, 26 warnings, `text 114068 / data 18488 / bss 18260`;
+  initial SP `0x20050000` and the empty-slot pattern `[7, 8, 9, 10, 13, 95]` match
+  both committed references (`anchor_check_f7.py` PASS). **Baseline changed on
+  2026-11-03**: `Source_F7/` used to mirror `PSDR_Rebuild` (merged in M2 as
+  `4dd2fca`); it now mirrors `PSDR_F7` (`ab2c8fd`), the branch the maintainer
+  named as the firmware base in #19. Reset-vector *values* move with the
+  GCC/linker layout, as on F4, so they are reported, not gated. The pre-rebase
+  F7 binary is no longer produced from this mainline -- the reference hexes and
+  the measured numbers for both baselines are kept in `dist/reference/`.
 - **2.6.1 design data.** From the PADS Layout ASCII `Hardware/PSDR.asc`:
   a 391-part / 278-net / 1132-pin netlist, a 10-page KiCad schematic, and a
   4-layer KiCad board (391 footprints, 1194 pads, 5034 track segments,
@@ -150,8 +154,9 @@ and why the DRC report is not hashed.
 # SMT placement table + BOM reconciliation (needs a CSV export of the BOM)
 python tools/pads_asc_placement.py Hardware/PSDR.asc \
     --out dist/fab/PSDR_2.6.1_placement.csv --bom-csv PSDR2.6.1_BOM.csv
-# F7 vector anchors against the author's 2018-06-21 hex
-python tools/anchor_check_f7.py Source_F7/build_linux_f7/PSDR.hex Source_F7/Debug/PSDR.hex
+# F7 vector anchors (references are tracked under dist/reference/)
+python tools/anchor_check_f7.py Source_F7/build_linux_f7/PSDR.hex \
+    dist/reference/PSDR_hex_2017-01-15_aaa24f8_PSDR_F7.hex
 ```
 
 KiCad 10.0 is required for the board format and the CLI flags. Firmware

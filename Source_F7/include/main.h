@@ -6,8 +6,6 @@
 #define PSDR257 4
 //#define ARM_MATH_CM7
 
-#include "stm32f7xx_hal.h"
-//#include "stm32f7xx_hal_def.h"
 
 //#define PSDR_BOARD PSDR2
 
@@ -44,22 +42,22 @@
 //#include "stm32f756xx.h"
 #define  ART_ACCLERATOR_ENABLE 1
 
-//#include "stm32f7xx.h"
-//#include "stm32f7xx_hal_conf.h"
-//#include "stm32f7xx_hal.h"
-//#include "stm32f7xx_hal_gpio.h"
-//#include "stm32f7xx_hal_def.h"
-//#include "stm32f7xx_it.h"
-//#include "stm32f7xx_hal_tim.h"
-//#include "stm32f7xx_hal_cortex.h"
-//#include "stm32f7xx_hal_dma.h"
-//#include "stm32f7xx_hal_dac.h"
-//#include "stm32f7xx_hal_uart.h"
-//#include "stm32f7xx_hal_usart.h"
-//#include "stm32f7xx_hal_i2c.h"
-//#include "stm32f7xx_hal_i2c_ex.h"
-//#include "stm32f7xx_hal_tim_ex.h"
-//#include "stm32f7xx_hal_pwr.h"
+#include "stm32f7xx.h"
+#include "stm32f7xx_hal_conf.h"
+#include "stm32f7xx_hal.h"
+#include "stm32f7xx_hal_gpio.h"
+#include "stm32f7xx_hal_def.h"
+#include "stm32f7xx_it.h"
+#include "stm32f7xx_hal_tim.h"
+#include "stm32f7xx_hal_cortex.h"
+#include "stm32f7xx_hal_dma.h"
+#include "stm32f7xx_hal_dac.h"
+#include "stm32f7xx_hal_uart.h"
+#include "stm32f7xx_hal_usart.h"
+#include "stm32f7xx_hal_i2c.h"
+#include "stm32f7xx_hal_i2c_ex.h"
+#include "stm32f7xx_hal_tim_ex.h"
+#include "stm32f7xx_hal_pwr.h"
 #endif
 
 
@@ -82,7 +80,6 @@
 #include "Adafruit_ILI9340.h"
 #include "spi.h"
 
-
 //#include "stm32f4xx_hal_rcc.h"
 //#include "stm32f4xx_hal.h"
 //#include "stm32f4xx_hal_rtc.h"
@@ -103,24 +100,17 @@ TIM_HandleTypeDef    TimHandle4;
 #define MASKWHITE  0b1111111111111111
 #define MASKBLACK  0b0000000000000000
 
-
-
-/* DMA */
-
-static DMA_HandleTypeDef hdma_tx;
-static DMA_HandleTypeDef hdma_rx;
-
 /* Definition for SPIx's DMA */
 #define SPIx_TX_DMA_CHANNEL              DMA_CHANNEL_3
-#define SPIx_TX_DMA_STREAM               DMA2_Stream3
+#define SPIx_TX_DMA_STREAM               DMA2_Stream5
 #define SPIx_RX_DMA_CHANNEL              DMA_CHANNEL_3
 #define SPIx_RX_DMA_STREAM               DMA2_Stream2
 
 /* Definition for SPIx's NVIC */
 #define SPIx_DMA_TX_IRQn                 DMA2_Stream3_IRQn
-#define SPIx_DMA_RX_IRQn                 DMA2_Stream2_IRQn
+#define SPIx_DMA_RX_IRQn                 DMA2_Stream0_IRQn
 #define SPIx_DMA_TX_IRQHandler           DMA2_Stream3_IRQHandler
-#define SPIx_DMA_RX_IRQHandler           DMA2_Stream2_IRQHandler
+#define SPIx_DMA_RX_IRQHandler           DMA2_Stream0_IRQHandler
 
 SPI_HandleTypeDef SpiHandle;
 UART_HandleTypeDef UartHandle;

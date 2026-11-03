@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Reconcile a freshly built F7 image against the author's 2018 reference hex.
+"""Reconcile a freshly built F7 image against a committed upstream reference hex.
 
 The F4 gate in ``docs/psdr-handoff/anchor_check.py`` requires the reset vector to
 equal its upstream value; on F7 that value moves with the linker layout, so this
@@ -8,7 +8,11 @@ pattern of empty vector slots -- and reports the reset values as measurements.
 
 Usage:
     python3 tools/anchor_check_f7.py Source_F7/build_linux_f7/PSDR.hex \
-        Source_F7/Debug/PSDR.hex
+        dist/reference/PSDR_hex_2017-01-15_aaa24f8_PSDR_F7.hex
+
+Since the 2026-11-03 re-base, ``Source_F7/`` mirrors upstream branch ``PSDR_F7``
+(``ab2c8fd``); references for both baselines are tracked under ``dist/reference/``
+because ``Source_F7/.gitignore`` hides ``/Debug``.
 """
 
 from __future__ import annotations

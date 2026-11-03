@@ -50,8 +50,8 @@ void dac2SetValue(uint16_t value);
 //void sendToDds(uint16_t data1, uint16_t data2);
 #define FFT_SIZE 256 //supported sizes are 16, 64, 256, 1024
 #define FFT_BUFFER_SIZE  512 //double the FFT_SIZE above.
-
 __IO long long millis = 0;
+
 
 float afGain = 1.0;
 float afGainLast = 2.0;
@@ -306,67 +306,62 @@ void teardownPeripheralPower()
 
 void configDMA(SPI_HandleTypeDef *hspi)
 {
-
-
-
-
-
-//  /* Configure the DMA handler for Transmission process */
-//  hdma_rx.Instance                 = SPIx_RX_DMA_STREAM;
+//	  static DMA_HandleTypeDef hdma_tx;
+//	  static DMA_HandleTypeDef hdma_rx;
 //
-//  hdma_rx.Init.Channel             = SPIx_RX_DMA_CHANNEL;
-//  hdma_rx.Init.Direction           = DMA_PERIPH_TO_MEMORY;
-//  hdma_rx.Init.PeriphInc           = DMA_PINC_DISABLE;
-//  hdma_rx.Init.MemInc              = DMA_MINC_ENABLE;
-//  hdma_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
-//  hdma_rx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
-//  hdma_rx.Init.Mode                = DMA_NORMAL;
-//  hdma_rx.Init.Priority            = DMA_PRIORITY_HIGH;
-//  hdma_rx.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
-//  hdma_rx.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
-//  hdma_rx.Init.MemBurst            = DMA_MBURST_INC4;
-//  hdma_rx.Init.PeriphBurst         = DMA_PBURST_INC4;
 //
-//  HAL_DMA_Init(&hdma_rx);
+//	hdma_tx.Instance                 = SPIx_TX_DMA_STREAM;
 //
-//  /* Associate the initialized DMA handle to the the SPI handle */
-//  __HAL_LINKDMA(hspi, hdmarx, hdma_rx);
-
-  hdma_tx.Instance                 = SPIx_TX_DMA_STREAM;
-
-	  hdma_tx.Init.Channel             = SPIx_TX_DMA_CHANNEL;
-	  hdma_tx.Init.Direction           = DMA_MEMORY_TO_PERIPH;
-	  hdma_tx.Init.PeriphInc           = DMA_PINC_DISABLE;
-	  hdma_tx.Init.MemInc              = DMA_MINC_ENABLE;
-	  hdma_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
-	  hdma_tx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE; //DMA_MDATAALIGN_BYTE;
-	  hdma_tx.Init.Mode                = DMA_NORMAL;
-	  hdma_tx.Init.Priority            = DMA_PRIORITY_HIGH; //DMA_PRIORITY_VERY_HIGH;
-	  hdma_tx.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
-	  hdma_tx.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
-	  hdma_tx.Init.MemBurst            = DMA_MBURST_INC4;
-	  hdma_tx.Init.PeriphBurst         = DMA_PBURST_INC4;
-
-	  HAL_DMA_Init(&hdma_tx);
-
-	  /* Associate the initialized DMA handle to the the SPI handle */
-	  __HAL_LINKDMA(hspi, hdmatx, hdma_tx);
-
-
-
-	  /*##-4- Configure the NVIC for DMA #########################################*/
-	  /* NVIC configuration for DMA transfer complete interrupt (SPI3_TX) */
-	  HAL_NVIC_SetPriority(15/*SPIx_DMA_TX_IRQn*/, 4, 4);
-	  HAL_NVIC_EnableIRQ(SPIx_DMA_TX_IRQn);
-
+//	  hdma_tx.Init.Channel             = SPIx_TX_DMA_CHANNEL;
+//	  hdma_tx.Init.Direction           = DMA_MEMORY_TO_PERIPH;
+//	  hdma_tx.Init.PeriphInc           = DMA_PINC_DISABLE;
+//	  hdma_tx.Init.MemInc              = DMA_MINC_ENABLE;
+//	  hdma_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+//	  hdma_tx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
+//	  hdma_tx.Init.Mode                = DMA_NORMAL;
+//	  hdma_tx.Init.Priority            = DMA_PRIORITY_LOW;
+//	  hdma_tx.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
+//	  hdma_tx.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
+//	  hdma_tx.Init.MemBurst            = DMA_MBURST_INC4;
+//	  hdma_tx.Init.PeriphBurst         = DMA_PBURST_INC4;
+//
+//	  HAL_DMA_Init(&hdma_tx);
+//
+//	  /* Associate the initialized DMA handle to the the SPI handle */
+//	  __HAL_LINKDMA(hspi, hdmatx, hdma_tx);
+//
+//	  /* Configure the DMA handler for Transmission process */
+//	  hdma_rx.Instance                 = SPIx_RX_DMA_STREAM;
+//
+//	  hdma_rx.Init.Channel             = SPIx_RX_DMA_CHANNEL;
+//	  hdma_rx.Init.Direction           = DMA_PERIPH_TO_MEMORY;
+//	  hdma_rx.Init.PeriphInc           = DMA_PINC_DISABLE;
+//	  hdma_rx.Init.MemInc              = DMA_MINC_ENABLE;
+//	  hdma_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+//	  hdma_rx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
+//	  hdma_rx.Init.Mode                = DMA_NORMAL;
+//	  hdma_rx.Init.Priority            = DMA_PRIORITY_HIGH;
+//	  hdma_rx.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
+//	  hdma_rx.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
+//	  hdma_rx.Init.MemBurst            = DMA_MBURST_INC4;
+//	  hdma_rx.Init.PeriphBurst         = DMA_PBURST_INC4;
+//
+//	  HAL_DMA_Init(&hdma_rx);
+//
+//	  /* Associate the initialized DMA handle to the the SPI handle */
+//	  __HAL_LINKDMA(hspi, hdmarx, hdma_rx);
+//
+//	  /*##-4- Configure the NVIC for DMA #########################################*/
+//	  /* NVIC configuration for DMA transfer complete interrupt (SPI3_TX) */
+//	  HAL_NVIC_SetPriority(15/*SPIx_DMA_TX_IRQn*/, 0, 1);
+//	  HAL_NVIC_EnableIRQ(SPIx_DMA_TX_IRQn);
+//
 //	  /* NVIC configuration for DMA transfer complete interrupt (SPI3_RX) */
 //	  HAL_NVIC_SetPriority(SPIx_DMA_RX_IRQn, 0, 0);
 //	  HAL_NVIC_EnableIRQ(SPIx_DMA_RX_IRQn);
-
-
-	  //HAL_DMA_Start();
-
-	  //DMA
+//
+//
+//	  //HAL_DMA_Start();
 }
 
 
@@ -941,9 +936,9 @@ void signalPath(int signalPath)
   }
 }
 
-#define debug
 
-int main(int argc, char* argv[])
+int
+main(int argc, char* argv[])
 {
 
   /* Enable the CPU Cache */
@@ -992,12 +987,68 @@ int main(int argc, char* argv[])
 	hal_setupPins();
 	spi_init();
 
-	configDMA(&SpiHandle );
+//	configDMA(&SpiHandle );
 
-	initFrequencySynth();
 
+//I2C_HandleTypeDef hi2c;
+//HAL_I2C_MspInit(&hi2c);
+
+//__HAL_I2C_DISABLE(I2C2);
+//clearStuckBusyFlag();
+
+	RCC_PeriphCLKInitTypeDef i2cClk;
+	i2cClk.PeriphClockSelection = RCC_PERIPHCLK_I2C2;
+	i2cClk.I2c2ClockSelection = RCC_I2C2CLKSOURCE_PCLK1;
+
+HAL_RCCEx_PeriphCLKConfig(&i2cClk);
+
+handleI2C.Instance = I2C2;
+HAL_I2C_DeInit(&handleI2C);
+
+handleI2C.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+//handleI2C.Init.ClockSpeed = 400000;
+//handleI2C.Init. = 400000;
+handleI2C.Init.DualAddressMode = I2C_DUALADDRESS_DISABLED;
+//handleI2C.Init.DutyCycle = I2C_DUTYCYCLE_16_9;
+//handleI2C.Init.Timing = I2C_ .DutyCycle = I2C_DUTYCYCLE_16_9;
+handleI2C.Init.GeneralCallMode = I2C_GENERALCALL_DISABLED;
+handleI2C.Init.NoStretchMode = I2C_NOSTRETCH_DISABLED;
+handleI2C.Init.OwnAddress1 = 0x30F;
+handleI2C.Init.OwnAddress2 = 0xFE;
+handleI2C.Init.Timing = ((uint32_t)0x40912732); //Not sure how this is calculated, taken from EVAL example
+
+
+if(HAL_I2C_Init(&handleI2C) != HAL_OK)
+  {
+    trace_puts("I2C didn't Init correctly");
+
+  }
+//handleI2C.Instance->SR2 = 0; //What the heck is wrong with this thing?!
+//clearStuckBusyFlag();
+
+HAL_StatusTypeDef result = HAL_ERROR;
+
+while(result!= HAL_OK)
+  result = HAL_I2C_IsDeviceReady(&handleI2C, (0x70 << 1), 100, 100); //We need to shift the address to the left for it to work (because of the R/W bit)
+
+//HAL_I2C_Master_Transmit(&hi2c, 230, 0x10, 1, 1000);  //write_Si5338(230, 0x10); //OEB_ALL = 1
+
+//*handleI2C = hi2c;
+
+//HAL_I2C_Master_Transmit(&handleI2C, 230, 0x4F, 1, 1000);  //write_Si5338(230, 0x10); //OEB_ALL = 1
+//HAL_I2C_Master_Transmit(handleI2C, 230, 0x4F, 1, 1000);  //write_Si5338(230, 0x10); //OEB_ALL = 1
+//handleI2C = &hi2c;
+//HAL_I2C_Master_Transmit(&handleI2C, 230, 0x4F, 1, 1000);  //write_Si5338(230, 0x10); //OEB_ALL = 1
+//HAL_I2C_Master_Transmit(handleI2C, 230, 0x4F, 1, 1000);  //write_Si5338(230, 0x10); //OEB_ALL = 1
+
+i2cSetup();
 setFreq(vfoAFrequency);
+//i2cLoop();
 
+
+//trace_puts(( == HAL_OK ? "SI5338 Ready" : "SI5338 Not ready"));
+
+//HAL_I2C_MspInit(&hi2c);
 
 
 
@@ -1014,22 +1065,7 @@ setFreq(vfoAFrequency);
 	Adafruit_ILI9340_begin();
 	Adafruit_ILI9340_setRotation(1);
 	//Adafruit_GFX_fillScreen(ILI9340_BLACK);
-
-	drawNumber('3', 0,0, 0xFFFF);
 	Adafruit_GFX_fillScreen(ILI9340_BLACK);
-
-	while(1)
-	  {
-
-//	    drawNumber('3', 0,0, 0xFFFF);
-	    //Adafruit_GFX_fillScreen(ILI9340_GREEN);
-	   //drawNumber('3', 5,5, 0xFFFF);
-	    Adafruit_GFX_fillScreen(ILI9340_BLACK);
-	    //Adafruit_GFX_fillScreen(ILI9340_RED);
-	    Adafruit_GFX_fillScreen(ILI9340_BLUE);
-//      Adafruit_GFX_fillScreen(ILI9340_RED);
-//      Adafruit_GFX_fillScreen(ILI9340_GREEN);
-	  }
 
 	Adafruit_GFX_setTextSize(3);
 	Adafruit_GFX_setTextWrap(1);
@@ -1989,20 +2025,6 @@ HAL_NVIC_EnableIRQ(TIM4_IRQn);
 //		 tim3 = timTryHandle.Instance->CNT;
 //	}
 
-}
-
-//void DMA2_Stream2_IRQHandler(void)
-//{
-//  //doNothing();
-//  HAL_DMA_IRQHandler(&hdma_rx);
-//  //HAL_GPIO_WritePin(LCD_NSS.port, LCD_NSS.pin, 1);
-//}
-
-void DMA2_Stream3_IRQHandler(void)
-{
-  //doNothing();
-  HAL_DMA_IRQHandler(&hdma_tx);
-  //HAL_GPIO_WritePin(LCD_NSS.port, LCD_NSS.pin, 1);
 }
 
 void TIM3_IRQHandler(void)
