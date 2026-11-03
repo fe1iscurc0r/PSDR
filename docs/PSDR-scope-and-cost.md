@@ -225,7 +225,8 @@ U211 / U298 = 74CBTLV3253（VCC=+3V3，1OE/2OE 接地，S0/S1 = FILTER_S0/FILTER
   开源 SDR 在这个价位打不赢，而且**固件只有 AM/USB/LSB/CW，没有 FM**（固件冻结，我们不写）。
 - UV 发射要真的 PA（几瓦 @144/430 MHz 是一条独立链路），现板只有一只 SXB-2089Z 级增益块；
   天线侧开关、滤波、谐波抑制都得重做，那就不是"改板"而是"换板"。
-- 讽刺的是：**接收端其实已经摸到 VHF**。`Source_F7/src/si5338.c:638-641` 把调谐频率 ×2 送进
+- 讽刺的是：**接收端其实已经摸到 VHF**。现基线 `Source_F7/src/i2c.c:762-763`（旧镜像里是
+  `si5338.c:638-641`，那只文件在 `PSDR_F7` 不存在）把调谐频率 ×2 送进
   Si5338（`//because the flipflops will devide it back down by 2`），并硬性限定在 5–350 MHz：
 
   ```c

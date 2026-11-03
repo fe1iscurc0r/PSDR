@@ -22,7 +22,7 @@ and upstream has not reviewed or endorsed its contents.
 
 ## What this fork adds
 
-As of 2026-11-02:
+As of 2026-11-03:
 
 - **Firmware builds.** Both lines build on Linux with `arm-none-eabi-gcc` 13.2.1
   from the same mainline. F4 (`Source/`): 0 errors, anchors `_estack=0x20030000`
@@ -64,20 +64,29 @@ As of 2026-11-02:
   stale label) and the switches get `Mfg Part # = MASWSS0129TR` only, because that
   row has no hyperlink -- no replacement part is proposed anywhere and
   "obsolete" is not verifiable from repository data (`OctopartBOM.csv` has no
-  lifecycle column). All of it is upstream **PR #18** (3 commits); PR #17
-  (KiCad schematic) is still open too.
-- **Firmware status (read-only survey, fork-local).** No source file was touched.
-  `docs/PSDR-firmware-survey.md` annotates every project module (~12k lines of
-  project code in `Source/`, ~11k in `Source_F7/`; the other 330k lines are ST HAL
-  and CMSIS-DSP) and lists what stands in the way. Two blocking defects are worth
-  stating here because they are invisible until the board boots:
-  `Source_F7/src/main.c:1021` has an unconditional debug `while(1)` that only
-  fills the screen, so the real main loop at line 1065 is unreachable in the
-  committed source; and `Source_F7/src/frequency_control.c:54` waits on the Si5338
-  over I2C in a loop with no timeout, so a missing synthesiser hangs the boot
-  before the display is initialised. Neither is fixed here on purpose -- this
-  fork does not modify firmware source. These findings are **not** proposed
-  upstream; they are recorded for whoever next has the board in hand.
+  lifecycle column). All of it is upstream **PR #18** (4 commits / 4 files -- the
+  last one adds a plain-text cell-by-cell change list so the binary `.xls` diff
+  can be reviewed without opening Excel); PR #17 (KiCad schematic, 3 commits /
+  23 files) is still open too. Neither has been reviewed upstream yet.
+- **Firmware status (read-only survey, fork-local).** No firmware source was
+  modified on the F7 line; the survey lives entirely in `docs/`.
+  `docs/PSDR-firmware-survey.md` annotates every project module (12,035 lines of
+  project code in `Source/`, 10,437 in `Source_F7/`; the other ~330k lines in each
+  tree are ST HAL and CMSIS-DSP -- `python tools/fw_stats.py Source Source_F7`)
+  and lists what stands in the way. **One** blocking defect applies to the tree we
+  carry, and it is invisible until the board boots:
+  `Source_F7/src/main.c:1031-1032` waits on the Si5338 over I2C in
+  `while(result != HAL_OK)` with no bail-out, so a synthesiser that does not answer
+  stops the boot before the display is initialised. The second defect we used to
+  list -- an unconditional debug `while(1)` at old `main.c:1021` that only paints
+  the screen -- **exists only in the `PSDR_Rebuild` lineage**; in `PSDR_F7`, the
+  baseline this mainline now mirrors, that block is commented out and the only live
+  `while(1)` is the real main loop at `:1101`. Neither is fixed here on purpose --
+  this fork does not modify firmware source (`git diff --stat
+  upstream/PSDR_F7:Source next:Source_F7` shows zero `.c/.h` changes; the F4 line
+  does carry build-necessary edits, see `docs/WO-psdr-takeover.md` chapter B).
+  These findings are **not** proposed upstream; they are recorded for whoever next
+  has the board in hand.
   `docs/PSDR-open-data-gaps.md` lists the datasheets still to obtain (HMC1023LP5E
   on U287 is the one that blocks issue #16, and the firmware contains no reference
   to the part at all) and the PCB revision/porting constraints.
@@ -92,6 +101,26 @@ As of 2026-11-02:
   Gerber/drill comparison script, `reproduce_kicad.py` and
   `anchor_check_f7.py` (the F7 vector-anchor gate); they use only the Python
   standard library.
+
+### Where the rest of the fork-only material is
+
+Nothing in this list is proposed upstream; each row says what it does and does
+not establish. The index with recommended reading order is
+[`docs/README.md`](docs/README.md), and every claim's command and output is in
+`docs/WO-psdr-takeover.md` (now chapters A-J).
+
+| 材料 | 它确立什么 | 它不确立什么 |
+|---|---|---|
+| `docs/PSDR-scope-and-cost.md` | 原始需求、BOM 成本构成、VNA 判为保留项、保留版地板价、不做射频直采的成本理由 | 任何具体降价承诺（价格来自 BOM 里的 DigiKey 号） |
+| `docs/PSDR-alternates-proposal.md` | U304 实测封装/偏置拓扑、候选件的频段与供电门槛、局部改版的范围 | 选型结论 -- 提案不是采购单 |
+| `docs/PSDR-author-measurement-log.md` | 作者自己量到什么：2.5-175 MHz、-90 dBm@7 MHz、2.5 原型装过、2019 年他选了 CubeMX+FreeRTOS | 板子现在还能不能跑到那些数（没实物） |
+| `docs/PSDR-HMC1023-netlist.md` | U287 的 SPI 四线、`LPF_POWER` 无人驱动、`VDDBG` 没有供电 | 改板方案；数据手册级别的结论 |
+| `docs/PSDR-open-data-gaps.md` | 还缺哪些手册、2.6 到 2.6.1 的实质差异只有一处 | 缺料是否等于停产 |
+| `docs/SOP-eda-import-2.6.1.md` | 导入后哪些步骤必须人工、"新板直接导入得 10/12 不是回归" | 端到端自动化（已记 `unsupported`） |
+| `docs/PSDR-bringup-checklist.md` | 42 个测点带坐标与网络，上电前该量什么 | 任何实测值（无实物，逐条 SKIP） |
+| `evidence/` | 不可重跑的现场读数（EDA 12/12、DRC 513 的构成） | 可重跑的东西 -- 那些只留命令 |
+| `dist/reference/` | F7 锚点门的两份参考 hex，带 sha256/blob/出处 | 与 GCC 13 产物字节相同（不声称） |
+| `delegation/` + `tools/make_delegation_pack.py` | 给无仓库上下文执行方的自包含输入包与答案 schema | 答案本身（尚未回收、未过机器校验） |
 
 Evidence, commands and per-item verdicts are in
 [`docs/WO-psdr-takeover.md`](docs/WO-psdr-takeover.md) (Chinese); the PCB

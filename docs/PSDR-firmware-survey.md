@@ -25,7 +25,9 @@
 - 逐行读了：`main.c` 的主循环与菜单入口、`frequency_control.c`（全文 81 行）、`dds.c`（全文 86 行）、
   `signalPath()`、`processStream()`/`drawWaterfall()`/`drawSMeter()` 的关键段、
   `si5338.c` 的 `setFreq` 区域、`adc.c`、`timer`/`queue` 小模块。
-- 结构化扫描了：两棵树全部 `.c/.h`（函数索引 149 + 119 个定义），以及中断向量与 ISR 入口。
+- 结构化扫描了：两棵树全部 `.c/.h`（函数索引 F4 149 个、F7 **116** 个定义；116 是 2026-11-03
+  在新基线 `PSDR_F7` 上复测的值，旧镜像 `PSDR_Rebuild` 上量到的是 119，差的正是
+  `si5338.c` 与 `frequency_control.c` 两只只在 Rebuild 里拆出来的文件），以及中断向量与 ISR 入口。
 - **没有**逐行审阅：厂商 `system/`（HAL/CMSIS，33 万行）与 `DSP_Lib`（CMSIS-DSP），
   这两部分只按其公开语义使用；`si5338.c` 里 695 行寄存器表按"数据手册驱动"对待，未逐条比对。
 
@@ -35,8 +37,19 @@
 
 | 树 | 总行数 | 项目自有 (`src/` + `include/`) | 厂商 (`system/`) | CMSIS-DSP (`DSP_Lib/`) |
 |---|---|---|---|---|
-| `Source/`（F4） | 341,318 | **12,035** | 194,934 | 134,349 |
-| `Source_F7/`（F7） | 346,049 | **10,686** | 153,932 | 181,431 |
+| `Source/`（F4） | 341,318 | **12,035**（10,059 + 1,976） | 194,934 | 134,349 |
+| `Source_F7/`（F7，**现基线 `PSDR_F7`**） | 345,800 | **10,437**（8,658 + 1,779） | 153,932 | 181,431 |
+
+复测命令（2026-11-03，输出即上表）：
+
+```bash
+python tools/fw_stats.py Source Source_F7
+python tools/fw_funcindex.py Source/src Source_F7/src    # 注意参数是 src 目录本身
+```
+
+> 本表 F7 行原来是 346,049 / 10,686，是在**旧镜像 `PSDR_Rebuild`** 上量的；2026-11-03 改基后
+> 差值来自 `src/` 少了 `si5338.c`(695) + `frequency_control.c`(81) 两只文件、而 `i2c.c`
+> 从 138 行换回 825 行（`main.c` 也从 2,166 涨到 2,188）。结论没变：**项目自有约 1 万行/棵**。
 
 结论第一句：**真正属于这个项目的代码只有约 1 万行/棵**，其余 96% 是 ST 的 HAL/CMSIS 与 ARM 的 DSP 库。
 所以"读源码"是可行的事，而不是 34 万行的深渊。
@@ -69,9 +82,29 @@ def78a44... def78a44...        ← 主文件逐 blob 相同（i2c.c / dds.c 同�
 ⇒ 准确表述：**审阅与注释全部写在 `docs/` 里，`.c/.h` 只有上述 6 行编译必需的 include 修正**；
 "没改一行源码"这种话以后不许写。
 
+**2026-11-03 改基后这句又要再改一次**（上文那 6 行是**旧镜像**的事实，现镜像不是这样）：
+
+```
+$ git diff --stat upstream/PSDR_F7:Source next:Source_F7
+ .gitignore     |    1 +
+ Debug/PSDR.hex | 6000 ----------------------------------------
+ Makefile.linux |  138 ++
+ 3 files changed, 139 insertions(+), 6000 deletions(-)
+```
+
+⇒ 现镜像 `Source_F7/` 相对 `upstream/PSDR_F7:Source` 的 `.c/.h` 改动是 **0 行**——
+上面那 6 行 include 修正随旧基线一起被换掉了（新基线本来就能被 GCC 13 编过，见 §I-8/§I-9）。
+主线里的 `Makefile.linux`(138 行) 与 `.gitignore`(1 行) 仍是我们的，`Debug/PSDR.hex`
+那 6,000 行是**被撤出的上游构建产物**，两份参考 hex 现在跟踪在 `dist/reference/`。
+所以对外可以写的准确表述是：**F7 线我们与上游差一个构建文件，源码零改动**；
+F4 线不是这样——`git diff --stat upstream/master:Source next:Source` 给出
+`Makefile.linux` +156、`src/hal.c` +17/−2、`src/main.c` +1、`src/misc.c` +1、
+新增 `src/uart_hal_stub.c` 46 行（链接桩），那是让 GCC 13 链得上、跑得通的必要改动，
+在施工记录 §B/§E-7 里有逐条记录。两条线的口径不要混着说。
+
 ## 1. 两棵树的文件构成
 
-| 文件 | F4 行数 | F7 行数 | 说明 |
+| 文件 | F4 行数 | F7 行数（旧镜像 `PSDR_Rebuild`） | 说明 |
 |---|---|---|---|
 | `src/main.c` | 1,946 | 2,166 | 主循环、菜单、频谱、S 表、信号路径 |
 | `src/hal.c` | 1,432 | 1,439 | 板级引脚/时钟/外设的薄封装 |
@@ -80,8 +113,8 @@ def78a44... def78a44...        ← 主文件逐 blob 相同（i2c.c / dds.c 同�
 | `src/Adafruit_GFX.c` | 547 | 576 | 图形/文字基础层 |
 | `src/images.c` + `glcdfont.c` | 1,115 | 1,130 | 位图与字模（数据，不是逻辑） |
 | `src/i2c.c` | 825 | 138 | F4 把 Si5338 驱动塞在 `i2c.c`；F7 拆出去了 |
-| `src/si5338.c` | — | 695 | 时钟合成器寄存器表与写序列（F7 新增） |
-| `src/frequency_control.c` | — | 81 | 频率合成的对外接口（F7 新增） |
+| `src/si5338.c` | — | 695 | 时钟合成器寄存器表与写序列（**只在 `PSDR_Rebuild` 血统里有**，`PSDR_F7` 无此文件——原写"F7 新增"是错的，见 §1 差异表） |
+| `src/frequency_control.c` | — | 81 | 频率合成的对外接口（**同样只在 `PSDR_Rebuild` 里有**） |
 | `src/uart.c` | 565 | — | F4 自写的串口收发；F7 改用 HAL，文件不存在 |
 | `src/TinyGPS.c` | 609 | 609 | GPS NMEA 解析（第三方 TinyGPS 的精简版） |
 | `src/spi.c` | 197 | 230 | 显示/DAC 的 SPI |
@@ -93,11 +126,36 @@ def78a44... def78a44...        ← 主文件逐 blob 相同（i2c.c / dds.c 同�
 | `src/Timer.c` | 53 | 53 | GNU ARM Eclipse 模板（作者 Liviu Ionescu），SysTick 延时 |
 | `src/_initialize_hardware.c` / `BlinkLed.c` / `uart_hal_stub.c` | 138/29/46 | 182/29/— | 启动与杂项；`uart_hal_stub.c` 是我们补的链接桩 |
 
+**上表 F7 列是旧镜像上量的。现基线 `PSDR_F7` 上只有 7 行不同**（2026-11-03 复测，
+其余各行逐一核对后与上表相同）：
+
+| 文件 | 旧镜像 | 现基线 `PSDR_F7` | 两份是不同 blob（最后一次改动） |
+|---|---|---|---|
+| `src/main.c` | 2,166 | **2,188** | F7 `5af0e159`←`aaa24f8`(2017-01-15)；Rebuild `def78a44`←`b78769a`(2019-05-24 CubeMX 重建) |
+| `src/i2c.c` | 138 | **825** | F7 `c3e49239`（与 `PSDR_F7_DMA` 同一份）；Rebuild `619f2f5e` |
+| `src/si5338.c` | 695 | **不存在** | 这只文件是 Rebuild 才拆出来的，`PSDR_F7` 树里没有 |
+| `src/frequency_control.c` | 81 | **不存在** | 同上 |
+| `src/Adafruit_ILI9340.c` | 844 | **740** | F7 `4fd55f0`←`1381f54`；Rebuild `4762ca8`←`457c270`(DMA) |
+| `src/Adafruit_GFX.c` | 576 | **558** | 不同 blob，行数差 18 |
+| `src/spi.c` | 230 | **205** | 不同 blob，行数差 25 |
+
+行数差之外的内容差异**没有逐行比对**（本轮只做统计与锚点复算），要引用具体行为请回到
+`git diff upstream/PSDR_F7:Source upstream/PSDR_Rebuild:Source -- <文件>` 现量。
+
+**引用旧路径时的换算锚点**（现基线实测，2026-11-03）：本文后面凡是写 `si5338.c:xx` /
+`frequency_control.c:xx` 的句子，都落在 `src/i2c.c`（825 行）或 `src/main.c` 里——
+`i2cSetup()` `:612`、`setFreq()` `:729`、×2 与 5–350 MHz 硬限 `:762-763`、
+I2C Timing 常量 `main.c:1018`、无界重试 `main.c:1031-1032`。
+
+⇒ 现基线 `src/` 共 **17** 个 `.c`（`PSDR_Rebuild` 是 19 个，多的正是 `si5338.c` 与
+`frequency_control.c`），项目自有总行数 10,437（见 §0.2）。本文后面凡是写
+`frequency_control.c:xx` / `si5338.c:xx` 的句子，读的时候请按顶部公告换算到 `src/i2c.c`。
+
 **纠正两处我自己写错的描述（2026-11-03 第二轮）**：
 
 1. 我在施工记录 §E-7 里把 F7 线称作"CubeMX + FreeRTOS 重写"，随后又在本文件写"实测 F7 树里
    **没有任何 FreeRTOS**（`xTaskCreate` 全树 0 处）"。**前半句的更正过头了**：
-   - 对 `Source/`（F4）与 `Source_F7/`（= `PSDR_Rebuild` 的 `Source/`）两棵**应用树**成立——
+   - 对 `Source/`（F4）与 `Source_F7/`（现镜像 `PSDR_F7`；改基前是 `PSDR_Rebuild`）两棵**应用树**成立——
      应用代码里没有 RTOS 调用，两条线都是裸机超级循环；
    - **对整库不成立**：同一血统里有作者 2019-05-24 的 CubeMX + **FreeRTOS** 重建
      （`b78769a`，在 `PSDR_Rebuild` 里、**不在 `PSDR_F7` 里**，故也在我们 `next` 里），落在
@@ -205,8 +263,14 @@ Si5338(U241，3225 晶振 Y237/Y182 作参考) → 本振
 **意图**：旋转编码器选择菜单项并调值；菜单项 11（F4）/12（F7）个：
 音量、模式、频率 6 位（MHz…Hz）、滤波上下限、（F7 新增）关机。
 
-**现状**：`Encoder()`(F7:403) 在初始化里被调用一次，之后**轮询**计数（`menuEncoderTicks/2`）；
-`updateMenu()`(F7:1173) 是一个**18 个分支的大函数**，每个分支直接访问全局变量并立即调 `setFreq`。
+**现状**：`Encoder()`(现基线 F7:398，旧镜像量到的是 403) 在初始化里被调用一次，之后**轮询**
+计数（`menuEncoderTicks/2`，见 `:419-422`）；`updateMenu()`(现基线 `:1209`，旧镜像 `:1173`)
+是一个 **12 个 `case` 的大函数**，每个分支直接访问全局变量并立即调 `setFreq`。
+
+> **更正一处本文件的旧数字（2026-11-03 复测）**：这里原来写"18 个分支"。两个基线上都数不出 18——
+> `awk '/^void updateMenu/,/^}/' main.c | grep -c "case "` 在 `PSDR_Rebuild` 与现基线 `PSDR_F7`
+> 上都给 **12**（F4 的 `Source/src/main.c` 给 11）。这条不是改基造成的漂移，是当时写错了，
+> 现在按 12 说。全文件 `case` 有 57 个，18 大概是把别的 switch 一起数了。
 
 **问题**：逻辑与 UI 混在一起；加一个菜单项要改 3 处；没有"确认/取消"、没有长按、没有范围约束集中定义。
 
@@ -271,11 +335,14 @@ Si5338(U241，3225 晶振 Y237/Y182 作参考) → 本振
 **意图**：Si5338 产生本振（LO）；`dds.c` 是更早的 AD98xx 类 DDS 位操作驱动，已被 Si5338 取代。
 
 **现状**：
-- `frequency_control.c`：`initFrequencySynth()` 配 I2C2（**Timing 常量注释写着"不确定怎么算的，抄自 EVAL 例程"**，41 行），
-  然后 **`while(result != HAL_OK) HAL_I2C_IsDeviceReady(...)`（54-55 行）——无超时的阻塞重试**：
+- `frequency_control.c`（**旧镜像文件；现基线没有这只文件，下列内容在 `src/main.c` 的
+  `i2cSetup()` 附近，逐条实测位置见括注**）：`initFrequencySynth()` 配 I2C2（**Timing 常量注释写着"不确定怎么算的，抄自 EVAL 例程"**，旧镜像 41 行——**实测是 :40，且现基线在 `main.c:1018`**），
+  然后 **`while(result != HAL_OK) HAL_I2C_IsDeviceReady(...)`（旧镜像 54-55 行 ⇒ **现基线 `main.c:1031-1032`**）——无超时的阻塞重试**：
   Si5338 不应答 ⇒ **开机永久卡死**，屏幕都不会亮。`setFrequency()` 只是转调 `setFreq()`。
-- `si5338.c`：寄存器表 + 写序列（`sendRegToSi5338`/`writeMultiSynthParameters`/`setFreq`），
+- `si5338.c`（**同样只在 `PSDR_Rebuild` 里有**）：寄存器表 + 写序列（`sendRegToSi5338`/`writeMultiSynthParameters`/`setFreq`），
   695 行里大部分是数据；`i2cSetup()` 与 `frequency_control` 里的初始化有重叠职责。
+  ⇒ 现基线这些全在 `src/i2c.c`(825 行)：`i2cSetup()` 在 `:612`、`setFreq()` 在 `:729`、
+  ×2 与 5–350 MHz 硬限在 `:762-763`；"两个入口职责重叠"这条在现基线**不再成立**（见 §3 P2-5）。
 - `dds.c`：`ddsPrefix/sendToDds/ddsSuffix` 的函数体**全部被注释**，只剩 `freqToReg()`（28 位相位累加器换算，参考 75 MHz）。
   ⇒ 死模块，但保留着容易被误认为在用。
 
@@ -316,12 +383,16 @@ F4：14 个入口，含 `TIM3_IRQHandler` 等业务中断；F7：只有 fault �
 
 ## 3. 缺陷清单
 
+> **本节三张表（P0/P1/P2）的位置列都是旧镜像 `PSDR_Rebuild` 上的行号**，正文里出现的
+> `(F7:2013)` 这类括注同理。**现基线 `PSDR_F7` 的逐条行号与两处更正见本节末尾的
+> "现基线复测"表**，对外引用一律以复测表为准。
+
 ### P0（阻断/会砖机）
 
 | # | 位置 | 现象 | 说明 |
 |---|---|---|---|
 | P0-1 | `Source_F7/src/main.c:1021-1032`（**旧镜像行号；该段代码在现镜像里已不存在**） | 无条件 `while(1)` 只刷屏，`main()` 到不了 1065 行主循环 | 调试残留；按当时那份源码，上电后停在蓝黑交替刷屏。**分支归属（2026-11-03 复核）：这条只在 `PSDR_Rebuild` 血统里有**——我们镜像的 `Source_F7/` 与 `PSDR_Rebuild:Source/src/main.c` 逐 blob 相同（`def78a44`），而维护者的 `PSDR_F7` 树里这段已被注释掉 ⇒ **2026-11-03 改基后本条从我们的缺陷清单移除**，只作为 Rebuild 血统的历史记录 |
-| P0-2 | `Source_F7/src/frequency_control.c:54-55` | `while(result != HAL_OK)` 无超时 | Si5338 不应答时开机永久阻塞，先于显示初始化。**这条不是 Rebuild 专属**：`PSDR_F7` 树没有 frequency_control.c，同一圈无上限重试在 `PSDR_F7:Source/src/main.c:1031-1032`（维护者 2026-11-03 说"我2棵里 i2c.c 结构不同"，结构确实不同，但等待本身仍在） |
+| P0-2 | `Source_F7/src/frequency_control.c:54-55`（**旧镜像路径与行号；现基线在 `src/main.c:1031-1032`**，见下方复测表） | `while(result != HAL_OK)` 无超时 | Si5338 不应答时开机永久阻塞，先于显示初始化。**这条不是 Rebuild 专属**：`PSDR_F7` 树没有 frequency_control.c，同一圈无上限重试在 `PSDR_F7:Source/src/main.c:1031-1032`（维护者 2026-11-03 说"我2棵里 i2c.c 结构不同"，结构确实不同，但等待本身仍在） |
 
 ### P1（功能缺失/明显错误）
 
@@ -338,11 +409,28 @@ F4：14 个入口，含 `TIM3_IRQHandler` 等业务中断；F7：只有 fault �
 | # | 位置 | 现象 |
 |---|---|---|
 | P2-1 | `src/dds.c` | 只剩 `freqToReg()`，其余全是注释掉的死代码 |
-| P2-2 | `main.c` 菜单 18 个分支 | 加菜单项要改多处；无范围/步进集中定义 |
+| P2-2 | `main.c` 菜单 **12** 个 `case`（本文件原写"18 个分支"，2026-11-03 复测更正，见 §3 的更正框） | 加菜单项要改多处；无范围/步进集中定义 |
 | P2-3 | `main.c` 里定义 ISR（F7:2013） | 与 `stm32f7xx_it.c` 职责分裂 |
 | P2-4 | 两棵树大量重复文件 | `TinyGPS.c`/`queue.c`/`Timer.c`/`images.c`/`glcdfont.c` 完全相同却各存一份 |
 | P2-5 | `si5338.c` 与 `frequency_control.c` 职责重叠 | 两个入口都能初始化 I2C/器件 |
 | P2-6 | 主循环无看门狗、无节拍 | 帧率随负载漂移；卡死无自恢复 |
+
+### 现基线复测（2026-11-03，`Source_F7/` = `PSDR_F7`）
+
+上面 P0/P1/P2 的行号是旧镜像上量的。逐条在现基线重量的结果——**每一条都仍然成立，
+只有 P2-5 随改基消失**，行号全部要按下表换：
+
+| 条 | 现基线位置 | 复测到的事实 |
+|---|---|---|
+| P0-2 | `src/main.c:1031-1032` | `while(result != HAL_OK) result = HAL_I2C_IsDeviceReady(&handleI2C, (0x70 << 1), 100, 100);` 无跳出上限、无失败分支，在显示初始化之前 |
+| P1-1 | `src/main.c:855-857` | `case recieve_with_filter:` 体内只有 `break;`（`enum signalPaths` 在 `:806-814`，7 个枚举） |
+| P1-2 | `src/main.c:1613` 起，init 在 `1626 / 1653 / 1679 / 1690 / 1714 / 1729` | **不是三处而是六处**：`processStream()` 里有 6 次 `arm_cfft_radix4_init_f32`，比旧记录更多 |
+| P1-3 | `src/main.c:2035-2039` + `1613` | `TIM4_IRQHandler()` 直接调 `processStream()`（FFT/FIR/RMS 都在其中）；`HAL_TIM_PeriodElapsedCallback()` 里调 `captureSamples()`，与主循环共享 `samplesA/B/C` 仍无保护 |
+| P1-4 | `src/main.c:833 / 868 / 900-901` | 三处 `AMP_SWITCH_A` 写 `0 // 0 to bypass (I think!)`，而 `:900` 的注释写 `//Amp relay set to on` 紧接着仍写 `0`——注释与值互相矛盾，未验证 |
+| P1-5 | `Source/src/ILI9341_t3.c`（F4） | 与基线无关，F4 侧不变：912 行、无调用点 |
+| P2-3 | `src/main.c:2035` | ISR 定义仍在 `main.c` 里，与 `stm32f7xx_it.c`(167 行) 职责分裂 |
+| P2-5 | **不适用** | `si5338.c` 与 `frequency_control.c` 在现基线里不存在，"两个入口都能初始化"这条随 Rebuild 的拆分一起消失；Si5338 驱动回到 `src/i2c.c`(825 行) |
+| 其余 P2 | 部分需修正 | `dds.c` 只有 `freqToReg()` 是活的 ✓（86 行，与旧记录同）；重复文件 ✓（`TinyGPS.c` 609/609、`queue.c` 126/126、`Timer.c` 53/53、`images.c`/`glcdfont.c` 合计 1,130 两树相同）；无看门狗 ✓（全树 `IWDG/WWDG/HAL_IWDG` 0 处）。**但"菜单 18 个分支"这句在现基线不成立**：`updateMenu()`（`:1209-1301`）只有 **12** 个 `case`——18 是旧镜像上的数，或当时把 `else if` 链一起数了。引用这条请按 12 说 |
 
 ## 4. 架构判断：要不要换？
 
@@ -352,11 +440,18 @@ F4：14 个入口，含 `TIM3_IRQHandler` 等业务中断；F7：只有 fault �
    一次外科手术式修补就能拿到 80% 的收益；重写会把"已验证的 391 件/278 网/1132 脚"以外的
    所有历史经验（菜单手感、滤波器系数、显示时序）全部作废。
 2. **两条线已经分叉**：F4（自写 HAL 层 + 自写 uart/misc）与 F7（CubeMX HAL + Si5338 拆分 + 信号路径表）。
-   **F7 的结构明显更好**（驱动分层、外设断电、频率合成独立），应当以 F7 为演进主线，
+   **F7 的结构明显更好**（驱动分层、外设断电 `setupPeripheralPower():282` /
+   `teardownPeripheralPower():294`、`enum signalPaths` 信号路径表 `:806-814`），应当以 F7 为演进主线，
    F4 保持"能构建、能对锚点"的冻结状态，不再加功能。
+   > **2026-11-03 更正**：这里原本还列了第三个论据"频率合成独立"——那是 **`PSDR_Rebuild`**
+   > 才做的 `si5338.c`/`frequency_control.c` 拆分。现基线 `PSDR_F7` 里 Si5338 驱动仍是
+   > `src/i2c.c`(825 行) 的一部分，拆分不存在，**这个论据撤回**。撤回后结论不变：
+   > 剩下两条（驱动分层、外设断电）加上信号路径表，已足够说明"F7 作演进主线、F4 冻结"。
 3. **要不要上 RTOS？**（**2026-11-03 限定适用范围**——原话"不值得为此换到 FreeRTOS"是
    在我没看过 `TestingMakeFile*/` 的情况下写的，收回）
-   - 事实：`Source/`(F4) 与 `Source_F7/`(= `PSDR_Rebuild` 的 Source) 两棵**应用树**是超级循环；
+   - 事实：`Source/`(F4) 与 `Source_F7/`(现镜像 `PSDR_F7`) 两棵**应用树**是超级循环
+     （2026-11-03 在现基线复核：`Source_F7/` 的 `src/`+`include/` 里
+     `xTaskCreate`/`osKernelStart`/`MX_FREERTOS_Init` 共 **0** 处，旧镜像上也是 0，这条不受改基影响）；
      而同一血统里作者 **2019 年已经建了 CubeMX + FreeRTOS 的重建**（`b78769a`，
      `main.c:137 MX_FREERTOS_Init(); :140 osKernelStart();`，`TestingMakeFile2/PSDR/Makefile` +
      `STM32F746VGTx_FLASH.ld`），他自述 **DMA 视频"基本完美"、但 radio 一行没移植**。

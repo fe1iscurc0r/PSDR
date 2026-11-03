@@ -3000,6 +3000,27 @@ F4 的 `Source/src/main.c:958/967`。核对下来**结论在两棵 F7 树都成�
    里仍在，位置 main.c:1031-1032**）+ 明确一问"哪棵为准"；
 ④ 调谐范围那条按 I-3 重写后再定发不发（倾向不发）。
 
+### I-5 对主线计划的实际影响（要你拍板）
+
+> **本条的最后一项已被取代**（2026-11-03 整合时发现这段错落在 §J 之后，先归位再标注）：
+> 当时记的用户倾向是 **B（维持 `PSDR_Rebuild`）**，理由是"除了改基代价没有太大优势"。
+> 随后 §I-8 把代价实测成 **0**（`Makefile.linux` 零改动即可编 `PSDR_F7`、锚点门原样通过），
+> §I-9 执行了 **A（改基到 `PSDR_F7`）**。下面四条里，前三条仍然有效，第四条只作为
+> "当时怎么想的"留痕，不要再当现状读。
+
+- 他要以 **`PSDR_F7`** 为基线做 HMC1023 上电，而我们 `next` 里那份是 **`PSDR_Rebuild`**。
+  **(A) 把 `Source_F7/` 改基到 `PSDR_F7`**——跟他并行、以后合得上；代价是 M2 的构建对账要重跑，
+  且 P0-1 消失、`docs/PSDR-firmware-survey.md` 的部分结论要重挂。
+  **(B) 维持 `PSDR_Rebuild`**——我们自己的复现与 hex 对账链完整，只在文档里标注分支差异。
+- 他**人回来了**（今天三条动作：关 #7、指 #19 基线、说正在起 HMC1023）⇒ HMC1023 那条我们
+  **不抢跑**（`docs/PSDR-HMC1023-netlist.md` 的 SPI/校准时钟/VDDBG 全表正好是他现在要的）；
+  LC 带通组、替代件、国产化继续 **fork-only 不上游**（§G-4/§G-5 口径不变）。
+- 他说要整理分支布局 ⇒ **在他动完之前不往任何上游分支推东西**（我们本来也不推）。
+- ~~**用户 2026-11-03 的倾向已记：B（维持 `PSDR_Rebuild`）**——"除了改基的代价，感觉没有太大优势"。
+  这条已在 #19 里摊开问他（见 §I-6），**他回话前不动 `Source_F7/`**；若他答"两棵要合流/以 F7 为准"，
+  改基才有意义，届时 M2 的构建对账要整体重跑一遍再说话。~~
+  ← **已作废**：改基不需要等他答，代价实测为 0，`29aa887` 已执行（§I-9）。
+
 ### I-6 ①②③ 已执行（用户 2026-11-03 批准"你都放就行了"），逐条回查过
 
 `mcp__github__*` 每次都回 `-32602 required property 'result'`（老假外壳错误），
@@ -3256,16 +3277,143 @@ E 手册正本清单 / F 焊盘 vs 厂商推荐 footprint。
 重新解码比对；手册类答案按给的页码/版本反查原文；**任一行不过，整批退回**，不挑能用的收。
 外部断言在核完之前不进任何对外文本（尤其 #16 已经公开说过 U304 的带宽）。
 
-### I-5 对主线计划的实际影响（要你拍板）
 
-- 他要以 **`PSDR_F7`** 为基线做 HMC1023 上电，而我们 `next` 里那份是 **`PSDR_Rebuild`**。
-  **(A) 把 `Source_F7/` 改基到 `PSDR_F7`**——跟他并行、以后合得上；代价是 M2 的构建对账要重跑，
-  且 P0-1 消失、`docs/PSDR-firmware-survey.md` 的部分结论要重挂。
-  **(B) 维持 `PSDR_Rebuild`**——我们自己的复现与 hex 对账链完整，只在文档里标注分支差异。
-- 他**人回来了**（今天三条动作：关 #7、指 #19 基线、说正在起 HMC1023）⇒ HMC1023 那条我们
-  **不抢跑**（`docs/PSDR-HMC1023-netlist.md` 的 SPI/校准时钟/VDDBG 全表正好是他现在要的）；
-  LC 带通组、替代件、国产化继续 **fork-only 不上游**（§G-4/§G-5 口径不变）。
-- 他说要整理分支布局 ⇒ **在他动完之前不往任何上游分支推东西**（我们本来也不推）。
-- **用户 2026-11-03 的倾向已记：B（维持 `PSDR_Rebuild`）**——"除了改基的代价，感觉没有太大优势"。
-  这条已在 #19 里摊开问他（见 §I-6），**他回话前不动 `Source_F7/`**；若他答"两棵要合流/以 F7 为准"，
-  改基才有意义，届时 M2 的构建对账要整体重跑一遍再说话。
+---
+
+## 任务 K · 整合：把改基后失效的东西复测归位（2026-11-03）
+
+### K-1 为什么做这一轮
+
+`29aa887` 把 `Source_F7/` 的镜像从 `PSDR_Rebuild` 换到 `PSDR_F7` 之后，只加了"顶部公告"，
+**正文里在旧镜像上量的数字没跟着走**。这一轮不做新分析，只做一件事：把每个还在被引用的
+数字重新量一遍，把失效的话改掉，并把散在 5 个文件里的结论口径对齐。
+
+### K-2 复测命令与实测输出
+
+```
+$ python tools/fw_stats.py Source Source_F7
+== Source: 341318 lines of .c/.h/.s (build dirs excluded)
+   system 194934 / DSP_Lib 134349 / src 10059 / include 1976
+== Source_F7: 345800 lines
+   DSP_Lib 181431 / system 153932 / src 8658 / include 1779
+
+$ python tools/fw_funcindex.py Source/src Source_F7/src     # 参数是 src 目录本身
+== Source/src: 149 function definitions
+== Source_F7/src: 116 function definitions
+
+$ git diff --stat upstream/PSDR_F7:Source next:Source_F7
+ .gitignore | 1 +   Debug/PSDR.hex | 6000 ----   Makefile.linux | 138 ++
+ 3 files changed, 139 insertions(+), 6000 deletions(-)      ⇒ .c/.h 改动 0 行
+
+$ git diff --stat upstream/master:Source next:Source
+ Makefile.linux +156 / src/hal.c +17-2 / src/main.c +1 / src/misc.c +1 /
+ src/uart_hal_stub.c +46 ⇒ 5 files, +219 -2
+
+$ ls src/*.c 计数：现基线 17 只；PSDR_Rebuild 19 只；
+  差的是 si5338.c 与 frequency_control.c（comm 双向核对，反向为空）
+```
+
+逐条行号复测（`grep -n` 取现值，全部在现镜像里直接读到，不引用旧记录）：
+
+| 断言 | 现基线实测 |
+|---|---|
+| P0-2 无界 I2C 等待 | `src/main.c:1031-1032`（`while(result!= HAL_OK)` + `HAL_I2C_IsDeviceReady(&handleI2C,(0x70<<1),100,100)`，无跳出） |
+| P0-1 刷屏死循环 | 现基线**不存在**：全文活动 `while(1)` 只有 `:1101`（真主循环），其余 6 处都在注释里 |
+| P1-1 空 case | `case recieve_with_filter:` 在 `:855-857`，体内只有 `break;`；`enum signalPaths` 在 `:806-814` |
+| P1-2 中断里重初始化 CFFT | `processStream()`（`:1613`）里 **6** 处 `arm_cfft_radix4_init_f32`：1626/1653/1679/1690/1714/1729（旧记录写的是 3 处，**低估了**） |
+| P1-3 ISR 里跑 FFT | `TIM4_IRQHandler` 在 `:2035-2039`，函数体就是 `processStream(); HAL_TIM_IRQHandler(...)`；`HAL_TIM_PeriodElapsedCallback` 调 `captureSamples()` |
+| P1-4 极性注释未验证 | `:833 / :868 / :901` 三处 `AMP_SWITCH_A ... 0 // 0 to bypass (I think!)`，而 `:900` 注释写 `//Amp relay set to on` 紧接仍写 `0` |
+| P2-3 ISR 定义分裂 | `main.c:2035` 有 ISR，`stm32f7xx_it.c` 167 行 |
+| P2-5 两个初始化入口 | **不适用**：那两只文件在现基线不存在 |
+| P2-6 无看门狗 | 全树 `IWDG/WWDG/HAL_IWDG` grep **0 处** |
+| P2-2 菜单 18 分支 | **不成立**：`updateMenu()`（`:1209-1301`）实测 **12** 个 `case`（F4 侧 `updateMenu` 是 11 个） |
+
+文件行数：`main.c` 2,188（旧记录 2,166）、`Adafruit_ILI9340.c` 740（844）、`Adafruit_GFX.c` 558（576）、
+`i2c.c` 825（138）、`spi.c` 205（230）、`hal.c` 1,439、`images.c`+`glcdfont.c` 1,130、
+`TinyGPS.c` 609、`adc.c` 202、`queue.c` 126、`dds.c` 86、`Timer.c` 53、`_initialize_hardware.c` 182、
+`BlinkLed.c` 29、`stm32f7xx_it.c` 167；`ILI9341_t3.c`/`uart.c`/`misc.c`/`uart_hal_stub.c` 在 F7 侧不存在。
+
+### K-3 改了哪些话（旧 → 新，逐条给出处）
+
+| 文件 | 旧说法 | 现说法 | 依据 |
+|---|---|---|---|
+| `docs/PSDR-firmware-survey.md` §0.1 | 函数索引 149 + 119 | F4 149、F7 **116**；差的两只文件正是 `si5338.c`/`frequency_control.c` | `fw_funcindex.py` |
+| 同上 §0.2 | F7 总 346,049 / 自有 10,686 | **345,800 / 10,437**（8,658+1,779），旧值留痕说明来源 | `fw_stats.py` |
+| 同上 §0.3 | "`.c/.h` 只有 6 行 include 修正" | 那是**旧镜像**的事实；现基线相对 `PSDR_F7` 是 **0 行**，且 F4 线不是这样（`hal.c` +17/−2 等） | 上面两条 `git diff --stat` |
+| 同上 §1 | F7 列一整列旧数字 | 列头标"旧镜像"，新增 7 行差异表 + blob/最后一次改动出处 | `git rev-parse` / `git log -1` |
+| 同上 缺陷清单后 | P0/P1/P2 用旧行号 | 新增"现基线复测"表；**P1-2 由 3 处改 6 处**；**P2-2 由 18 改 12**；P2-5 标不适用 | K-2 表 |
+| `README.fork.md` | "`Source_F7/src/main.c:1021` 有无条件调试 `while(1)`…`frequency_control.c:54` 无超时" | 现镜像只有一处 P0：`main.c:1031-1032`；并写明旧镜像上还有那段刷屏调试循环、我们镜像的 `PSDR_F7` 里它已被注释掉 | 同上 |
+| `README.fork.md` | "~11k lines in `Source_F7/`" | 10,437，并给出复算命令 | `fw_stats.py` |
+| `README.fork.md` | "PR #18 (3 commits)" | **4 commits / 4 files**；PR #17 = 3 commits / 23 files；两条都还没人审 | `git log upstream/master..upstream-pr/...` |
+| `README.fork.md` | 新增件只讲构建/板/BOM | 加了"fork-only 材料一览"表：每份文档"确立什么/不确立什么" | 本轮 |
+| `docs/README.md` | 总账"A–I 章、约 3,000 行" | A–J（+§K），行数按实际 | `grep -n '^## 任务 '` |
+
+### K-4 顺带发现的结构性缺陷
+
+`## 任务 J`（原 3222 行）后面**跟着的是 `### I-5`**——它属于任务 I，应排在 §I-4 与 §I-6 之间。
+这是 §I-9/§I-10 追加时插错位置留下的。本轮把它归位到 §I-6 之前，并加"已被 §I-8/§I-9 取代"的
+标注：其中"用户倾向 B、他回话前不动 `Source_F7/`"那条**已作废**（代价实测为 0 后就执行了 A），
+另外三条（HMC1023 不抢跑、LC/替代件/国产化不上游、他整理分支布局前不推上游）**仍然有效**。
+
+### K-5 本轮明确没动的东西
+
+- 没改任何 `.c/.h`（K-2 的 `git diff` 就是证据）；没重新构建（构建与锚点门的记录在 §I-8/§I-9 与
+  `dist/reference/README.md`，本轮数字没有 invalidate 它们：`text 114068 / data 18488 / bss 18260`）。
+- 没跑 `reproduce_kicad.py --check`（本轮不碰板子生成物；跑法与最近结果在 §C-18）。
+- 没动上游、没发任何对外文本、没碰 IMA/知识库（按用户指示）。
+- 没新增分析结论：本轮只复测与归位。
+
+### K-6 下一步规划
+
+**现在就能做、不需要硬件/上游/新授权**（按建议顺序）：
+
+1. **`docs/PSDR-revB-workorder.md` 局部改版工作单**（最高优先，是"必须改版、只做局部"这个
+   已定方向的唯一执行前提）。要产出的东西全部可由仓库现有数据算出：
+   - 三个改动区（U304 周边、U16/U24/U30 三处、U287 及其供电）的**影响圈闭包**：
+     以 `dist/netlist/PSDR_2.6.1_netlist.json` + `tools/pads_asc_netlist.py` /
+     `tools/pads_asc_placement.py` 为源，给每区一个坐标框（mil/mm 双单位，沿用贴装表原点
+     = 板框左下角）与区内器件—引脚—网络清单；
+   - **影响圈外的 391 件清单必须逐件不变**，用贴装表对拍（这是"只动局部"的可判定验收）；
+   - 6 段带通的**波段↔控制线表**（固件冻结，只出表；控制线用 §H-5 的六根开关脚与
+     `E_FILT_IF_P/N`、`E_FILT_RF_P/N` 两个现成插件槽）；
+   - 改版后要重出的三件套（Gerber/贴装表/BOM）与**旧 `dist/kicad/SHA256SUMS` 作废声明**。
+   - 未定的部分（具体替代件型号、HMC1023 是否保留）按 K-6.3 的队列标 `pending`，**不许填典型值**。
+2. **`tools/check_delegation_answers.py`**：把 §J 的验收口径做成一条命令——8 列 schema 校验、
+   `anchor` 指向的合并文件小节是否存在、`MANIFEST.csv` 的 sha256 与字节数、各文件 `TOTALS:` 自洽、
+   随机抽 10 行复算、decal 类答案用 `tools/pads_asc_decal.py` 重解码比对，**任一行不过整批退回**。
+   交付前用一正一反两组自造样本证明这道门真能抓错位（负样本形态就是委派方报过的那种）。
+3. **`docs/PSDR-datasheet-findings.md`**：接收外部核到手册结论的容器。每条写"要证的判断 /
+   可接受出处（官方 PDF 优先，厂商页次之，第三方只算线索）/ 影响哪份文档哪一节 /
+   答案未到写 `pending`"。首位 `SXB-2089Z` 那条决定要不要在 #16 公开更正带宽——**没有原文不出门**。
+   另有一条纯离线可做：`docs/PSDR-author-measurement-log.md` §4 留的"原理图 notes 区"线索，
+   可用 WSL `pdftotext -layout` 抽 `Hardware/PSDR Schematic.pdf`（2.6.1 版）文本核对，
+   可能直接解释 -70 dBm 与作者 -90 dBm 之间那 20 dB。
+
+**等外部条件，推不动**：PR #17/#18 有人审；#19/#20 回话（有界 I2C 重试是否可接受、
+是否已有未发布分支含 VNA/HMC1023 代码）；委派答案回传；手册队列答案回来；
+实物（M3 的 42 点、#16 四条件、`E_FILT` A/B 实测、U304 丝印、GPS 四指标、VNA 校准面）。
+
+**需你点头才做（一次一件）**：推 `3a98072`（回滚点 `d5ccb32`）与本轮整合提交；
+删 fork 远端已合并的 `m2/untrack-build-artifacts`；#37 收口需要接受一次铺铜 rebuild；
+若要把 U304 带宽更正发到 #16，需先有 K-6.3 的手册原文。
+
+### K-7 引用面回查（K-3 改完后顺着旧路径线索再扫一遍，2026-11-03）
+
+改完 §K-3 那张表不等于引用干净了。用 `grep -rn "si5338.c:638\|frequency_control.c\|main.c:1730"`
+把所有**按旧镜像路径写死的引用**捞出来，逐条在现基线实测，结果 6 处：
+
+| # | 位置 | 原文引用 | 现基线实测 | 性质 |
+|---|---|---|---|---|
+| 1 | survey §3 模块清单 | `frequency_control.c` 的 Timing 常量"41 行" | Rebuild 里是 **`:40`**（`git show … \| grep -n`）；现基线在 **`main.c:1018`**，同一常量 `0x40912732`、同一句注释 | **两个基线上都错**（老错一位），且常量没随拆分消失 |
+| 2 | survey §1 文件表 | `si5338.c`/`frequency_control.c` 说明写"F7 新增" | 两只文件**只在 `PSDR_Rebuild` 血统里有**，`PSDR_F7` 里不存在 | 表述错误（现基线直接读成"文件缺失"） |
+| 3 | gaps #2 | 同上两文件 + `frequency_control.c:41` | 已改写：驱动在 `i2c.c`（`setFreq():729`），Timing 在 `main.c:1018`，无界重试 `:1031-1032` 就在其后 13 行 | 已更正 |
+| 4 | gaps #9 | `si5338.c:638-641` 的 5–350 MHz 硬限 | **`i2c.c:762-763`**（`if(frequency < 5000000) return;` / `if(frequency > 350000000) return;`） | 已更正 |
+| 5 | scope §8.2 | 同 `si5338.c:638-641` | 同上；该行已带现基线路径并注明旧写法 | 已更正 |
+| 6 | author-measurement-log | "与固件 VFO 夹取 `main.c:1730-1731` 完全对上" | 现基线 **`main.c:1766-1767`**（`updateVfo()` 在 `:1758`），旧镜像 `:1730-1731` | 已更正（scope §8.2 早就写了双行号，这条漏了） |
+
+顺带在 survey 里加了一段**"引用旧路径时的换算锚点"**：`i2cSetup():612`、`setFreq():729`、
+`:762-763`、`main.c:1018`、`main.c:1031-1032`——以后谁按旧路径读，一句话就能换到现基线，
+不用每处重新 grep。
+
+**这轮整合的自查结论**：改基造成的失效已全部复测并改掉，另外**抓到两处跟改基无关的老错**
+（1 与 2）——这两条按原样就会被引用进对外文本，属于本轮最有价值的产出。
