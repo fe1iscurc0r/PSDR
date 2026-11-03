@@ -3184,6 +3184,40 @@ P0-2 仍在，位置 `src/main.c:1031-1032`。survey 顶部加了"基线变更�
 **提交**：`29aa887`（改基本体 + dist/reference + Makefile 头部 + 工具 docstring + README.fork）。
 **待办**：并回 `next` 与推送需要点头（回滚点 `4ce4540`）；F4 那侧不受影响。
 
+### I-10 起草对外评论时自查出的两处 Makefile 头部假话（2026-11-03）
+
+给 #19 写"我们的参数是照您分支的 `.cproject` 来的"之前，先去核了 `.cproject`，
+结果发现**我自己在 §I-9 那次提交里写的头部有两句在新基线上不成立**：
+
+| 头部原话 | `PSDR_F7` 的实测 |
+|---|---|
+| "Debug sourceEntries 只排除 `DSP_Lib/Examples` 与 `src/TinyGPS.c`" | 它排除 `Examples`，**没有排除 TinyGPS.c**（全文件 `TinyGPS` 出现 0 次） |
+| "不像 F4 工程，**不排除任何 HAL 模块**" | 它的 Debug 排除 **42 个** `system/src/stm32f7-hal/*`（`.cproject:232`；含 `hal_dma.c`，但 `hal_i2c/uart/tim/spi/adc/dac/gpio/rcc` 都留着） |
+
+根因是**把旧基线的注释直接搬进新基线的文件里**——那两句对 `PSDR_Rebuild` 是准确的（它的 Debug 排除
+`Examples`+`TinyGPS.c`+9 个 HAL），对 `PSDR_F7` 不是。已改掉，并把三种口径都实测一遍：
+
+```
+PSDR_F7 @ ab2c8fd，GCC 13.2.1，make -f Makefile.linux -j4
+  本 harness 的策略（全编 HAL，跳 TinyGPS.c）    rc=0 0err 26warn  text 114068 data 18488 bss 18260
+  照分支原样（编译 TinyGPS.c，全编 HAL）        rc=0 0err 30warn  text 114064 data 18488 bss 18260
+  照分支原样 + 它那 42 条 HAL 排除              rc=0 0err 30warn  text 114064 data 18488 bss 18260
+```
+
+⇒ `--gc-sections` 让三种口径收敛到同一量级，所以"全编 HAL"是便利而非隐性行为差异；
+**但只说"尺寸相同"，不说"镜像逐字节相同"**（没验）。头部现在把这条写成明确的 (f) 项差异清单。
+改完重跑：`rc=0`、0 error、`text 114068`，锚点门仍 **PASS**。
+
+顺带把头部另一句也修了：原来写"本文件与编 Rebuild 那版逐字节相同"——改完注释就不成立了，
+换成"规则未动，只改了注释块"。以及参数来源如实写成"**最初是从 `PSDR_Rebuild` 的 `.cproject` 抄的**，
+在 `PSDR_F7` 上只对得上 `HSE_VALUE=26000000` 与 `--gc-sections` 两项"，不再声称逐参数一致。
+
+**教训（写死）**：改基时**注释比代码更容易变成假话**——代码错了编不过，注释错了没人报警。
+以后凡是"照 X 的构建配置"这类话，必须当场把 X 的配置文件 grep 一遍再落笔。
+
+**落地**：`next` 已推到 `239fe23`（`4ce4540..239fe23`，远端 tree 与本地一致、ahead/behind 0/0、
+upstream 无 `next` 未被写入）；本次头部更正与其后的 #19 评论单列提交。
+
 ### I-5 对主线计划的实际影响（要你拍板）
 
 - 他要以 **`PSDR_F7`** 为基线做 HMC1023 上电，而我们 `next` 里那份是 **`PSDR_Rebuild`**。
