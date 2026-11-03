@@ -22,5 +22,7 @@
 ## 相关但不在 `docs/`
 
 - `dist/kicad/SHA256SUMS` + `tools/reproduce_kicad.py`：一条命令重建参考板、DRC 与制造包并自检。
+- `dist/reference/`：**F7 构建的锚点参考 hex**（两份基线各一，带 sha256/blob/出处）与复算命令；
+  放这里是因为 `Source_F7/.gitignore` 的 `/Debug` 会把它们挡在版本控制外（2026-11-03 改基时差点丢）。
 - `dist/fab/PSDR_2.6.1_placement.csv`：SMT 贴装表（391 件），与 BOM 和 KiCad 锚点双向对账过。
 - `tools/`：解析器、KiCad 生成器、Gerber 对拍、层覆盖率、固件统计（`fw_stats.py` / `fw_funcindex.py`）。

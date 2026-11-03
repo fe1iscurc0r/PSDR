@@ -3122,6 +3122,68 @@ $ python tools/anchor_check_f7.py <我们编出的 hex> <ref hex>
 
 （本节用的板外临时件已清理：`C:/Users/ASUS/tmp_*.sh`、`f7src.tar`、`f7_PSDR_F7_*.{hex,elf}`。）
 
+### I-9 改基执行记录：`Source_F7/` 现镜像 `PSDR_F7`（分支 `m5/f7-rebase-psdr-f7`，2026-11-03）
+
+用户批准"按 2→1→3 做"。第 2 步（文档提交推送）已完成，本条是第 1 步（改基）。**尚未并回 `next`、尚未推送**。
+
+**做法**（全在本地分支，`next` 与所有上游 ref 未动）：
+
+```
+$ git checkout -q -b m5/f7-rebase-psdr-f7
+$ git rm -rq --cached Source_F7 && rm -rf Source_F7 && mkdir Source_F7
+$ git archive --format=tar upstream/PSDR_F7:Source | tar -x -C Source_F7
+$ git checkout 4ce4540 -- Source_F7/Makefile.linux          # 我们的构建器原样挂回
+$ git show 4ce4540:Source_F7/.gitignore > Source_F7/.gitignore
+```
+
+**换树的净效果**（`git diff --cached --name-status HEAD`）：**6 删 15 改**。
+删除的 6 个 = `Debug/PSDR.hex`（改址保号）、`Firmware_Build_Notes.md`（Jeff 2021-01-18 的文件，
+`PSDR_F7` 侧没有）、`include/{si5338,frequency_control}.h`、`src/{si5338,frequency_control}.c`；
+修改的 15 个里真正有内容的是 `src/main.c`(+111/−89)、`src/i2c.c`、`src/spi.c`、
+`src/Adafruit_*`、`include/*.h`、`.cproject`、`.settings/language.settings.xml`。
+
+**差点丢锚点（记下来当规矩）**：`Source_F7/Debug/PSDR.hex` 是**被跟踪的**参考件（PR #1 特意保留的
+两份 hex 之一），而 `Source_F7/.gitignore` 里的 `/Debug` 会把换树后解出来的同名文件挡在索引外 ⇒
+直接提交等于**悄悄删掉 M2 对账链的参考**。处置：两份基线的 hex 改名带出处，落到
+`dist/reference/`（不受 `/Debug` 影响），并写 `dist/reference/README.md` 记 sha256/blob/出处。
+
+```
+PSDR_hex_2017-01-15_aaa24f8_PSDR_F7.hex   269,832 B  sha256 d5f372a6…  blob e6fe1975…  ← 新基线官方参考
+PSDR_hex_2018-06-21_457c270_DMA.hex       216,207 B  sha256 88cf1abb…  blob 73b11f70…  ← M2 用的历史参考
+（git 把这次移动识别为 rename：Source_F7/Debug/PSDR.hex -> dist/reference/…_457c270_DMA.hex）
+```
+
+**改基后的复算**（从**已入库的树**跑的，不是临时 archive）：
+
+```
+$ cd Source_F7 && make -f Makefile.linux -j4
+  rc=0   errors=0  fatal=0  undefined=0  warnings=26
+  text 114068   data 18488   bss 18260     built PSDR.hex 372,928 B (sha256 5409836e…)
+$ python tools/anchor_check_f7.py <built> dist/reference/PSDR_hex_2017-01-15_aaa24f8_PSDR_F7.hex
+  SP=0x20050000 agree=True  empty-slots=[7,8,9,10,13,95] agree=True  words=7/118  RESULT: PASS
+$ python tools/anchor_check_f7.py <built> dist/reference/PSDR_hex_2018-06-21_457c270_DMA.hex
+  同上                                                      RESULT: PASS        ← 两条参考都过
+```
+
+**改基后我们在 F7 侧的自有内容**（`git diff --numstat upstream/PSDR_F7:Source HEAD:Source_F7`）：
+
+```
+1	0	.gitignore
+0	6000	Debug/PSDR.hex        ← 有意不再跟踪构建产物（PR #1 政策），参考件已搬去 dist/reference/
+120	0	Makefile.linux
+```
+
+⇒ **`.c/.h` 净改动 = 0**：旧镜像上那 6 行 include 修正随 `si5338.c`/`frequency_control.c`
+一起消失（新基线不需要）。也从此可以准确说"我们没有改动固件源码"——上一版提交信息里
+我还特意声明"这句以后不许写"，现在它换成了有依据的成立。
+
+**清单变化**：P0-1（刷屏死循环）在新基线上不存在 ⇒ 从我们的缺陷清单移除，仅作 Rebuild 血统的历史记录；
+P0-2 仍在，位置 `src/main.c:1031-1032`。survey 顶部加了"基线变更公告"，旧行号一律按 §I-4 对照表换算，
+`README.fork.md`、`tools/anchor_check_f7.py` 的引用路径与数字同步更新。
+
+**提交**：`29aa887`（改基本体 + dist/reference + Makefile 头部 + 工具 docstring + README.fork）。
+**待办**：并回 `next` 与推送需要点头（回滚点 `4ce4540`）；F4 那侧不受影响。
+
 ### I-5 对主线计划的实际影响（要你拍板）
 
 - 他要以 **`PSDR_F7`** 为基线做 HMC1023 上电，而我们 `next` 里那份是 **`PSDR_Rebuild`**。
