@@ -229,42 +229,147 @@ Sources: `Hardware/PSDR.asc` (part types, decals, placement),
 Units: PADS ASCII coordinates are integers, **38100 units = 1 mil** (derived from
 the board outline, not stated in the file).
 
-Decal names are the layout database's own names and are **shared or inherited**: the
-STM32F746 on this board sits on the decal named `STM32F746_LQFP100` in the netlist but
-its pad group is called `STM32F429_LQFP100` in `*PARTDECAL*`. Never infer which chip a
-footprint is for from the decal file name - use `decal_raw/_index.csv` (refdes -> part
-type -> decal) for that mapping.
+## How to consume this pack: trust the body, never the file name
 
-## Files
+The per-designator files under `ic_context/` and the per-footprint files under
+`decal_raw/` are convenient, but a knowledge-base ingest that re-orders uploads can
+pair a file name with the wrong body. Two defences, both mechanical:
 
-| file | what it is | feeds task |
-|---|---|---|
-| `ic_context/<ref>.md` | one IC: every pin -> net -> other pins on that net, with each part type. Passive part-type names **encode the value** (`CSM-X5R-22U-20P-10V-1210`, `RSM-6K98-1PCT-250MW-1206`) | C |
-| `decal_raw/<decal>.txt` | **verbatim** `*PARTDECAL*` source block for that footprint (deliberately not decoded - compare pads against the vendor's recommended land pattern without taking my word for the grammar) | F |
-| `decal_raw/_index.csv` | refdes -> placement type -> decal, terminal count, block file | F |
-| `parts_census.csv` | every distinct part type with quantity and designators | A, B, E |
-| `bom_rows.csv` | BOM rows carrying a DigiKey part number (qty / DK / vendor / MPN / link) | A, B |
+1. **Use the three merged files - one per task. Nothing there can be mislabelled:**
+
+   | file | contains | task |
+   |---|---|---|
+   | `TASK_C_ic_context_all.md` | every IC section, each starting `## <ref> ...` | C |
+   | `TASK_F_decal_raw_all.md` | every footprint block, each starting `## <decal> ...` | F |
+   | `TASK_ABE_census_and_bom.md` | part census + BOM rows + the datasheet target list | A, B, E |
+
+   Each merged file ends with a `TOTALS:` line stating how many sections/rows it holds;
+   check it before answering. `MANIFEST.csv` lists sha256, byte size and the first line
+   of every file in the pack, so any transport that shuffles names is detectable.
+
+2. If you are handed the small files instead, identify each one by **its own first
+   line** (`# <ref> - pin/net context`) and by `_index.csv` (refdes -> part type ->
+   decal), not by its name. Decal names are shared or inherited: the STM32F746 sits on
+   a pad group called `STM32F429_LQFP100`, so never infer a chip from a footprint name.
 
 ## Answer schema (this repo machine-checks against it)
 
+One row per question, 8 columns - the 7 working columns plus a leading anchor so the
+result is verifiable line by line:
+
 ```
-<file>:<row> | conclusion (one sentence) | evidence strength (datasheet text / vendor page / distributor) | source (document + revision + page or table) | verbatim English quote | contradiction with the premise | unverified items
+anchor | IC/件 | 引脚或功能 | 手册公式或规格(原文) | 手册推荐条件 | 板上实际值 | 判定 | 出处与依据强度
 ```
 
-Hard rules for the answering side:
-
-1. Every conclusion needs a document name + revision + page or table, plus a short
-   **verbatim English quote**. No citation = no answer.
-2. Anything not read from official material is written as `unverified`. Never fill a
-   gap with "typical value" or "usual practice".
-3. Distributor or aggregator text is a lead, not evidence.
-4. If official material contradicts the premise in the file, say so plainly.
-5. Answer only the question at the top of the file. No design proposals.
+- `anchor` = `<merged file>:<section>` e.g. `TASK_C_ic_context_all.md:U314`, or
+  `MANIFEST.csv` row for census/BOM answers.
+- `判定` in `一致 / 不一致 / 信息不足`. `出处与依据强度` = document + revision + page or
+  table, marked `手册原文` / `厂商页` / `第三方`, and must carry a short verbatim English quote.
+- Anything not read from official material: write `unverified` in that cell. Never fill a
+  gap with a typical value or usual practice. Distributor text is a lead, not evidence.
+- If official material contradicts the premise stated in the file, say so in `判定`
+  rather than working around it.
+- Answer only the question at the head of each section. No design proposals.
 
 Verification on our side: rows are re-checked by re-decoding the decals with
-`tools/pads_asc_decal.py`, and by spot-recomputing 10 random BOM/census rows.
-A batch with any failed spot check is returned whole, not cherry-picked.
+`tools/pads_asc_decal.py`, by recomputing the totals in each merged file, and by
+spot-recomputing 10 random rows. A batch with any failed spot check is returned whole.
 """
+
+
+def merged_ic_sections(nb: dict, types: dict):
+    for ref in sorted(IC_TOPICS):
+        rows = nb.get(ref, [])
+        yield ref, rows
+
+
+def write_merged(out: str, nb: dict, types: dict, lines: list, parts: dict,
+                 parttypes: dict, decals: dict) -> None:
+    # Task C: all IC contexts in one file.
+    with open(os.path.join(out, "TASK_C_ic_context_all.md"), "w", encoding="utf-8", newline="\n") as fh:
+        fh.write("# TASK C - external parts vs the datasheet formulas\n\n")
+        fh.write("One section per designator. Answer only the question in that section.\n")
+        fh.write("Identify your answer by the section heading, not by any file name.\n\n")
+        n = 0
+        for ref, rows in merged_ic_sections(nb, types):
+            n += 1
+            fh.write(f"---\n\n## {ref} — `{types.get(ref, 'NOT IN NETLIST')}`\n\n")
+            fh.write(f"Question (only this one): {IC_TOPICS[ref]}\n\n")
+            exp = EXPECT.get(ref)
+            if exp:
+                fh.write(f"Premise check: this section assumes the part is **{exp}**; "
+                         "if the type in the heading does not match, stop and report the "
+                         "contradiction.\n\n")
+            if not rows:
+                fh.write("No pins of this designator appear in the netlist.\n\n")
+                continue
+            fh.write("| pin | pin name | net | other pins on the same net (refdes(part_type).pin) |\n")
+            fh.write("|---|---|---|---|\n")
+            for pin, pin_name, net, others in rows:
+                fh.write(f"| {pin} | {pin_name or '-'} | `{net}` | {fmt_neighbours(others, types)} |\n")
+            fh.write("\nNets named `$$$...` are unnamed wires in PADS: one electrical node, no meaning.\n\n")
+        fh.write(f"TOTALS: sections={n} (expected {len(IC_TOPICS)})\n")
+
+    # Task F: all decal blocks in one file.
+    refs = [r for r in IC_TOPICS if r in parts]
+    names = sorted({parttypes.get(parts[r]["type"], parts[r]["type"]) for r in refs})
+    with open(os.path.join(out, "TASK_F_decal_raw_all.md"), "w", encoding="utf-8", newline="\n") as fh:
+        fh.write("# TASK F - board footprint as drawn, verbatim, vs the vendor's recommended land pattern\n\n")
+        fh.write("Blocks are copied out of `*PARTDECAL*` untouched. Coordinates are PADS ASCII\n")
+        fh.write("integers, **38100 units = 1 mil**. Do not trust the decal name as a chip name\n")
+        fh.write("(the STM32F746 sits on a pad group called `STM32F429_LQFP100`).\n\n")
+        for name in names:
+            blk = decal_source_blocks(lines, name)
+            users = sorted(r for r in refs
+                           if parttypes.get(parts[r]["type"], parts[r]["type"]) == name)
+            fh.write(f"---\n\n## {name} — used by {', '.join(users)}"
+                     f" — {len(decals.get(name, {}).get('terminals', []))} terminals\n\n")
+            fh.write("```text\n" + "\n".join(blk) + "\n```\n\n")
+        fh.write(f"TOTALS: decals={len(names)}\n")
+
+    # Tasks A/B/E: census + BOM rows + target list, one file.
+    with open(os.path.join(out, "TASK_ABE_census_and_bom.md"), "w", encoding="utf-8", newline="\n") as fh:
+        fh.write("# TASKS A/B/E - every distinct part on the board, and the DigiKey-numbered BOM rows\n\n")
+        fh.write("A = lifecycle status per line, B = LCSC/SMT usability, E = the official\n")
+        fh.write("datasheet URL + revision + page for each part type you are asked about.\n\n")
+        fh.write("## 1. part census (part_type, qty, category, designators)\n\n")
+        fh.write("Passive part-type names encode the value, e.g.\n")
+        fh.write("`CSM-X5R-22U-20P-10V-1210` = 22 uF X5R 20% 10 V 1210,\n")
+        fh.write("`RSM-6K98-1PCT-250MW-1206` = 6.98 kOhm 1% 250 mW 1206.\n\n")
+        fh.write("```csv\n")
+        with open(os.path.join(out, "parts_census.csv"), encoding="utf-8", newline="") as cf:
+            fh.write(cf.read())
+        fh.write("```\n\n")
+        fh.write("## 2. BOM rows that carry a DigiKey number\n\n```csv\n")
+        with open(os.path.join(out, "bom_rows.csv"), encoding="utf-8", newline="") as bf:
+            fh.write(bf.read())
+        fh.write("```\n\n")
+        fh.write("## 3. non-passive part types (the datasheet target list)\n\n")
+        targets = sorted({t for t in types.values() if not t.startswith(PASSIVE_PREFIX)})
+        for t in targets:
+            fh.write(f"- `{t}`\n")
+        fh.write(f"\nTOTALS: part_types={len(set(types.values()))} "
+                 f"designators={len(types)} non_passive_types={len(targets)}\n")
+
+
+def write_manifest(out: str) -> int:
+    import hashlib
+    rows = []
+    for root, _, files in os.walk(out):
+        for fn in sorted(files):
+            if fn == "MANIFEST.csv":
+                continue
+            p = os.path.join(root, fn)
+            rel = os.path.relpath(p, out).replace("\\", "/")
+            data = open(p, "rb").read()
+            first = data.split(b"\n", 1)[0].decode("utf-8", "replace").strip()
+            rows.append((rel, len(data), hashlib.sha256(data).hexdigest(), first[:90]))
+    with open(os.path.join(out, "MANIFEST.csv"), "w", encoding="utf-8", newline="") as fh:
+        w = csv.writer(fh)
+        w.writerow(["path", "bytes", "sha256", "first_line"])
+        w.writerows(sorted(rows))
+    return len(rows)
+
 
 
 def main() -> int:
@@ -303,6 +408,30 @@ def main() -> int:
     n_bom = write_bom_rows(a.bom, os.path.join(a.out, "bom_rows.csv"))
     with open(os.path.join(a.out, "README.md"), "w", encoding="utf-8", newline="\n") as fh:
         fh.write(README)
+    write_merged(a.out, nb, types, lines, parts, parttypes, decals)
+    n_manifest = write_manifest(a.out)
+
+    # Self-check the merged files: what they claim to contain must be what they do contain.
+    problems = []
+    c = open(os.path.join(a.out, "TASK_C_ic_context_all.md"), encoding="utf-8").read()
+    f = open(os.path.join(a.out, "TASK_F_decal_raw_all.md"), encoding="utf-8").read()
+    abe = open(os.path.join(a.out, "TASK_ABE_census_and_bom.md"), encoding="utf-8").read()
+    if c.count("\n## ") != len(IC_TOPICS) or f"TOTALS: sections={len(IC_TOPICS)}" not in c:
+        problems.append(f"TASK_C sections={c.count(chr(10) + '## ')} expected {len(IC_TOPICS)}")
+    for ref in IC_TOPICS:
+        if f"## {ref} " not in c:
+            problems.append(f"TASK_C missing section {ref}")
+    if "TOTALS: decals=" not in f:
+        problems.append("TASK_F has no TOTALS line")
+    if "TOTALS: part_types=" not in abe or "digikey" not in abe or "part_type,qty" not in abe:
+        problems.append("TASK_ABE is missing census or BOM content")
+    print(f"merged  : TASK_C sections={c.count(chr(10) + '## ')}  "
+          f"TASK_F decals={f.count(chr(10) + '## ')}  manifest rows={n_manifest}")
+    if problems:
+        print("ERROR merged pack self-check failed:")
+        for p in problems:
+            print("  -", p)
+        return 3
 
     print(f"ic_context: {n_ctx} files (netlist has {len(types)} designators)")
     print(f"decal_raw : {n_decal} distinct decals for the IC list")

@@ -13,38 +13,48 @@ Sources: `Hardware/PSDR.asc` (part types, decals, placement),
 Units: PADS ASCII coordinates are integers, **38100 units = 1 mil** (derived from
 the board outline, not stated in the file).
 
-Decal names are the layout database's own names and are **shared or inherited**: the
-STM32F746 on this board sits on the decal named `STM32F746_LQFP100` in the netlist but
-its pad group is called `STM32F429_LQFP100` in `*PARTDECAL*`. Never infer which chip a
-footprint is for from the decal file name - use `decal_raw/_index.csv` (refdes -> part
-type -> decal) for that mapping.
+## How to consume this pack: trust the body, never the file name
 
-## Files
+The per-designator files under `ic_context/` and the per-footprint files under
+`decal_raw/` are convenient, but a knowledge-base ingest that re-orders uploads can
+pair a file name with the wrong body. Two defences, both mechanical:
 
-| file | what it is | feeds task |
-|---|---|---|
-| `ic_context/<ref>.md` | one IC: every pin -> net -> other pins on that net, with each part type. Passive part-type names **encode the value** (`CSM-X5R-22U-20P-10V-1210`, `RSM-6K98-1PCT-250MW-1206`) | C |
-| `decal_raw/<decal>.txt` | **verbatim** `*PARTDECAL*` source block for that footprint (deliberately not decoded - compare pads against the vendor's recommended land pattern without taking my word for the grammar) | F |
-| `decal_raw/_index.csv` | refdes -> placement type -> decal, terminal count, block file | F |
-| `parts_census.csv` | every distinct part type with quantity and designators | A, B, E |
-| `bom_rows.csv` | BOM rows carrying a DigiKey part number (qty / DK / vendor / MPN / link) | A, B |
+1. **Use the three merged files - one per task. Nothing there can be mislabelled:**
+
+   | file | contains | task |
+   |---|---|---|
+   | `TASK_C_ic_context_all.md` | every IC section, each starting `## <ref> ...` | C |
+   | `TASK_F_decal_raw_all.md` | every footprint block, each starting `## <decal> ...` | F |
+   | `TASK_ABE_census_and_bom.md` | part census + BOM rows + the datasheet target list | A, B, E |
+
+   Each merged file ends with a `TOTALS:` line stating how many sections/rows it holds;
+   check it before answering. `MANIFEST.csv` lists sha256, byte size and the first line
+   of every file in the pack, so any transport that shuffles names is detectable.
+
+2. If you are handed the small files instead, identify each one by **its own first
+   line** (`# <ref> - pin/net context`) and by `_index.csv` (refdes -> part type ->
+   decal), not by its name. Decal names are shared or inherited: the STM32F746 sits on
+   a pad group called `STM32F429_LQFP100`, so never infer a chip from a footprint name.
 
 ## Answer schema (this repo machine-checks against it)
 
+One row per question, 8 columns - the 7 working columns plus a leading anchor so the
+result is verifiable line by line:
+
 ```
-<file>:<row> | conclusion (one sentence) | evidence strength (datasheet text / vendor page / distributor) | source (document + revision + page or table) | verbatim English quote | contradiction with the premise | unverified items
+anchor | IC/件 | 引脚或功能 | 手册公式或规格(原文) | 手册推荐条件 | 板上实际值 | 判定 | 出处与依据强度
 ```
 
-Hard rules for the answering side:
-
-1. Every conclusion needs a document name + revision + page or table, plus a short
-   **verbatim English quote**. No citation = no answer.
-2. Anything not read from official material is written as `unverified`. Never fill a
-   gap with "typical value" or "usual practice".
-3. Distributor or aggregator text is a lead, not evidence.
-4. If official material contradicts the premise in the file, say so plainly.
-5. Answer only the question at the top of the file. No design proposals.
+- `anchor` = `<merged file>:<section>` e.g. `TASK_C_ic_context_all.md:U314`, or
+  `MANIFEST.csv` row for census/BOM answers.
+- `判定` in `一致 / 不一致 / 信息不足`. `出处与依据强度` = document + revision + page or
+  table, marked `手册原文` / `厂商页` / `第三方`, and must carry a short verbatim English quote.
+- Anything not read from official material: write `unverified` in that cell. Never fill a
+  gap with a typical value or usual practice. Distributor text is a lead, not evidence.
+- If official material contradicts the premise stated in the file, say so in `判定`
+  rather than working around it.
+- Answer only the question at the head of each section. No design proposals.
 
 Verification on our side: rows are re-checked by re-decoding the decals with
-`tools/pads_asc_decal.py`, and by spot-recomputing 10 random BOM/census rows.
-A batch with any failed spot check is returned whole, not cherry-picked.
+`tools/pads_asc_decal.py`, by recomputing the totals in each merged file, and by
+spot-recomputing 10 random rows. A batch with any failed spot check is returned whole.

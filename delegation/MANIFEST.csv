@@ -1,0 +1,67 @@
+path,bytes,sha256,first_line
+README.md,3040,a29822463cf735fb6ae7a5cc93096361ca6e9246c95a1446bb8c7d8c08a70a56,# Delegation input pack
+TASK_ABE_census_and_bom.md,12912,9802ae085078507a8feba89d37c00a24410ea1ba5546170f50085ac9025a640b,"# TASKS A/B/E - every distinct part on the board, and the DigiKey-numbered BOM rows"
+TASK_C_ic_context_all.md,80551,4235ddcca5ab43a54a4915612da7d8331f4fdf371ee1529bc695bbc0f35273bc,# TASK C - external parts vs the datasheet formulas
+TASK_F_decal_raw_all.md,48787,648b8b5b3d6cf4bc8c4a57e6f54d6fa6e960c1b647e377d157e70545109a62e0,"# TASK F - board footprint as drawn, verbatim, vs the vendor's recommended land pattern"
+bom_rows.csv,8297,f37cd2e883d6304d0e6f61cef9aa7f4bcb7d571bcb2a89b219d4e1583ea4ac7d,"qty,digikey,vendor,mpn,octopart_url"
+decal_raw/74CBTLV3253.txt,1733,ea9011bc2dd0fd5bed091f059e91e08d45576ff0b3b12e728be41f630e87a750,74CBTLV3253      M 0     0      8 16 1 0 2
+decal_raw/AD8131.txt,1358,12fba0d9d64b67b4bb936b7d3f539c6d2e7e921439d43bbdbf4bbd71016774f3,AD8131           I 0     0      8  8 1 0 2
+decal_raw/AD8302.txt,1645,c9c880f00abab64e42944196c7b0bfb469036c99fd88f561316c526273a08f41,AD8302           M 0     0      8 14 1 0 2
+decal_raw/AUDIO_AMP_TPA0253DGQR.txt,1018,0784024cb06fb3b581b2c84c8819df77edbe0f3f303952028189aae83164e54f,AUDIO_AMP_TPA0253DGQR M 0     0      3 11 2 0 2
+decal_raw/BALUN_1-2_WBC2-1TL.txt,1001,1aaf788517fdb369052e3fa807038c0516d044de0dc62fc892698947ebdffadd,BALUN_1-2_WBC2-1TL M 0     0      7  6 1 0 2
+decal_raw/BAT-MANAGE_MCP73871.txt,3479,2705708ff8536f505611cd2166cc1da3b4955debb9683e2c2bf2f85e87feec08,BAT-MANAGE_MCP73871 M 0     0     11 21 12 0 2
+decal_raw/BOOST_REG_ADP1613.txt,1359,e7efdf9404dbe9deaf48236b01a8ca63a491a1a71bb6af7105da68793ac8926b,BOOST_REG_ADP1613 I 0     0      8  8 1 0 2
+decal_raw/BUCK_REGULATOR_AP3417C.txt,676,3294fbc8de67f17a866a46c57bee0340e24e4e3ded09b01528b6567901a13d80,BUCK_REGULATOR_AP3417C M 0     0      2  5 1 0 2
+decal_raw/DIGITAL_POT_MAX5388.txt,1492,cc8974955945214c498e2be2d607239e18237e8aa439d463b31bafc84f859536,DIGITAL_POT_MAX5388 M 0     0      8 10 1 0 2
+decal_raw/DPDT_ANALOG_MAX4525.txt,1428,cc2f47c89a580ca1d86b94ec6f78643c9f287b1cc1c8403b50f1c7cc80348670,DPDT_ANALOG_MAX4525 M 0     0      8 10 1 0 2
+decal_raw/GP-1513.txt,1656,3634491972ade43017ebc95a6ade48b1e706883137046add278d9126e85ae985,GP-1513          I 0     0      3 22 3 0 2
+decal_raw/MCP6N11.txt,832,f02ecc0c10ada83d5677315470897f4c0ab533fd49974fe45d5f02b9dc4ee12d,MCP6N11          M 0     0      2  8 1 0 2
+decal_raw/MICROPHONE_MEMS_SPU0410HR5H-PB_ALT.txt,676,134f9e3eabf8408ad9adddc42f9780256a60c556cfcf7e26807a04d1b3f8304e,MICROPHONE_MEMS_SPU0410HR5H-PB_ALT M 0     0      2  4 1 0 2
+decal_raw/MIC_PREAMP_SSM2167.txt,1491,6826018883d31254f99e30438ac061f84590615e8832afe951c24faef3c274fe,MIC_PREAMP_SSM2167 M 0     0      8 10 1 0 2
+decal_raw/MIXER_DIODE-RING_ADE-2ASK.txt,842,eb7e192bd4b574995a40e44da35396a2cdc2951ae85ea25d99989d83ef772937,MIXER_DIODE-RING_ADE-2ASK I 0     0      3  6 1 0 2
+decal_raw/MMIC-AMP-HMC482ST.txt,1012,b77184756188e9a32955c48dc90f49713e113e91238b132523cd55ef81c16e77,MMIC-AMP-HMC482ST M 0     0      3  3 1 0 2
+decal_raw/OP_AMP_FAN4174.txt,733,82f58abcf4e9e5073440a3d8a2aaf8d6168d1aa8d8891152411bc0cb954d2594,OP_AMP_FAN4174   M 0     0      3  5 1 0 2
+decal_raw/RF_DPDT_MASWSS0129TR.txt,2299,4f84eaab9189a1f2affffc87d73b5fe81c97722e03aaf82bf45802e94df98df3,RF_DPDT_MASWSS0129TR M 0     0      7 13 8 0 2
+decal_raw/SI5338.txt,3527,9f9f23d76af7b0aad30b310e66cb528ab60a48c437cc4ad825a7e3f8217a80a1,SI5338           M 0     0      7 25 14 0 2
+decal_raw/SPDT_ANALOG_SWITCH_SN74LVC1G3157.txt,771,581414251cedec9e9266430e43b259612a44623a8e2bfd3d14b13f6e6dad0938,SPDT_ANALOG_SWITCH_SN74LVC1G3157 M 0     0      3  6 1 0 2
+decal_raw/STM32F429_LQFP100.txt,11893,eeaa03984a02ca413239b341fee53bbbe28435d387f41e4c11906019142bf736,STM32F429_LQFP100 M 0     0      8 100 51 0 2
+decal_raw/SY10EP52V.txt,1422,23e12df0c069c74d4da0ccd6c6320b83164e988e9250f75cf01e9668ea337d07,SY10EP52V        I 0     0      8  8 1 0 2
+decal_raw/VARIABLE_FILTER_HMC1023.txt,4368,e5cbb933a74d20431522dd726784d0ed9fb3c0e8f92bfc4c2057435031bf190c,VARIABLE_FILTER_HMC1023 M 0     0      7 33 18 0 2
+decal_raw/_index.csv,3001,739cebc1aa56ba7d13adffc64cf51e2ad97596c386316b2ebe4ede9e7ad0161e,"refdes,netlist_part_type,placement_type,decal,terminals,block_file"
+ic_context/L39.md,1300,0d2c73d058f92454a2745493ec86c785d1e8dbdf8b944940448fc07e4a935209,# L39 - pin/net context
+ic_context/L41.md,1170,da99e006b34204e88b9291b05d2d5056eb3faa3edc2b4bedb65122396ca32a08,# L41 - pin/net context
+ic_context/L81.md,1172,b5f5a880fc8863b5c2acf5769cf35d9bb88312040fada1d9ec398b84efafe231,# L81 - pin/net context
+ic_context/L82.md,1080,7c3218d9b27066922e52a5072fc18622ef149a25c1c397b4adbdcd1e68c54e9d,# L82 - pin/net context
+ic_context/U114.md,1608,d50d22fe24a2b079d845bfb9108eabe1d12673f2616c536c9f5aedb50d22489b,# U114 - pin/net context
+ic_context/U121.md,11203,8b8636778d0a3aeed39b3009846d6588dae4b83237b844fb0d7f86175ab7be25,# U121 - pin/net context
+ic_context/U131.md,1391,dbeba9846e840ce80ba9fb6b0bdd861255574afbd9eddf952d976f138a02b407,# U131 - pin/net context
+ic_context/U15.md,1707,0e80a5bdc9e9f349ade3327a0a76b3fa53aa334c54f574ef2848409e9bd64fd1,# U15 - pin/net context
+ic_context/U16.md,3100,745de47a4a6edb0c541fde58ca581cd903d778427a4ae1152a7fde17b2d96c0e,# U16 - pin/net context
+ic_context/U161.md,4749,94579de7156c6842000b9794642d64788b5d160aeaa2e3e278a4380f041ccae3,# U161 - pin/net context
+ic_context/U18.md,1903,49882d153571dd363d6f838491f4e2a865ffc31ff04207272756cefa10665eee,# U18 - pin/net context
+ic_context/U185.md,2323,40ebdfb930e6ae1269c45e77c5f160588b165b0045b5b9cfca80ca1946638a16,# U185 - pin/net context
+ic_context/U189.md,1637,4663197fca5762196e49cf601f0a3fead22dc9e4b9c46da46a427fe37331b65e,# U189 - pin/net context
+ic_context/U199.md,1844,9b158a8384c9e8d762ef31dc090c36e585a1536fa2d68d601839610113364298,# U199 - pin/net context
+ic_context/U211.md,2591,9898633ef7c8d7066348e1e51c3f7ae4ae76ec13067b54c3eda580f48114a41d,# U211 - pin/net context
+ic_context/U216.md,1394,d334b6539403e279f17374b86619bdb580b98c58b1172f75021ae5889081ecc2,# U216 - pin/net context
+ic_context/U24.md,3113,eb7cdc44c0a14216ae1f15496ff573199a39ce098bcd2473c436ccdd004c15b0,# U24 - pin/net context
+ic_context/U241.md,4032,5fe4c370afed78f0ccfb0f24468dfe92a7615aa42c81fb7f35f65f889748d271,# U241 - pin/net context
+ic_context/U253.md,1706,db03559944328af033865be6a69bc429cb97461d3361b842a782fb248f32ddc5,# U253 - pin/net context
+ic_context/U255.md,1839,d3f2e28f3db2850b5b99a711c42d1479a2080419efbddab50a31809fe4f86b7b,# U255 - pin/net context
+ic_context/U260.md,1706,7cf036aaf175c143b3082f6365048faa96c7c04108c743fa8c23d71e04f2c0bb,# U260 - pin/net context
+ic_context/U272.md,1843,a2f2f27f5bd4212d2307a75b4764babb247d11fced4ceef5e8cf7a45dc4162ca,# U272 - pin/net context
+ic_context/U279.md,1654,7c6320d3b50251d58ab1c5fa42a364a4a401c719b5bca357d64c06e9c7d53cab,# U279 - pin/net context
+ic_context/U280.md,1654,0baba615dc1c07007c81e7f1e1007b4487425e79e8fbb6c0d37e0f0f55c4b91e,# U280 - pin/net context
+ic_context/U287.md,6746,2fdb4a880d440f4c7db322e82cd44a11b0e2f4e6b2dbedc47ad6eab692ee8462,# U287 - pin/net context
+ic_context/U298.md,2589,c6be5fb8a0cf9bab81186e17d1ca5a7b3557b4a1c1ef393b825bdc199e02a9d1,# U298 - pin/net context
+ic_context/U30.md,3063,ae8269dc0352ed9cfbc653cbe58db7d37e4f0b7a06287301d810fefa8d6b43ac,# U30 - pin/net context
+ic_context/U304.md,1064,d9ed32ad31f3090b5a73cf404e42cbae2e718ac97d76beb514b422c47aac3080,# U304 - pin/net context
+ic_context/U314.md,1740,43e8677655940d0538eeff4545623160142b399b5854b5403c0b70f2cd87d3d2,# U314 - pin/net context
+ic_context/U32.md,1551,a0ddea5775e1f9c4210f668b12f5cbc3c7795fea9467c4ed99ea505f816e05ca,# U32 - pin/net context
+ic_context/U37.md,1443,71e78cff95bea3a50a0e7338a9ab8be567aa2ed3ef021d2139276dfb2c0a327e,# U37 - pin/net context
+ic_context/U4.md,1903,6aaa89c1530a93afec348a45942cf5aa6f385950a446414ad5fe9cbd0ed8c9da,# U4 - pin/net context
+ic_context/U47.md,1385,66a4fa86cde23f3f217149bcf724085ad532188e209a0901b10568ecea42529e,# U47 - pin/net context
+ic_context/U58.md,1385,f7d1a42989f9f441f229984c9f833a855ba87a99eab82b3610de0fefdee0c773,# U58 - pin/net context
+ic_context/U85.md,1797,889e44dd05dafe30ee67c18d92d5c4c46069a6553b2cc84a7cb09e2cdbf1177b,# U85 - pin/net context
+ic_context/U86.md,1901,f9f23a1f13cf70a5287f2926c298c38bf66acd2a4ecb4a79cca112a1f72e9fef,# U86 - pin/net context
+parts_census.csv,2965,1460679f7c91a07c6cb55946d5f9ea2d8c0993c0d74feb1be35e4a58b27f1cba,"part_type,qty,category,designators"
