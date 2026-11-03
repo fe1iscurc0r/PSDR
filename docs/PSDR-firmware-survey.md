@@ -36,6 +36,24 @@ git log --oneline -1 -- Source Source_F7           # 仍指向并入时的提交
 本轮只新增本文档与 `docs/WO-psdr-takeover.md` 的记录。任何以"注释"为名的源码改动都没有做——
 这是用户明确的边界（不改源码、不做 vibecoding）。
 
+**但"主线里没有源码改动"这句不许说**（2026-11-03 自查，命令与结果都在这儿）：`next:Source_F7/`
+相对 `upstream/PSDR_Rebuild:Source/` 有 **6 行 `.c` 改动**，是为了让 GCC 13 能编而加的 include 修正，
+在 `Source_F7/Makefile.linux` 头部第 (e) 条与本总账 §E-7 都有记录，不是暗改：
+
+```
+$ git diff --stat upstream/PSDR_Rebuild:Source next:Source_F7
+ .gitignore              |   1 +
+ Makefile.linux          | 112 +++++++++++++++++++++++++++++++++++++
+ src/frequency_control.c |   1 +
+ src/si5338.c            |   5 ++++
+ 4 files changed, 119 insertions(+)
+$ git rev-parse next:Source_F7/src/main.c upstream/PSDR_Rebuild:Source/src/main.c
+def78a44... def78a44...        ← 主文件逐 blob 相同（i2c.c / dds.c 同）
+```
+
+⇒ 准确表述：**审阅与注释全部写在 `docs/` 里，`.c/.h` 只有上述 6 行编译必需的 include 修正**；
+"没改一行源码"这种话以后不许写。
+
 ## 1. 两棵树的文件构成
 
 | 文件 | F4 行数 | F7 行数 | 说明 |
@@ -60,10 +78,26 @@ git log --oneline -1 -- Source Source_F7           # 仍指向并入时的提交
 | `src/Timer.c` | 53 | 53 | GNU ARM Eclipse 模板（作者 Liviu Ionescu），SysTick 延时 |
 | `src/_initialize_hardware.c` / `BlinkLed.c` / `uart_hal_stub.c` | 138/29/46 | 182/29/— | 启动与杂项；`uart_hal_stub.c` 是我们补的链接桩 |
 
-**纠正一处我自己写错的描述**：我在施工记录 §E-7 里把 F7 线称作"CubeMX + FreeRTOS 重写"。
-实测 F7 树里 **没有任何 FreeRTOS**（`xTaskCreate` 全树 0 处，`system/` 下只有 HAL 与 CMSIS）。
-两条线都是**裸机超级循环**，F7 的差别是换了 CubeMX 生成的 HAL 骨架、加了 Si5338 频率合成、
-拆分了 I2C 驱动、补了外设断电函数（`teardownPeripheralPower`）。这条更正在本文生效。
+**纠正两处我自己写错的描述（2026-11-03 第二轮）**：
+
+1. 我在施工记录 §E-7 里把 F7 线称作"CubeMX + FreeRTOS 重写"，随后又在本文件写"实测 F7 树里
+   **没有任何 FreeRTOS**（`xTaskCreate` 全树 0 处）"。**前半句的更正过头了**：
+   - 对 `Source/`（F4）与 `Source_F7/`（= `PSDR_Rebuild` 的 `Source/`）两棵**应用树**成立——
+     应用代码里没有 RTOS 调用，两条线都是裸机超级循环；
+   - **对整库不成立**：同一血统里有作者 2019-05-24 的 CubeMX + **FreeRTOS** 重建
+     （`b78769a`，在 `PSDR_Rebuild` 里、**不在 `PSDR_F7` 里**，故也在我们 `next` 里），落在
+     `TestingMakeFile/PSDR`（785 个 `.c`，项目级 36）、`TestingMakeFile/PSDRestore/PSDR`（395，带
+     `makefile` + `STM32F756VGTx_FLASH.ld`）、`TestingMakeFile2/PSDR`（390，项目级 17，带
+     `Makefile` + **`STM32F746VGTx_FLASH.ld`**——芯片正是 2.6.1 的 F746）。
+     FreeRTOS 是真在跑的：`TestingMakeFile/PSDR/Src/main.c:137 MX_FREERTOS_Init(); :140 osKernelStart();`
+     ＋ `Src/freertos.c` ＋ `Drivers/CMSIS/RTOS/` ＋ `stm32f7xx_hal_timebase_TIM.c`（RTOS 配套 HAL 时基）。
+     我当时的 grep 只覆盖两棵应用树，所以"全树 0 处"是**口径错误**。
+2. 由此，本文 §5 的"不值得为此换到 FreeRTOS"**不能按原话读**：作者 2019 年已经选了 FreeRTOS，
+   并且把他最头疼的 DMA 视频做到"pretty much perfectly"，只是**radio 一行没移植**（他自述
+   "It can't do any radio like things yet… no interface, no audio"）。该建议的适用范围见 §5 的更正。
+
+F7 相对 F4 的真实差别（不变）：换 CubeMX 生成的 HAL 骨架、加 Si5338 频率合成、拆分 I2C 驱动、
+补外设断电函数（`teardownPeripheralPower`，`main.c:294`）。详见 `docs/PSDR-author-measurement-log.md` §3。
 
 ## 2. 模块级中文注释与审阅
 
@@ -270,8 +304,8 @@ F4：14 个入口，含 `TIM3_IRQHandler` 等业务中断；F7：只有 fault �
 
 | # | 位置 | 现象 | 说明 |
 |---|---|---|---|
-| P0-1 | `Source_F7/src/main.c:1021-1032` | 无条件 `while(1)` 只刷屏，`main()` 到不了 1065 行主循环 | 调试残留；按现状源码，F7 上电后停在蓝黑交替刷屏 |
-| P0-2 | `Source_F7/src/frequency_control.c:54-55` | `while(result != HAL_OK)` 无超时 | Si5338 不应答时开机永久阻塞，先于显示初始化 |
+| P0-1 | `Source_F7/src/main.c:1021-1032` | 无条件 `while(1)` 只刷屏，`main()` 到不了 1065 行主循环 | 调试残留；按现状源码，上电后停在蓝黑交替刷屏。**分支归属（2026-11-03 复核）：这条只在 `PSDR_Rebuild` 血统里有**——我们镜像的 `Source_F7/` 与 `PSDR_Rebuild:Source/src/main.c` 逐 blob 相同（`def78a44`），而维护者的 `PSDR_F7` 树里这段已被注释掉 |
+| P0-2 | `Source_F7/src/frequency_control.c:54-55` | `while(result != HAL_OK)` 无超时 | Si5338 不应答时开机永久阻塞，先于显示初始化。**这条不是 Rebuild 专属**：`PSDR_F7` 树没有 frequency_control.c，同一圈无上限重试在 `PSDR_F7:Source/src/main.c:1031-1032`（维护者 2026-11-03 说"我2棵里 i2c.c 结构不同"，结构确实不同，但等待本身仍在） |
 
 ### P1（功能缺失/明显错误）
 
@@ -304,11 +338,19 @@ F4：14 个入口，含 `TIM3_IRQHandler` 等业务中断；F7：只有 fault �
 2. **两条线已经分叉**：F4（自写 HAL 层 + 自写 uart/misc）与 F7（CubeMX HAL + Si5338 拆分 + 信号路径表）。
    **F7 的结构明显更好**（驱动分层、外设断电、频率合成独立），应当以 F7 为演进主线，
    F4 保持"能构建、能对锚点"的冻结状态，不再加功能。
-3. **要不要上 RTOS？** 当前两棵树都是超级循环，而 F7 的痛点（P1-3：重活在 ISR、
-   主循环与 ISR 共享缓冲）恰好是 RTOS 或至少"前后台 + 双缓冲"要解决的。
-   但**不值得为此换到 FreeRTOS**：这个规模用"主循环 + 定时器中断 + 双缓冲 + 状态机"就能解决，
-   引入 RTOS 会带来栈/优先级/竞态的新问题，且没有实测条件。
-   ⇒ **推荐：保持裸机，做结构性三件事**（见 §5 第 1-3 项）。
+3. **要不要上 RTOS？**（**2026-11-03 限定适用范围**——原话"不值得为此换到 FreeRTOS"是
+   在我没看过 `TestingMakeFile*/` 的情况下写的，收回）
+   - 事实：`Source/`(F4) 与 `Source_F7/`(= `PSDR_Rebuild` 的 Source) 两棵**应用树**是超级循环；
+     而同一血统里作者 **2019 年已经建了 CubeMX + FreeRTOS 的重建**（`b78769a`，
+     `main.c:137 MX_FREERTOS_Init(); :140 osKernelStart();`，`TestingMakeFile2/PSDR/Makefile` +
+     `STM32F746VGTx_FLASH.ld`），他自述 **DMA 视频"基本完美"、但 radio 一行没移植**。
+   - 所以问题不是"该不该引 RTOS"，而是 **"要不要沿用他自己选定的那条下一代线"**。
+     对**现有裸机树**做演进，我的建议不变：主循环 + 定时器中断 + 双缓冲 + 状态机就够，
+     引 RTOS 会带来栈/优先级/竞态的新问题，而我们没有实测条件去驾驭它。
+   - 若要**向作者的下一代靠拢**，正确动作是先审 `TestingMakeFile*/`（36/17 个项目级文件、
+     `freertos.c` 的线程表、DMA 显示路径），量出"把 radio 代码搬过去"的真实工作量——
+     **而不是**由我们从零再设计一套 RTOS 结构。见 `docs/PSDR-author-measurement-log.md` §3。
+   ⇒ **推荐：`Source_F7/` 保持裸机做结构性三件事（§5 第 1-3 项）；改基/演进另立一线，先审后说。**
 4. **真正需要"换架构"的是射频控制**：`signalPath()` 的散装 GPIO 写法必须换成"模式表 + 极性自检"，
    否则 #16 永远无法收敛。这是数据/接口层重构，不是固件重写。
 

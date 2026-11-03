@@ -2748,3 +2748,390 @@ worktree 干净。留着的是三个还有用的：主树、PR #18 的 `bom_pr`�
 上游会看 PR（维护实际只剩我们和 maintainer 两人），所以 PR 正文只放可核对的证据，
 不放意向。国产化/替代件这条线**不并入上游、不写进 PR**，在实测完成之前最多是个意见；
 而实测本身依赖硬件与仪器，可能长期不发生——§G-4 保持"提案 + 明确标注大概率不做"。
+
+## 任务 H · 需求边界修订（2026-11-03）
+
+用户 2026-11-03 对 `docs/PSDR-scope-and-cost.md` 上一版拍了六条：VNA 不能砍（"我当时看中就是
+VNA"）、GPS 可以更便宜、LC 带通组**要先验证**才允许向上游提、电容这轮不谈、CMOS 与继电器都行
+但**要一个合并结论**、以及一个方向性疑问"短波段真的有火腿吗，不该是 UV 更合适吗"。
+本轮全部按"只读 + 文档"处理，不改设计、不改固件源码。
+
+### H-1 VNA 改判为保留项，成本地板随之上移
+
+上一版"砍 VNA ≈$33"作废。改判不只因为用户偏好，网表本身也支持：VNA 不是外挂而是主链路。
+
+```
+ANT/VNA-IN.1 → C303 → U16.10/12 → (U304 放大器旁路) → C21 → U24 → C27 → U30 → C306 → RF_REF → VNA-OUT.1
+RF_REF = C306.1 C322.1 R28.1 R321.2 REF.1 VNA-OUT.1(RF)     ← 桥的参考臂
+RF_ANT = C309.1 DUT.1 R29.1 R308.2                          ← 桥的被测臂
+U314(AD8302)：INPA ← C322，INPB ← C309                     ← 跨接两臂取幅度/相位
+```
+
+三级 GaAs DPDT 的分工也一并钉死（U16=放大器旁路、U24=阻抗桥插入/旁路、U30=射频口切换），
+控制线全部来自 MCU：`AMP_SWITCH_A/B`、`IMP_BRIDGE_SWITCH_A/B`、`TX_RF_SWITCH_A/B`——
+与 `Source_F7/src/main.c` 的 `signalPath()` 注释逐条对得上。所以砍 VNA 等于重做 RF 主链，
+省下的 $33 会以改版代价还回来。**保留版地板 ≈ $225–235**（GPS −16.9、HMC1023→LC 组 −19、
+1210 电容 −7、开关换型 ±2）；旧数字"$190–200"只在砍 VNA 时成立，已在文里写死作废。
+
+### H-2 我自己的一处错误：CMOS 开关"板上有先例"这个论据不成立
+
+追 MAX4525 时发现它是**低电压单电源件**，且本板把它接在 3.3 V 上：
+
+```
+# 逐引脚网络归属：临时内联脚本读 dist/netlist/PSDR_2.6.1_netlist.json
+U4  pin 10 V+ -> +3V3      U18 pin 10 V+ -> +3V3      U86 pin 10 V+ -> +3V3_CPU
+
+$ grep -n MAX4525 Hardware/BOMs/PSDR_2.6.1/OctopartBOM.csv
+70:3,MAX4525CUB+-ND,Maxim Integrated,MAX4525CUB+,https://octopart.com/max4525cub%2B-maxim+integrated-42624946,...
+```
+
+手册（Maxim 19-1332 Rev 0）：单电源 **+2 V～+12 V**，Ron **200 Ω@+5 V / 500 Ω@+3 V**，
+轨到轨信号，关断漏电 2 nA。500 Ω 串进 50 Ω 系统 = `20·log10(1+500/100)` ≈ **15.6 dB 插损**。
+
+⇒ 替代提案 §4.1 路线 C 里"板上已有 CMOS，证明 CMOS 可用"这句**是错的**：I/Q 那些高阻电压节点
+用 500 Ω 级开关成立，天线侧 50 Ω 节点不成立。两处都已就地更正（alternates §4.1 引用块 +
+scope §7.1），并把"作者的 I/Q=CMOS / 天线侧=GaAs 是按阻抗分工"写进去。
+教训还是同一条：**跨层核对要按物理锚点**——这次救场的是"开关的供电轨接的是几伏"这个锚点；
+只看位号和封装名会得出方向相反的结论。
+
+### H-3 LC 带通组：未验证，所以不提上游；但验证不需要改版
+
+按用户的条件（"如果你验证过性能能够更好、动态范围更高的话"）如实回答：**没验证过**，
+这里没硬件没仪器。因此本轮**不开**这条上游 issue（开上游 issue 本身也要逐次批准）。
+
+意外收获（板子给的，不是推测）：外接滤波器插槽**已经在板上、也已经在 mux 档位里**。
+
+```
+U211/U298 = 74CBTLV3253，VCC=+3V3，1OE/2OE 接地，S0=FILTER_S0(U121.40/PE10)，S1=FILTER_S1(U121.55/PD8)
+E_FILT_IF_P/N、E_FILT_RF_P/N 封装类型 = 0.1"_1PIN（四个直插焊盘）
+FILTER_IN_P/N / FILTER_OUT_P/N ↔ U287(IIP/IIN/OQP/OQN)
+```
+
+⇒ 插一块 6 段 LC 小板就能和 HMC1023 同机 A/B，不动主射频设计。两个必须如实标注的缺口：
+固件 `FILTER_S0/S1` 只出现三处、三处都写 `(1,0)`＝bypass（`recieve_with_filter:` 分支是空的），
+所以外接档**当前从不被选中**；而 CBTLV3253 的真值表是数据缺口，得实测确认哪档导电。
+固件冻结 ⇒ 不改代码，台架用跳线/断驱动，不能拿信号顶 MCU 的推挽输出。最小测量集（5 项，
+含判据）写进 scope §6。
+
+### H-4 短波 vs UV：找到一个代码级事实，两条边界都反直觉
+
+`Source_F7/src/si5338.c:638-641`：
+
+```c
+frequency *= 2;              //because the flipflops will devide it back down by 2
+if(frequency < 5000000) return;
+if(frequency > 350000000) return;
+```
+
+⇒ 固件实际允许 **2.5–175 MHz**，越界**静默返回**（无错误路径）。两条后果：
+
+1. README 承诺 0–35 MHz，但 **160 m（1.8–2.0 MHz）和 0.1–2.5 MHz 本来就调不到**。
+   用户 2026-11-03 就此定了性：**发射端不算损失**——1.8 MHz 的 λ/2 要 83 m、λ/4 要 42 m，
+   背包那 20 m 线只有 0.12λ，5 m 鞭 `Rr≈40(h/λ)²` 不到 1 Ω，白天还被 D 层吸收，
+   "便携 + 160 m 发射"本来就不成立（同他买日版 705 的取舍）；**真正丢的是 0.1–2.5 MHz 的
+   接收**（中波 DX、135 kHz WSPR、NDB），那是 SWL 价值。**措辞边界**：只写"固件不允许
+   2.5 MHz 以下"，不写"硬件能做到但被代码挡了"——`SY100EP52V` 的最低输入频率和巴伦
+   `WBC2-1TL` 的低频下限还没查完（分频件普遍有最低频率约束），硬件地板可能本来就在几 MHz。
+   ⇒ 对上游的正确形态是"**README 0–35 MHz 与代码 2.5–175 MHz 不一致，且越界静默 `return`
+   无错误路径**"，不是"请支持 160 m"。（是否真开这条 issue 仍逐次批准。）
+2. **2 m（144–148 MHz）已在 LO 允许范围内**，而 70 cm（430 MHz）需要 LO > 350 MHz，
+   现在必然调不到。所以"要不要做 UV"的瓶颈不在 LO，而在**前端选择性/预置滤波器、真正的 PA、
+   以及 FM 模式（固件只有 AM/USB/LSB/CW，且固件冻结）**。
+
+结论保持：本体留在 HF（差异化在"自带屏 + 瀑布 + 天线 VNA + 电池"这个组合），
+VHF/UHF 走外置变频器 + 板上原始 I/Q 焊盘（RXI/TXI/RXQ/TXQ，均 `PAD_1MM`）。
+另外核实：**全板 391 件里没有一颗信号继电器**，5 只 IRLML6401 全是电源域开关——
+"继电器"这条路是新增件，不是恢复旧件。
+
+合并结论（scope §7.3，按节点拍，不给通用答案）：**能慢的用继电器**（波段选择、桥的插入），
+**不能慢的才用 RF 级低阻 CMOS**（T/R 全插、VNA 快扫）；通用逻辑 CMOS 只待在 I/Q 高阻节点。
+天线侧三只 GaAs 的替代首选继电器（接受半插）、次选 RF 级低阻 CMOS，两者都要重新核
+插损/隔离/时序、都要改板、都不并入上游（§G-4/§G-5 口径不变）。
+
+### H-5 查"具体极限"：查出唯一射频增益件在 HF 本来就没增益（2026-11-03）
+
+用户让查各频段真实极限，并批准"可以提 issues"。逐件结果与依据强度落在
+`docs/PSDR-scope-and-cost.md` §8.2、`docs/PSDR-open-data-gaps.md` #3/#9/#10、
+`docs/PSDR-alternates-proposal.md` §2.1。这里只记关键的两条与查法。
+
+**一、器件极限**（公开检索，未上仪器）
+
+| 件 | 结论 | 依据 |
+|---|---|---|
+| U304 `SXB-2089Z`（同族 SBB2089Z） | **50–850 MHz** ⇒ HF 全段无增益 | SIRENZA 手册标题即"50 - 850 MHz, Cascadable Active Bias InGaP/GaAs HBT MMIC Amplifier"；Qorvo 参数页 min 50 / max 850 MHz、20 dB、NF 2.7 dB、5 V/90 mA、SOT-89 |
+| 封装名对应的 HMC482ST89 | **DC–5 GHz**，但要 **+6～+12 V** | 厂商转载页（P1dB +22 dBm、20 dB、SOT-89）⇒ 与本板 `+5V_AMP` 不符 ⇒ 名字是化石、电气按 5 V 件重设计过 |
+| 巴伦 L39/L82 `WBC2-1TL` | 是 **Coilcraft WBC 系列**（不是 Mini-Circuits），族表 WBC1-1L **0.400–600 MHz** ⇒ 1.8 MHz 可用 | 华秋/立创参数条目 + elecfans 的 WBC 系列文章（WBC2-1TL 逐档仍待核） |
+| U279/U280 `SY10EP52V` | **最低输入频率没查到**，仍是缺口 | 中英文检索只拿到同类 GaAs/SiGe 分频件"正弦波有下限、方波可到 DC"的旁证（HMC438/433/492） |
+
+结构侧顺手钉死的一条（网表逐引脚打印）：两只 EP52 是**交叉耦合成正交 ÷2**——
+`CLKA/CLKB`（Si5338 CLK0 经 C265/C267 交流耦合 + R268/R270/R271/R273/R274 偏置网络）进时钟脚，
+`D`、`Q`、`\Q` 三组互相回接，出 `LO1P/LO1N/LO2P/LO2N`，供电 `+3V3_FLIP_FLOP`（经 Q246 P-MOSFET）。
+所以"LO 频率 = 2× 调谐频率"是硬件拓扑，不是软件的随手乘法。
+
+**二、固件侧**（纯读，`Source_F7/src/main.c`）
+
+```
+enum signalPaths (:811-820) 共 7 个状态，只有 0/2/3 有实现；
+  1 recieve_with_filter、4 tramsmit_with_amp_with_filter、5 vna_reflected、6 vna_through 全是空桩
+default: 分支被注释掉 (:937-940) ⇒ 非法值静默无操作
+调用点只有 :1103（TX 用 transmit_no_amp_no_filter，:1104 的 with_amp 那行是注释）与 :1115（RX 用 no_filter）
+三个已实现分支里 AMP_SWITCH_A 一律写 0（bypass），包括 :905 注释写着 "Amp relay set to on" 的那一支
+F4 树没有 signalPath()，但 Source/src/main.c:958 `=1 //Route through amp`、:967 `=0 //Bypass amp`
+```
+
+⇒ **两条能对外说的结论**：① **射频端**当前不存在任何一级增益（器件带宽不符 + 开关从未置成插入，
+两件事叠加），#16 标题"Enable Pre-Amp in Firmware"若只按字面在固件里打开，HF 也不会有 RF 增益。
+**注意不要说过头**：混频之后的基带放大是有的（`U255/U272` 两只 MCP6N11 仪表放大器 +
+`U15` MAX5388 数字电位器设增益），所以损失的是噪声系数/镜像抑制这一档，不是"整机不能工作"；
+② **VNA 的两条路径在固件里是空的**——VNA 定为保留项之后，缺的是这两段状态与扫描流程，不是硬件。
+另记：#16 楼里 2025-10-30 DM2NT 已在问 `MASWSS0129` 断供，作者答"缺件可以告诉我，我还有存货"——
+断供的短期来源可能就在作者手里（只是信息，不构成我们的采购动作）。
+
+**三、查重**（发东西之前必须做的）：`repo:MichaelRColton/PSDR` 全量 issue 12 条
+（开着的 7 条：#19 我们那条、#16、#14、#13、#9、#8、#6）；#16 的 12 条回帖逐条读过，
+**没有人提过 50–850 MHz 这条**，作者本人在 2021-12-07 只说过"RF 开关要配置、LPF IC 有一堆寄存器"、
+"值得挂个外置前放试试"、"PSDR 几乎完全没有放大设计"。⇒ 这条是新增信息，不是重复劳动。
+
+**当前未提交/未推送的改动**：`docs/PSDR-scope-and-cost.md`（§3/§4/§5/§6/§7/§8.1/§8.2/§9/§10）、
+`docs/PSDR-alternates-proposal.md`（§4.1 路线 C 更正 + 新增 §2.1）、
+`docs/PSDR-open-data-gaps.md`（#3 更新 + 新增 #9/#10）、`docs/README.md`（索引）、本 §H。
+上游三条正文（#16 评论 / 空桩路径新 issue / 调谐范围新 issue）已起草，**先给用户过中文目再发**。
+
+### H-6 待用户输入
+
+- 群里那份"其他开源 HF SSB"文件还没拿到；scope §9 先只写了判据（纯收发前端普遍更便宜，
+  但缺"屏 + 瀑布 + VNA + 电池"这个组合），文件到手再逐个核许可/成本/模式。
+- GPS 三条路线（换国产模块 / 基础版不装只留焊盘 / 同厂降级 NEO）在 scope §5，
+  **A 路线属国产化替代，不报上游**；C 路线可以上游谈。验收四项（首冻、灵敏度、PPS 精度、
+  低压冷启动电流）都要仪器。
+- 本轮全部文档改动清单见上一条 §H-5 末尾，**尚未提交/推送**，等点头。
+
+## 任务 I · 维护者回归：两条实权回复与逐条复核（2026-11-03）
+
+上游今天动了。两条都是 `OWNER`（MichaelRColton）本人回的，都会改变我们的做法，所以
+**先把他的话当假设去验**，不把他的话当结论抄进文档。
+
+### I-1 #7 结案：MIT 正式落地（许可证阻塞解除）
+
+他 2026-11-03T01:47:22Z 关掉 #7："The MIT license is official — fully open (firmware,
+software, and hardware) has always been my intent… Fork and build away."
+
+按 ref 复核（不按他说的话）：
+
+```
+$ git show upstream/master:LICENSE.md | head -2
+MIT License
+Copyright (c) 2026 PSDR
+$ git rev-parse next:LICENSE.md
+aa9f66f0a9e0c0c2700d965a18222eee0dd9ffa6      ← 我们 next 上已是同一份 MIT
+```
+
+⇒ takeover 文档里"LICENSE.md 只有 TODO ⇒ 事实上保留所有权利"这条前置阻塞**已经消失**，
+本 fork 的接手从"请求许可"变成"已授权的接手"。#7 线程本身就是我们 2026-08-19 发起的，
+Jeff 2026-09-11 承诺加 MIT、Michael 今天落地——闭环。历史文档保留原样，只加"已于
+2026-11-03 解除"的标注，不重写历史。
+
+### I-2 #19 他的分支指引：一半对、一半是猜错
+
+他说：master 是老的 F4；我们那份 `Source_F7/` 审阅"看起来来自 DMA 那条线"；
+**`PSDR_F7` 才是该拿来做起点的那棵**（刷屏死循环已注释、`i2c.c` 结构不同）；
+他已在命令行无头把它编出来，并准备以它为基线做 HMC1023 LPF 上电；
+同时肯定我们两处产出：**HMC1023 `VDDBG`（脚 28 没有 5 V）是真板级 bug**、mux/bypass 映射正确。
+
+逐条按 blob 核（本地已有这些 ref，**没有动上游任何分支**）：
+
+| 他的说法 | 核验 | 结论 |
+|---|---|---|
+| `master` 是 F4 | `upstream/master:Source/src/main.c` = `190a0409`（F4 线） | 对 |
+| 我们来自 **DMA** 线 | 我们 `Source_F7/src/main.c` = `def78a44`；`PSDR_F7_DMA` = `f5a41214`；**`PSDR_Rebuild` = `def78a44`** | **错**：我们是 `PSDR_Rebuild`（`i2c.c` 也逐 blob 相同 `619f2f5e`），不是 DMA |
+| `PSDR_F7` 刷屏死循环已注释 | `PSDR_F7:Source/src/main.c:1020-1045` 直接进 setTextSize，唯一活动 `while(1)` 在 :1101 = 真主循环；`PSDR_Rebuild:…:1021-1032` 仍有 `fillScreen(BLACK/BLUE)` 陷阱 | 对 ⇒ **我们的 P0-1 是 PSDR_Rebuild 专属** |
+| `PSDR_F7` 的 I2C 不一样 | 文件确实不同：`PSDR_F7`/`PSDR_F7_DMA` 共用 `c3e49239`（825 行），`PSDR_Rebuild` 拆成 `i2c.c` 138 行 + `frequency_control.c` + `si5338.c` | 结构对，但 **P0-2 没消失**：`PSDR_F7:Source/src/main.c:1031-1032` 就是那圈 `while(result != HAL_OK) result = HAL_I2C_IsDeviceReady(&handleI2C, (0x70 << 1), 100, 100);`——无上限重试还在，只是从 frequency_control.c 搬进 main.c |
+| 分支布局他会整理 | — | 待他做；他动完之前我们不碰上游 |
+
+分支时间线（顺手记下，免得下次又当"最新"猜）：`PSDR_F7` tip `ab2c8fd` **2018-07-31**；
+`PSDR_F7_DMA` tip `457c270` 2018-06-21；`PSDR_Rebuild` tip `b9c0629` **2021-01-27**（Jeff 的 PR #12 合并）；
+`DMA_Video`/`DMA_Video_Alt` 2016-01-13。⇒ 按提交日期 `PSDR_Rebuild` 更晚，按他的说法 `PSDR_F7`
+是他的 F7 主线——**"哪棵为准"要他一句话**，不是我们能替他定的。
+
+### I-3 新发现的代码事实：调谐上下限作者早就写死在 VFO 里
+
+`Source_F7/src/main.c:1730-1731`（= `PSDR_Rebuild:Source/src/main.c:1730-1731`；
+`PSDR_F7` 同一对夹取在 :1766-1767，**两棵 F7 树都有**）：
+
+```c
+if(vfoAFrequency < 2500000)   vfoAFrequency = 2500000;   //Currently, the code can only corectly drive down to 5MHz/2 = 2.5MHz
+if(vfoAFrequency > 175000000) vfoAFrequency = 175000000; //Currently, the code can only correctly drive up to 350MHz/2 = 175MHz
+```
+
+⇒ **两处口径要更正（是我们自己写过头的地方）**：
+1. `si5338.c:635-636` 那两个 `return` **在正常操作下不可达**——编码器路径先把 VFO 夹在 2.5–175 MHz。
+   §H-4 与 scope §8.1 里"越界静默失败、用户无从得知"说过头了；准确说法是
+   "**作者已在 UI 侧夹住范围并写了注释，`setFreq()` 里的 guard 只是第二道保险**"。
+2. 这条新证据反而**加强**"2.5 MHz 是硬件下限"的读法：注释是作者本人写的
+   "code can only correctly drive **down to** 5MHz/2 = 2.5MHz"，与 EP52 正交分频存在最低频率的猜测一致。
+   真正的矛盾是"**README 的 0–35 MHz** vs **代码自带的 2.5–175 MHz**"，不是"代码有隐藏 bug"。
+   ⇒ 第三条上游正文按此**重写**（从"静默失败请报错"降级为"文档与作者自己的注释哪个算数"），
+   价值明显降低，**我倾向先不发**。
+
+### I-4 我们已发出的东西有一处引用缺陷，得自己更正
+
+今天发的 **#16 评论**与重复的 **#20/#21** 正文里，F7 侧行号用的是**我们 fork 的路径**
+`Source_F7/src/main.c`——**上游没有这个目录**（上游叫 `Source/src/main.c`）。
+其余引用是真的：`Hardware/BOMs/PSDR_2.6.1/OctopartBOM.csv:75`、`Hardware/PSDR.asc` 网表、
+F4 的 `Source/src/main.c:958/967`。核对下来**结论在两棵 F7 树都成立**，只是行号要成对给：
+
+| 事实 | `PSDR_Rebuild`（= 我们的 `Source_F7/`） | `PSDR_F7` |
+|---|---|---|
+| `enum signalPaths` 7 个状态 | main.c:811-820 | main.c:806-815 |
+| 空桩 `tramsmit_with_amp_with_filter` / `vna_reflected` / `vna_through` | :928 / :931 / :934 | :923 / :926 / :929 |
+| `//default:` 被注释 | :937-940 | :932-935 |
+| `AMP_SWITCH_A = 0` 三处（bypass 图案） | :838 / :873 / :906 | :833 / :868 / :901 |
+| `//Amp relay set to on` 后仍写 0 | :905-906 | :900-901 |
+| TX 调用用 no-amp、with-amp 那行注释 | :1103-1104 | :1139-1140 |
+| `FILTER_S0/S1` 三处都写 (1,0) | :856-857 / :891-892 / :924-925 | :851-852 / :886-887 / :919-920 |
+| 无上限 `IsDeviceReady` 重试 | frequency_control.c:53-54 | **main.c:1031-1032** |
+| VFO 2.5–175 MHz 夹取 | main.c:1730-1731 | main.c:1766-1767 |
+
+待办（**对外动作，逐条等批准**）：
+① **#20 与 #21 是同一份正文被表单建了两遍**（`created_at 01:25:20Z` / `01:25:34Z`，字节相同），
+   关一条、留一条，并把留下那条的正文换成"按分支给行号"；
+② 在 #16 补一条更正评论（同样按分支给行号，并说明 `Source_F7/` 是我们 fork 的镜像路径）；
+③ 回 #19：谢他指基线 + 给出 I-2 的核验（**P0-1 确为 PSDR_Rebuild 专属；P0-2 在 PSDR_F7
+   里仍在，位置 main.c:1031-1032**）+ 明确一问"哪棵为准"；
+④ 调谐范围那条按 I-3 重写后再定发不发（倾向不发）。
+
+### I-6 ①②③ 已执行（用户 2026-11-03 批准"你都放就行了"），逐条回查过
+
+`mcp__github__*` 每次都回 `-32602 required property 'result'`（老假外壳错误），
+所以每条都用**状态回查**判定，不看返回文本：
+
+```
+#21  issue_write update state=closed state_reason=duplicate duplicate_of=20
+     -> issue_read: state=closed  state_reason=duplicate  closed_by=fe1iscurc0r
+                   closed_at 2026-11-03T05:04:06Z                     只关了一次
+#20  add_issue_comment（按分支成对给行号的更正）
+     -> issue_read fields=comments: 0 -> 1   updated_at 05:05:08Z
+#16  add_issue_comment（同一毛病的更正：Source_F7/ 是我们 fork 的路径）
+     -> comments: 13 -> 14  updated_at 05:05:41Z
+#19  add_issue_comment（三条核验 + 基线一问 + U287 表可提供）
+     -> comments: 1 -> 2   updated_at 05:06:27Z
+```
+
+发出去的三条要点（都只给可核对证据、不附 PR、声明 AI 辅助）：
+- **#20 / #16 更正**：F7 侧行号来自我们 fork 的 `Source_F7/`（上游无此目录，是 `Source/src/main.c`）；
+  并给出两棵 F7 树的成对行号表（见 §I-4），**结论原样成立**：两棵都有 4 个空 case，
+  两条 VNA 路径从未置过任何继电器状态。
+- **#19 回复**：认下 P0-1 是 `PSDR_Rebuild` 专属；更正"我们不是 DMA 血统"（blob 证据）；
+  **指出 P0-2 在 `PSDR_F7` 仍在**（`main.c:1031-1032`，只是从 `frequency_control.c` 搬过来）；
+  一问"哪棵为准 + 有界重试在 `PSDR_F7` 原则上是否可接受"，二问"要不要把我们镜像改基到 `PSDR_F7`"，
+  并把我们的判断摊开：**改基只有代价（M2 构建对账重跑、审阅结论重挂），除非两棵本就要合流**
+  —— 用户 2026-11-03 的倾向是 **B（维持 `PSDR_Rebuild`）**，等他回话再定。
+
+**顺手多验的一条（写下来免得下次重查）**：`LPF_POWER` / `HMC1023` 在 `PSDR_F7` 里同样**没有任何引用**
+（`git grep -niE "lpf_power|hmc1023|lpf" upstream/PSDR_F7 -- Source/src Source/inc` 只命中一行
+"helpful" —— **`lpf` 是 `helpful` 里的子串**，大小写不敏感的交替匹配会吃这种假阳性）。
+⇒ #19 评论里"固件从不驱动 LPF 供电脚"这句对两棵 F7 树都成立。
+
+### I-7 用户提示"2016 年有人打板焊装测过"→ 捞出作者的实测记录，并翻出我们两个错（2026-11-03）
+
+**查法**（全部本地，可重跑）：
+
+```
+$ git log --all --format="%h|%ad|%an|%s" --date=short | grep -iE "dbm|measur|tested|works|assembl|prototype|..."
+$ git merge-base --is-ancestor <sha> {next,upstream/master,upstream/PSDR_F7,upstream/PSDR_Rebuild}   # 逐条判在哪些血统里
+$ git ls-tree -r --name-only next -- TestingMakeFile TestingMakeFile2 | grep -iE "makefile|\.ld$"
+$ git grep -n "teardownPeripheralPower\|osKernelStart" ...
+```
+
+结果汇编成新文档 **`docs/PSDR-author-measurement-log.md`**（sha/日期/作者/血统/原话/数字/关联 issue/
+证据强度全部逐条给）。最关键的四条：
+
+1. **`2c1530d` 2016-05-07**：作者实测"能调 **2.5–175 MHz**"、灵敏度 "**-90dbm on 7MHz**、
+   **-80-85dbm on 146.4MHz**"。⇒ ①与 §I-3 那对 VFO 夹取完全对上，**夹取是实测出来的**；
+   ②我们此前说"第三层（射频验证过的整机）全空白"**过头了**，正确表述是"有作者一手实测自述、
+   无原始数据与测量条件"。③立案：**2016 的 -90 dBm vs 2021 #16 的 -70 dBm 差 20 dB**，
+   三个候选解释（板版本 / 配置 / 测量口径），且**没有条件不许写"退化了"**。
+2. **`1890b25` 2016-04-18**："PSDR 2.5 prototypes **are assembled**"，并说想改的事项记在
+   "**the notes section of the schematic**" ⇒ 库里那份 2.6.1 原理图 PDF 的 notes 区是**作者设计意图
+   的第一手，我们还没挖**（WSL `pdftotext`，本机 Windows 侧无该工具）。
+3. **`b78769a` 2019-05-24（我们的实质盲区）**：作者在 `PSDR_Rebuild` 血统里做了
+   **CubeMX + FreeRTOS 重建**，落在 `TestingMakeFile/PSDR`、`TestingMakeFile/PSDRestore/PSDR`、
+   `TestingMakeFile2/PSDR`（**带 `Makefile` 与 `STM32F746VGTx_FLASH.ld`，芯片正是 2.6.1 那颗**），
+   `main.c:137 MX_FREERTOS_Init(); :140 osKernelStart();` 是真在起内核；他自述 **DMA 视频"基本完美"、
+   radio 一行没移植**。⇒ survey 两处更正：①"全树没有任何 FreeRTOS"是**口径错**（我只 grep 了两棵应用树）；
+   ②"不值得为此换到 FreeRTOS"收回，改成"对现有裸机树成立；要向下一代靠拢就先审那棵树"。
+4. **`#9` 不缺代码**：`teardownPeripheralPower()` 在 `PSDR_F7` 与我们 `Source_F7/` 的 **`main.c:294`
+   都有**，standby 入口 `:2161 HAL_PWR_EnterSTANDBYMode()` ⇒ #9 要的是"不用按 Reset 就能唤醒"，
+   是唤醒源问题。与我们那条未对外说的硬证据正好对上：**PA0 既是 `PA0_WKUP` 又是 U16 的
+   `AMP_SWITCH_A`**（待机时同一根脚同时决定"能不能醒"和"前放停在哪一挡"）。
+
+**对第 2 步计划的改动**：验证"能不能无头编 F7"之前，先试 `TestingMakeFile2/PSDR/Makefile`
+（库里现成、目标芯片正确）——若它能编，改基/演进的成本判断就有真实数字，
+而"把我们手工的 `Makefile.linux` 移植到 `PSDR_F7`"未必是最优路径。
+
+### I-8 改基代价实测：`Makefile.linux` 零改动就能编 `PSDR_F7`，锚点门原样通过（2026-11-03）
+
+**这推翻了我在 §I-5 里给你的成本估算**（"改基要重跑整套对账、优势不大"）——实测下来移植是免费的，
+所以"倾向 B"这个判断的前提不成立了。命令与输出都在下面，全部在板外 `/tmp` 跑，**仓库与上游 ref 未动**。
+
+环境：WSL Ubuntu-24.04，`arm-none-eabi-gcc (15:13.2.rel1-2) 13.2.1`，`/usr/bin/make`。
+
+```bash
+# 1) 结构差异（Windows 侧）
+$ git ls-tree --name-only upstream/PSDR_F7:Source/src | wc -l     # 17
+$ git ls-tree -r --name-only next -- Source_F7/src   | wc -l      # 19（多 si5338.c + frequency_control.c）
+$ for d in include system ldscripts DSP_Lib; do ...; done
+  src 17↔19  include 16↔18  system 164↔164  ldscripts 3↔3  DSP_Lib 323↔323
+
+# 2) 把我们的 Makefile.linux 直接放到 PSDR_F7 的 Source 上编
+$ git archive --format=tar -o C:/Users/ASUS/f7src.tar upstream/PSDR_F7:Source
+$ wsl bash /mnt/c/Users/ASUS/tmp_port_f7_test.sh
+  === make rc=0
+  === error lines: 0   fatal: 0   undefined-ref: 0
+  text 114068  data 18488  bss 18260   (build_linux_f7/PSDR.elf / .hex / .bin)
+
+# 3) 与 PSDR_F7 自己那份已提交的 hex 过我们现成的门
+$ git show upstream/PSDR_F7:Source/Debug/PSDR.hex > C:/Users/ASUS/f7_PSDR_F7_ref.hex
+$ python tools/anchor_check_f7.py <我们编出的 hex> <ref hex>
+  reference  base=0x08000000 SP=0x20050000 reset=0x080002F9 empty-slots=[7,8,9,10,13,95]
+  built      base=0x08000000 SP=0x20050000 reset=0x080001D5 empty-slots=[7,8,9,10,13,95]
+  initial SP agree: True   empty-slot pattern: True   words equal: 7/118
+  RESULT: PASS   (rc=0)
+```
+
+另外那棵 2019 的骨架也量了（`TestingMakeFile2/PSDR`）：Makefile 是 Windows 生成的，
+**只需改 1 行**（`Makefile:213 cmd /c "mkdir $@"` → `mkdir -p $@`）就 `rc=0`、0 error、4 warning
+（全是 newlib `_read/_write/_lseek` 未实现桩），产物 `text 22172 / data 20 / bss 18532`
+⇒ 与他自述一致：**能编、DMA 骨架在、radio 一行没移植**。
+
+**改基真正要重挂的东西**（都不难，但要一件件做完才允许说"改了基"）：
+
+| 要重挂 | 现状 | 工作量 |
+|---|---|---|
+| Makefile | 零改动可用 | 0 |
+| 锚点门 `tools/anchor_check_f7.py` | 原样 PASS | 0 |
+| 我们那 6 行 include 修正 | `PSDR_F7` 没有 `si5338.c/frequency_control.c` ⇒ **这两只文件不存在，修正自动作废**（Si5338 在 `i2c.c` 825 行那份里） | 判定后删注 |
+| survey 的行号引用 | 全部要换成 `PSDR_F7` 的行号 ⇒ §I-4 的对照表已经建好，可直接套 | 机械 |
+| 尺寸注记（Makefile 头部第 25-30 行） | Rebuild 的 -O0 是 112344 B；`PSDR_F7` 是 text 114068 | 改数字 |
+| P0-1 显示陷阱 | `PSDR_F7` **没有**这个陷阱（§I-2 已核） ⇒ 我们的 P0 清单少一条 | 更正 |
+| hex 对账链 | 从"2018-06-21（DMA 期）"换成 `PSDR_F7:Source/Debug/PSDR.hex`（269,832 B，本次已用） | 重跑记录 |
+
+⇒ **建议改为 A（把 `Source_F7/` 改基到 `PSDR_F7`）**，理由不是"跟他合流"这种偏好，而是实测：
+构建免费、门免费、行号对照表已在手，而我们原本镜像的那棵**少一条他已修掉的 P0**、
+又不是他现在做 HMC1023 的地方。要不要动，等你点头——这是主线内容变更，不擅自做。
+
+（本节用的板外临时件已清理：`C:/Users/ASUS/tmp_*.sh`、`f7src.tar`、`f7_PSDR_F7_*.{hex,elf}`。）
+
+### I-5 对主线计划的实际影响（要你拍板）
+
+- 他要以 **`PSDR_F7`** 为基线做 HMC1023 上电，而我们 `next` 里那份是 **`PSDR_Rebuild`**。
+  **(A) 把 `Source_F7/` 改基到 `PSDR_F7`**——跟他并行、以后合得上；代价是 M2 的构建对账要重跑，
+  且 P0-1 消失、`docs/PSDR-firmware-survey.md` 的部分结论要重挂。
+  **(B) 维持 `PSDR_Rebuild`**——我们自己的复现与 hex 对账链完整，只在文档里标注分支差异。
+- 他**人回来了**（今天三条动作：关 #7、指 #19 基线、说正在起 HMC1023）⇒ HMC1023 那条我们
+  **不抢跑**（`docs/PSDR-HMC1023-netlist.md` 的 SPI/校准时钟/VDDBG 全表正好是他现在要的）；
+  LC 带通组、替代件、国产化继续 **fork-only 不上游**（§G-4/§G-5 口径不变）。
+- 他说要整理分支布局 ⇒ **在他动完之前不往任何上游分支推东西**（我们本来也不推）。
+- **用户 2026-11-03 的倾向已记：B（维持 `PSDR_Rebuild`）**——"除了改基的代价，感觉没有太大优势"。
+  这条已在 #19 里摊开问他（见 §I-6），**他回话前不动 `Source_F7/`**；若他答"两棵要合流/以 F7 为准"，
+  改基才有意义，届时 M2 的构建对账要整体重跑一遍再说话。
