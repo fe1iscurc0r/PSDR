@@ -110,7 +110,8 @@ As of 2026-11-03:
 Nothing in this list is proposed upstream; each row says what it does and does
 not establish. The index with recommended reading order is
 [`docs/README.md`](docs/README.md), and every claim's command and output is in
-`docs/WO-psdr-takeover.md` (now chapters A-J).
+`docs/WO-psdr-takeover.md` (chapters A-K; `docs/PSDR-chronicle.md` is the same
+story told in order, including the eleven claims we later withdrew).
 
 | 材料 | 它确立什么 | 它不确立什么 |
 |---|---|---|
@@ -118,7 +119,8 @@ not establish. The index with recommended reading order is
 | `docs/PSDR-alternates-proposal.md` | U304 实测封装/偏置拓扑、候选件的频段与供电门槛、局部改版的范围 | 选型结论 -- 提案不是采购单 |
 | `docs/PSDR-author-measurement-log.md` | 作者自己量到什么：2.5-175 MHz、-90 dBm@7 MHz、2.5 原型装过、2019 年他选了 CubeMX+FreeRTOS | 板子现在还能不能跑到那些数（没实物） |
 | `docs/PSDR-HMC1023-netlist.md` | U287 的 SPI 四线、`LPF_POWER` 无人驱动、`VDDBG` 没有供电 | 改板方案；数据手册级别的结论 |
-| `docs/PSDR-open-data-gaps.md` | 还缺哪些手册、2.6 到 2.6.1 的实质差异只有一处 | 缺料是否等于停产 |
+| `docs/PSDR-open-data-gaps.md` | 还缺哪些手册、2.6 到 2.6.1 的**三处**电阻改动加 2.6.1 表内的自相矛盾（"只有一处 R164"那句已作废，见 §2.1） | 缺料是否等于停产 |
+| `docs/PSDR-chronicle.md` | 编年史：上游 2014→2025 的原史（带时间戳与原话）、接手七天 72 提交按天编年、对外件全表与我们自己撤过的 11 条断言 | 结论汇总与待办（那些在总账与缺口表里） |
 | `docs/SOP-eda-import-2.6.1.md` | 导入后哪些步骤必须人工、"新板直接导入得 10/12 不是回归" | 端到端自动化（已记 `unsupported`） |
 | `docs/PSDR-bringup-checklist.md` | 42 个测点带坐标与网络，上电前该量什么 | 任何实测值（无实物，逐条 SKIP） |
 | `evidence/` | 不可重跑的现场读数（EDA 12/12、DRC 513 的构成） | 可重跑的东西 -- 那些只留命令 |

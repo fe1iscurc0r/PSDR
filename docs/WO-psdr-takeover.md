@@ -3667,3 +3667,35 @@ office-excel 导入（2.6：41,472 B，BIFF `076a7098…`；2.6.1：39,424 B，`
 **6) 本轮没做**：没新开 issue；没向 upstream 推；没动固件源码；没碰 #19/#20；
 `next` 上仍有待办三件——重委派 TASK_C 剩余行（合并文件已重做，KB 里那 59 个散输入是旧的）、
 `docs/PSDR-revB-workorder.md` 起稿、M3 实测量（11 个位号 + 两条轨）。
+
+### K-14 编年史落档 + 外部答案收档（2026-11-04，用户"帮我整理一份完整历史"）
+
+新增 `docs/PSDR-chronicle.md`：五纪结构（上游原史 2014→2025 / 接手七天按天编年 / 对外件全表 /
+**我们自己撤过的 11 条断言** / #16 点名的外部项目与 UHSDR 调研现状），每条都带 sha、评论 id、
+单元格地址或页面原话。写的时候按"写不出处就不写"的规矩现拉了一遍证据，顺手抓到并修掉四处：
+
+1. **`updated_at` ≥ 2026-09 的上游条目是 8 条不是 7 条**（#7/#14/#16/#17/#18/#19/#20/#21），
+   而且 #7 的关闭（2026-09-11）是 maintainer 自己做的，不能算"我们触发"——旧口径改成实测计数并分组说明。
+2. **"maintainer 周末 3 小时回 Please do" 改成可核时刻**：#14 上我方 13:19:34Z 补证据、
+   jeffersonbenson **16:58:37Z 回 "Please do!"**（间隔 3 小时 39 分，日期 2026-10-31 是**周六**），
+   PR #18 是次日周日 12:46:28Z 才开的。原话出处 `api …/issues/14/comments`。
+3. **#17 的日期在按天编年里写错了一天**（写成 11-01，实际 `created_at = 2026-10-31T13:13:09Z`），
+   已挪到 10-31 那行；11-01 那行改成 PR #18（12:46:28Z）。
+4. **两条"只差 R164"的旧口径还在索引里活着**：`docs/README.md` 与 `README.fork.md` 的表格描述列
+   都还写着"2.6→2.6.1 实质差异只有一处"——正文早已作废，**索引没跟着改**。这种"正文改了、目录没改"
+   是本轮最容易漏的一类，已就地改成三处 + 表内自相矛盾，并顺手把 `README.fork.md` 的"chapters A-J"改成 A-K。
+
+外部执行方交回的 6 份答案此前只活在临时目录（`%TEMP%/psdr_answers`），**随时会丢**；
+已逐字节收档到 `delegation/answers/`（只在文件头加了一段 PROVENANCE 注释，正文一字未改，
+原始 sha256 写在头里），并补 `delegation/answers/README.md` 说明每份的核对状态：
+原厂 PDF 那 7 份是复算过的，两份开源 SDR 调研**未逐条复核**，性能数字不得直接进对外文本。
+`delegation/MANIFEST.csv` 只覆盖输入包，不含 answers 目录（已在两处写明）。
+
+UHSDR 这条线的口径也在这轮钉正：**#16 里没人说过"UHSDR 有非常棒的前端设计"**，
+DM2NT 的原话只有 "Andreas DF8OE has already implemented the HMC1023 in his UHSDR" + 一个**目录级**链接；
+我方已把文件与 commit 核到 `mchf-eclipse/hardware/uhsdr_hmc1023.c` / `c447c2e4`（2018-10-21）。
+今日直取 OVI40 官方页面拿到架构原话："direct sampling… upto 48 kHz. Above 48 kHz the RX works as a QSD"、
+TX "50 W"、"dual LDMOSFET design" ⇒ 与 PSDR 的"全程 Tayloe QSD + HMC1023 可编程低通"是同颗器件的两种用法。
+GitHub wiki 页面当日抓取失败（"error while loading"）、`documentation/readme.md` 直链 fetch 失败，
+所以 UHSDR 前端器件级的细节（滤波组、衰耗器、分集接收）**仍未核**，列为下一步：
+本地 clone 后读 `mchf-eclipse/hardware/` 与 OVI40 原理图，对照我们的 `PSDR-HMC1023-netlist.md` 借寄存器序列。
