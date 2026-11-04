@@ -28,6 +28,13 @@
 ## 相关但不在 `docs/`
 
 - `dist/kicad/SHA256SUMS` + `tools/reproduce_kicad.py`：一条命令重建参考板、DRC 与制造包并自检。
+- **`dist/kicad/` 里哪块板才算参考板**（2026-11-04 标注，别拿错文件）：
+  **参考板 = `PSDR_2.6.1_pcb_spike_full.kicad_pcb`**（1.8 MB，2026-11-01，铺铜/板框/丝印齐全，
+  名字里的 `spike` 是早期"探针"阶段的遗留）；**DRC 权威报告 = `drc_PSDR_2.6.1_pcb_spike_full.txt`**
+  （**795 条**，已在总账 §C-16 逐类定性：没有一条是转换几何错误）。
+  同目录的 `PSDR_2.6.1.kicad_pcb`（721 KB，10-31）、`PSDR_2.6.1_spike_TX-Q_DRIVER_P.kicad_pcb`
+  与 **`PSDR_2.6.1-drc.json`（10-30，364 条，其 `source` 字段自己写着 `PSDR_2.6.1.kicad_pcb`）**
+  都是被取代的早期产物，**不要引用它们的数字**；要引用 DRC 一律引那份 `.txt` 与 §C-16。
 - `dist/reference/`：**F7 构建的锚点参考 hex**（两份基线各一，带 sha256/blob/出处）与复算命令；
   放这里是因为 `Source_F7/.gitignore` 的 `/Debug` 会把它们挡在版本控制外（2026-11-03 改基时差点丢）。
 - `Hardware/BOMs/PSDR_2.6.1/PSDR2.6_BOM_flat.csv` / `PSDR2.6.1_BOM_flat.csv` /
