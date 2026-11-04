@@ -4,11 +4,29 @@
 一个 issue/评论 id、一个文件路径或一个单元格地址**；写不出处的句子直接不写。
 要干活看 `docs/WO-psdr-takeover.md`（施工总账，按 §号查）与 `docs/README.md`（文档地图）。
 
+**引用约定**：凡本文里出现英文原话，**全文在 `docs/PSDR-upstream-threads.md`**（2026-11-04 REST 全量抓回的
+21 条 issue/PR 正文与 61 条评论，按 issue 照录）可回查，本史只保留有信息量的句子并注明来自哪条帖。
+
 引用约定：
 * `next` = 本 fork 主线；`上游` = `MichaelRColton/PSDR`；提交号一律给 7 位短 sha。
 * "算得 / 量得 / 读得"三种口径不许混：算得=公式推的，量得=仪器测的（本史里**一条都没有**，
   因为至今没有板子在手），读得=从原件或表格里逐格读出的。
 * 引用总账一律用 §号（追加记录会让行号漂移）。
+
+---
+
+## 第〇纪 · 我们是从哪天开始碰这件事的（2026-08-19，不是 10-30）
+
+之前所有内部文档都把起点写在 2026-10-30 的工单上——**那是错的**，起点早两个月：
+
+| 日期 | 事 | 出处 |
+|---|---|---|
+| 2026-08-19 | 我们在 **#7**（许可/贡献那条 2017 年的老帖）下第一条留言自述身份：`I'm a university student and amateur radio enthusiast (recently passed my A-class ham license exam in China). I found PortableSDR through Hackaday…`，并明说想接手维护，指出 `LICENSE.md` 里还是 "TODO: Determine…" | #7 评论 |
+| 2026-09-11 13:20:37Z | **jeffersonbenson 关掉 #7**（events 实测：先 mentioned/subscribed 我们，再 `closed`），留言在同一帖里："I will see what I can do about adding an MIT license to the project to **unblock you** and please feel free to fork…" | `api …/issues/7/events`、#7 评论 |
+| 2026-11-03 | Michael 回到已被关闭的 #7 写："**The MIT license is official — fully open (firmware, software, and hardware)** has always been my intent… I've corrected the copyright line… **Closing this out.**" ⇒ `closed_at` 仍是 09-11（他是在已关的帖上补话），别把两次当成两次关闭 | #7 评论 + `closed_at` |
+
+⇒ **fork 的合法性锚点是 2026-09-11 的 MIT**，我们真正的第一个动作是 2026-08-19 那次请求接手；
+10-30 只是"工单到手、开始按任务施工"的日子。第二纪的七天表读的是施工期，别当项目起点。
 
 ---
 
@@ -45,6 +63,69 @@
 **这一纪的读法**：#16 的三条关键事实（作者承认前放/LPF 在量产板上没跑起来、HMC1023 有"一堆寄存器"、
 UHSDR 已实现该器件）在 2021 年就齐了；此后四年没人再碰。我们 2026-11 的全部对外动作都在补这段空档，
 而不是在推翻它。
+
+### 第一纪补 · 2014–2017 那十条帖子逐条说了什么（2026-11-04 全量重拉后新增）
+
+之前这节只有一张时间表。这次把 **上游 21 条 issue/PR 的正文与全部 61 条评论**用 REST 整批拉回
+（`api …/issues/N` + `/issues/N/comments`），才把十年前那些活人对话捞出来。以下只记有信息量的：
+
+* **#1/#2（2014-07-15 开，2017-01-07 关）**：作者自己关的，原话
+  "I probably won't bother with the drawings for the **PSDR1**… but I did make instructions for the PSDR2.6.
+  Find it here: `…/blob/PSDR_F7/Documentation/Assembly Instructions.pdf`"，
+  并指向 **hackaday.io/project/1538-portablesdr#menu-logs** 作为更新记录。
+  ⇒ 装配说明其实一直在库里（见 `docs/PSDR-documentation-archive.md`），我们此前没读。
+* **#3（2014-09-25）** @johnlaur 重排引脚名与初始化，关时说 "I will create a new PR after merging PSDR2 stuff"
+  ——**这个后续 PR 从未出现**，是"贡献者流失"的最早样本。
+* **#5（2016-12-31 → 2017-01-19，8 条评论）**：@pwarren（Paul Warren）一人做完了 newlib Linux 编译、
+  编译器告警、音量菜单显示 AF 增益，还自己加了 **OFF 位图 + `HAL_PWR_EnterSTANDBYMode()`**。
+  作者回："**AWESOME!** … I'm still a little unskilled at some git operations … **You are my hero!**"
+  Paul 自述是**出过钱升级"不用焊接"套件**的众筹支持者（"I paid extra to have my extreme kit upgraded to a
+  non-soldering one"，并提到 "backer lists"）⇒ **PSDR2 有 Kickstarter/众筹支持者这一层历史**，
+  我们所有内部文档都没记过。同一条 PR 里他还把自己误删的 `.gitignore` 认了出来（commit `1381f54`）。
+  @fstkmaro 在这条下面问"还能买到套件吗"，作者答"**I can put you on a list of people to contact if more become available**"
+  ⇒ 2017 年 1 月就已在"要不要再产一批"的悬置状态。
+* **#6（2017-01-06，至今 OPEN）**：USB 模式下 S 表钉死。作者当场承认：
+  "**Just kidding, you are right, it does do that on USB. It didn't used to though,
+  I'm not sure when I introduced that bug**"，Paul 又补"AM 模式也一样"。
+  ⇒ 这条是我们一直引用的"S 表问题"的原文，**它自带"作者认为这是回归"的判断**。
+* **#8/#9（2017-01-06，至今 OPEN）**：待机功耗那条捞到两枚硬数据——
+  作者 2017-01-15："I made a mistake in my measurement before (I was using a different meter and **misread** it)
+  so it draws **~80 mA** before it's programmed… Some **thermal imaging** shows that our biggest power consumption is
+  the frequency synth chip (**U241: SI5338**)… the LCD control circuitry… the phase/mag chip (**U314: AD8302**)"；
+  以及他的设计自白："**I didn't design the PSDR with an eye for excellent standby efficiency** …
+  but I did include the ability to kill power to many of the sub systems (via **MCU controlled FETs**)"。
+  2021 年 Jeff 提了物理电池拨开关方案并贴了 `chacal/stm32sleep` 链接。
+  ⇒ 位号 `U241`=Si5338、`U314`=AD8302 是**作者亲口**给的，与我们的网表定位一致（跨层核对的物理锚点又多一处）。
+* **#9 那条"50 dB"的真正出处链**（以前我只知道它是 #16 的症状描述）：句子本体是
+  2021-02-04 @sanamon 在 #9 下写的 "i'd start by looking into the preamp issue (preamp not enabled,
+  perhaps by not being initialized in software) as **this thing is deaf as a brick** right now
+  (**sensitivity around -70dBm** if I remember correctly, **indicating 50 dB 'missing'**)"；
+  而 **#16 的正文只有 237 字符，就是把这句原样搬过去开的帖**（jeffersonbenson 2021-02-06）
+  ⇒ 我们公开引用的"差 50 dB"从头到尾是**一位用户的经验值（还带 "if I remember correctly"）**，
+  不是厂商指标、不是实测记录；引用时必须带这个身份。
+  （我方 #16 首帖写的就是 "the … symptom in your first comment"，归属没写错，**不需要对外更正**。）
+  sanamon 另在 **#16**（2022-07-04）说 "You dont need windows to do this" 并指 wiki 的 Linux 构建页。
+* **#10（2017-01-11→01-12）**：Ubuntu 14.04 的 `gcc-arm-none-eabi` 不带 `libstdc++`
+  （launchpad bug **1293024**，"known but unfixed"）， Jonas 先手动装 `libstdc++-arm-none-eabi-newlib_4.9.3+svn227297-1+8_all.deb`，
+  第二天又推翻："could not build the project anyway. Had to **de-install** gcc-arm-none-eabi and instead install **gcc-arm-embedded** PPA"。
+  ⇒ 这是第二条 Linux 构建史，与我们 2026 年写的 `Makefile.linux` 复现链是同一需求的两次回答。
+* **#11（2017-01-23）**：显示图元的工具链原话——PNG 用 `branah.com/text-to-image`，
+  转 C 数组用 `rinkydinkelectronics.com/t_imageconverter565.php`，然后"**removed '0x00' Bytes from the end until it worked**"；
+  还提到"Michael's asked that we use github for now… **I did have a Discourse instance set up**"
+  ⇒ 项目曾有过自建论坛，讨论痕迹可能在站外（这是"全部历史"还没扒的地方）。
+* **#12/#15（2021）**：Jeff 建 `Hardware/BOMs/<版本>` 目录结构，合并 #15 时写下治理口径
+  "**Merging since sufficient time has elapsed to allow for comments**"（2021-03-05）——上游最后一次合并。
+* **#13（2021-01-30，至今 OPEN）**：2021-02-19 Jeff 已经在 DigiKey 之外找到过两只断供件：
+  `599-1068-1-ND` → **SXB-2089Z**（win-source.net 页面）、`1465-1374-1-ND` → **MASWSS0129TR-3000**（Richardson RFPD）。
+  ⇒ 这是 **U304 真是 SXB-2089Z 的第二条独立来源**（不依赖 BOM 内嵌超链接），
+  也说明 MASWSS0129 在 2021 年就已在主流分销渠道消失——比 DM2NT 2025 年那句"欧洲买不到"早四年。
+* **#14（2021-01-30）**：Jeff 自己解释 BOM 记号 "the **NA** seems to mean 'just leave it open'
+  and **DNS** means 'do not stuff'"，并提出"要不要 0 Ω 桥"的疑问——2026-10-31 我们用网表逐只回答了这个疑问，
+  16:58:37Z 他回 "Please do!"，才有 PR #18。
+
+> 这批原始 JSON（42 个响应、61 条评论）已按 issue 整理成**仓内可读文本**：`docs/PSDR-upstream-threads.md`
+> （2026-11-04 REST 抓取，正文照录，只压缩空白）。分析在本节，底稿在那份里。
+> 还没扒的是**站外**那层：见 `delegation/PROMPT-full-history.md`。
 
 ---
 

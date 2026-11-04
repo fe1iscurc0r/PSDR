@@ -3699,3 +3699,60 @@ TX "50 W"、"dual LDMOSFET design" ⇒ 与 PSDR 的"全程 Tayloe QSD + HMC1023 
 GitHub wiki 页面当日抓取失败（"error while loading"）、`documentation/readme.md` 直链 fetch 失败，
 所以 UHSDR 前端器件级的细节（滤波组、衰耗器、分集接收）**仍未核**，列为下一步：
 本地 clone 后读 `mchf-eclipse/hardware/` 与 OVI40 原理图，对照我们的 `PSDR-HMC1023-netlist.md` 借寄存器序列。
+
+### K-15 十年史全量重拉 + `Documentation/` 这个洞（2026-11-04，用户"这些十年前的帖子你该都整理起来"）
+
+**1) 全量重拉上游对话。** 一次循环把 21 条 issue/PR 的正文与评论全抓回来：
+`/issues/{1..21}` + `/issues/{1..21}/comments?per_page=100` ⇒ **42 个响应、61 条评论**，
+落在本机仓外 `D:\my git\_psdr_history\uphist\`；另抓 `/issues/7/events` 才能把 #7 的关闭主体钉准。
+以前我只读过 #13/#14/#16 与 #19/#20，**2014–2017 那十条基本没读过**，这就是"史"缺的那一层。
+
+**2) 起点日期是错的（已改）。** #7 里我方第一条留言是 **2026-08-19**（自述学生 + 中国 A 类业余无线电操作证 +
+"found PortableSDR through Hackaday"），Jeff 在 **2026-09-11 13:20:37Z 关掉 #7**（events 实测 `closed` 主体是
+`jeffersonbenson`），Michael 2026-11-03 是在**已关闭**的帖上补 "The MIT license is official … Closing this out"
+⇒ 不是两次关闭。编年史新增**第〇纪**，把"10-30 工单"降级为"施工起点"。
+
+**3) 十年里捞出来的硬料（都进编年史第一纪补，此处只列可复用的锚点）：**
+
+* `#5`：pwarren 一个人做了 newlib/Linux 编译、告警、OFF 位图 + `HAL_PWR_EnterSTANDBYMode()`；
+  作者 "You are my hero!"；pwarren 自述**众筹支持者**（"paid extra to have my extreme kit upgraded to a
+  non-soldering one"、"backer lists"）⇒ **PSDR2 有众筹史**，我们此前完全没记；
+  他还自曝误删 `.gitignore` 的 commit `1381f54`。@fstkmaro 问"还买得到吗"⇒ 作者"我给你列个联系名单"。
+* `#6`（至今 OPEN）作者承认 S 表 USB 是回归："It didn't used to though, I'm not sure when I introduced that bug"。
+* `#9`：作者 2017-01-15 的热成像结论 **最大功耗是 `U241: SI5338`**，其次是 LCD 控制与 **`U314: AD8302`**；
+  这两个位号与我方网表一致（`U241 -> SI5338`、`U314 -> AD8302`，`dist/netlist/PSDR_2.6.1_netlist.json` 实测），
+  是**作者亲口给的物理锚点**，比符号名对齐可靠得多。同一帖他还更正了自己先前的读数（"misread"、~80 mA）。
+* `#9`/`#16` 的 **-70 dBm / "50 dB missing"**：句子本体是 @sanamon 2021-02-04 在 #9 的经验值
+  （"this thing is deaf as a brick … if I remember correctly"），**#16 正文只有 237 字符，就是搬这句开的帖**。
+  我方 #16 首帖写的是 "the … symptom in **your first comment**" ⇒ 归属没写错，**不需要对外更正**。
+* `#10`：Ubuntu 14.04 的 `gcc-arm-none-eabi` 缺 `libstdc++`（launchpad bug 1293024），
+  先手装 `libstdc++-arm-none-eabi-newlib_4.9.3+svn227297-1+8_all.deb`，次日推翻改 `gcc-arm-embedded` PPA
+  ⇒ 这是**第二条 Linux 构建史**，与我们 `Makefile.linux` 那条并列。
+* `#11`：图元工具链（branah text-to-image + rinkydinkelectronics RGB565 转换器 + "删尾巴 0x00 试到能跑"）；
+  pwarren 提过**自建过 Discourse 实例** ⇒ 站外可能还有讨论。
+* `#13`：Jeff 2021-02-19 已在 DigiKey 之外找到两只断供件：`SXB-2089Z`（win-source）、
+  `MASWSS0129TR-3000`（Richardson RFPD）⇒ **U304=SXB-2089Z 的第二条独立来源**，
+  且 MASWSS 早在 2021 年就离开主流渠道（比 DM2NT 2025 年"欧洲买不到"早四年）。
+* `#15` 合并语："Merging since sufficient time has elapsed to allow for comments"（2021-03-05，上游最后一次合并）。
+
+**4) `Documentation/` 这个洞（新档 `docs/PSDR-documentation-archive.md`）。**
+`grep -rln "PSDR2 Guide|Assembly Instructions|Video Script|filter coeficient" docs README.fork.md` **零命中**
+⇒ 库里 6 份作者材料我们从没读过。本轮用本机 `pypdf` / `openpyxl` / `zipfile`(docx) 全读：
+
+| 文件 | 新确立的事 |
+|---|---|
+| `PSDR2 Guide.pdf`（PDF 创建 2014-09-28，2021 年由 Jeff 进仓） | 作者的**半成品 VNA 说明页**，里面留着自问 "Whre is it controlled in code?"、"THEN WHAT HAPPENS?"、"TODO: What are C68 and 111 for again?"；并写 "Set at 0 Ω, the output is **30mV/db and 10mV/Degree**"（与我们按 AD8302 Rev.B 式 8a/9 算得的一致，独立来源） |
+| 同一页的位号 | 它是 **PSDR2 一代**：`U23`=AD8302、`U24/U25/U26/U27`=DPDT（四片）——2.6.1 是 `U314` 与三片 `U16/U24/U30` ⇒ **跨版本位号会漂**，与"固件符号名≠网名"同类坑 |
+| `Assembly Instructions.pdf`（创建 2016-11-08，`2a0a65c` 进仓） | PSDR2 机械装配全文（螺丝"倒转至咬住"、顶丝对齐扁位、防静电），可直接补进 M3 检查表的机械前置；图纸框仍留 "**<INSERT COMPANY NAME HERE>**" 的 PROPRIETARY 模板字 |
+| 两份 `Video Script.docx` | 项目自我叙述原话："**open source project. Everything about its design is freely available**"、"I plan on offering **kits**… hope to offer assembled units"、"**I didn't design it as an emergency device**"、GPS 应急定位意图 ⇒ "开源"这句话比 #7（2017）更早出现在文稿里 |
+| `Stepping through filter coeficient population.xlsx`（`46c832e` 2014-10-15） | `Sheet1` 1155 行 × 19 列，单元格名 `fftFilterCoeficient[0..511]` **正好 512 个下标** = 固件 `Source/src/main.c:52 #define FFT_BUFFER_SIZE 512`；**表里是浮点系数，代码 `:162-182` 只填 1/0** ⇒ 与 #6（filter bottom）、#20（空 filter case）同一条线，rev-B 做显示窗/数字滤波时这是唯一作者原稿 |
+
+**5) 本机环境认知更正（我自己的坑）**：这台机器的 `python3.13.2` 里 **pypdf / pdfminer / pymupdf / openpyxl 都在**，
+不需要 WSL `pdftotext`（我第一次试 `wsl bash "带空格路径"` 静默没产出，改用 pypdf 才通）。
+以后 Windows 侧读 PDF 先直接试 pypdf，别照旧记忆绕 WSL。
+
+**6) 交给外部去扒的部分**：`delegation/PROMPT-full-history.md`——只让他做**仓外**普查
+（Hackaday 项目 1538 的 update 列表、众筹与销售渠道、社区足迹、成品视频是否存在、fork 谱系、
+KA7OEI 是否写过、断供件 PCN、项目之前的痕迹），并钉死四条规矩：**只读不发帖、不改我们的仓、
+每条带 URL+原文+抓取时间、失败要写状态码且不许把 403/429 写成"不存在"**。
+交付表里专门留一节"与委托方已知事实冲突的地方"——我们最想知道自己哪里说错了。
