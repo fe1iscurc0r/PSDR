@@ -207,7 +207,7 @@ uSDX 5.8–9.4 W / 76–93%）在 findings §4 有对应的落点与引用面。
 | 三处 `master` | 本地 / `origin` / `upstream` 全部 = `c34afebe`（11-04 纯快进，FF 前置检查见 §K-13） |
 | PR 分支工作树 | `D:/my git/PSDR-build-artifacts/bom_pr` = `cb6dda0`（#18）；`…/pr-kicad-sch` = `0d1941a`（#17，已合） |
 | tag | `fork-base/2026-10-30` |
-| 未推 / 待批准 | **3 个提交未推**（`6f4bec4`、`0b3394e`、`d18961d`，回滚点 `84f3790`）；`docs/PSDR-revB-workorder.md` 仍未起稿 |
+| 未推 / 待批准 | `84f3790` 之后的全部文档提交都还没推（**现算** `git log --oneline origin/next..next`，本文不写死条数），回滚点 `84f3790`；`docs/PSDR-revB-workorder.md` 仍未起稿 |
 | 下一轮委派已备好 | `delegation/PROMPT-recheck-taskC.md`（TASK_C 剩余 32 行，值已随新包给出）；`delegation/PROMPT-uhsdr-frontend.md`（UHSDR/OVI40 前端器件级拆解） |
 | 待外部条件 | PR #18 审；#19/#20 maintainer 回复；4 只件的原厂 PDF（SXB-2089Z / MASWSS0129 / SPU0410HR5H-PB / W3062A）；M3 实测量（11 个冲突位号 + 两条轨） |
 
