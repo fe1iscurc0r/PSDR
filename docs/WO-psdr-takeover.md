@@ -4008,3 +4008,21 @@ C118/C119（各 3）、GPSR（3）、U253/U287/C256/C257/C179/R117/REF（各 2�
 3. **pin 29 `VBG` 悬空符合手册**（"1.2V Bandgap output (testing only)"）——
    此前把"pin 29 无网络"当异常列出来，口径已改成正常。
 另：`CALCK`(11) 确由 `C283` 交流耦合接 Si5338 `CLK1A`；`VDDCAL`(22) 有 `LPF_5V` 供电（与 VDDBG 不同）。
+
+### K-27 HMC1023 驱动可行性判定 + 贴装/选材清单（2026-11-04，用户"按你的顺序"）
+
+**1) 驱动可行性**（`docs/PSDR-hmc1023-driver-feasibility.md`）：
+已具备——SPI 与 U15 共用 `SCK/SDI`、`SEN`/`SDO` 专用；`DVDD/VDDQ/VDDi/VDDCAL` 全在 `LPF_5V`；
+`CALCK` 经 `C283` 接 Si5338 `CLK1A`；手册原件在手。
+缺三件——**A** `VDDBG`(28) 只挂 `C292` 去耦、**无供电**（网表 `$$$15137` 只有这两个脚）；
+**B** `CLK1A` 不由固件配置（全树只写 `MULTISYNTH0`，是否有时钟取决于 NVM）；
+**C** 固件零引用（`grep = 0`）。判定：**这块板上"只靠固件"补不出来；rev-B 上可补**（一段铜 + CLK1 配置 + 驱动）。
+给了一条**不改固件、不改板**的台架实验：外接 5 V 到 `C292` 热端 + 外部时钟 20–80 MHz 进 `CALCK` + USB-SPI 直驱，
+扫 `FILTER_IN → FILTER_OUT`。这是"这颗件值不值得留"的最短验证。
+
+**2) 贴装/选材**（`docs/PSDR-assembly-sourcing.md` + `Hardware/BOMs/PSDR_2.6.1/assembly_class.csv`）：
+391 件 = **290 手贴 / 25 热风 / 18 必须机贴 / 58 机械件**。必须机贴的 18 个是：
+U121(LQFP100)、U287(QFN32)、U241(QFN24)、U161(QFN20)、U199(QFN24)、U314(LFCSP14)、U185(LCC)、U32(LGA)、
+GPS_ANTENNA、U16/U24/U30、microSD/microUSB/J170、三颗晶振。
+**买不到：U304（SXB-2089Z）、U16/U24/U30（MASWSS0129）**；**无原厂手册：U32、GPS_ANTENNA**（但可买）。
+⇒ **"全部贴完"不可能**；最小可验板只能验电源/时钟/MCU/外设，射频链留空。三种打法（混合/全手/只打裸板）与代价已列表。

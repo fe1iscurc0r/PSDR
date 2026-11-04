@@ -10,6 +10,8 @@
 | `PSDR-author-measurement-log.md` | **作者自述的装配与实测记录**（fork-only）：commit sha/日期/血统/原话逐条编目——2016 实测 2.5–175 MHz、-90 dBm@7MHz、-80~-85 dBm@146.4MHz、"2m 很弱可能要前放"、2.5 原型已装配、原理图 notes 区这条没挖的线索、以及库里那棵 **2019 CubeMX+FreeRTOS 重建**（`TestingMakeFile*/`，带 F746 的 Makefile） | 想知道"这板子到底跑到过什么程度"的人 |
 | `PSDR-HMC1023-netlist.md` | **U287（HMC1023LP5E 可编程低通）引脚—网络—SPI 表**（fork-only）：SPI 四线接 PB12–15、校准时钟来自 Si5338、`VDDBG` 无供电是硬件缺口 | 做 #16（前放/低通）的人 |
 | `PSDR-HMC1023-pinmap-check.md` | **U287 的 32 脚逐脚对手册**（v01.0113 Table 6 × 网表）：N/C 脚全部接地符合手册注；`CALCK` 已由 Si5338 CLK1A 经 `C283` 接入；**pin 28 `VDDBG` 只挂去耦、无供电**；pin 29 `VBG` 悬空符合"testing only"；**Q 通道输出经两只电容自环回输入**（双通道只用一半） | 要补 HMC1023 驱动或改供电的人 |
+| `PSDR-hmc1023-driver-feasibility.md` | **HMC1023 驱动"能不能补"的判定**：SPI 已通、供电除 `VDDBG` 外齐、`CALCK` 已由 Si5338 CLK1A 接进；三个缺口（VDDBG 无供电 / CLK1 不由固件配 / 固件零引用）+ rev-B 代价 + 不改固件的台架实验路径 | 想复活低通滤波的人 |
+| `PSDR-assembly-sourcing.md` | **贴装与选材**：391 件按封装分 290 手贴 / 25 热风 / 18 必须机贴 / 58 机械件；`U304` 与 `U16/U24/U30` 买不到 ⇒ 全贴完不可能，最小可验板只能验电源与 MCU | 要下单/备料的人 |
 | `PSDR-vna-path.md` | **VNA 通路拓扑**（只读，fork-only）：`U314` 的 INPA/INPB 经 `C322`/`C309` 分别接 `RF_REF`/`RF_ANT`，桥路由 `U24` 切、`REF`/`DUT` 是 1 mm 焊盘，`VMAG`/`VPHS` 进 MCU；**硬件完整、`vna_reflected/vna_through` 两个 case 是空的** | 想搞 VNA 或 #20 的人 |
 | `PSDR-signalpath-pinmap.md` | **`signalPath()` 引脚状态表**（只读）：12 根控制线的"固件符号→GPIO→MCU 脚→网名→板上落点"全链，7 个枚举态的实际电平；三条观察（态 1 落进发射分支、态 3 加电仍旁路、态 4/5/6 不写任何脚） | 要动射频路径或做 rev-B 的人 |
 | `PSDR-scope-and-cost.md` | **最初需求、成本结构与降本边界**（fork-only）：README 原文需求、BOM 构成（$276.78）、**VNA 判为保留项**、保留版地板 ≈$225–235、GPS 三条降本路线、LC 带通组"先验证再谈上游"与免改版的验证路径、CMOS/继电器按节点的结论、"为什么是短波而不是 UV" | 决定改版范围/预算的人 |
