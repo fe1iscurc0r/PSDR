@@ -84,7 +84,18 @@ def main():
     ap.add_argument("--placement", default="dist/fab/PSDR_2.6.1_placement.csv")
     ap.add_argument("--outdir", default="dist/revB")
     ap.add_argument("--max-fanout", type=int, default=12)
+    ap.add_argument("--zone", action="append", default=[],
+                    metavar="TAG:SEED[,SEED...]",
+                    help="extra zone on top of the built-in three, e.g. "
+                         "--zone antenna_ports:ANT/VNA-IN,REF,DUT,VNA-OUT")
     a = ap.parse_args()
+
+    zones = list(ZONES)
+    for spec in a.zone:
+        tag, _, seeds = spec.partition(":")
+        if not tag or not seeds:
+            ap.error("--zone wants TAG:SEED[,SEED...]")
+        zones.append((tag, [s for s in seeds.split(",") if s]))
 
     nl = load_netlist(a.netlist)
     place = load_placement(a.placement)
@@ -94,7 +105,7 @@ def main():
     allin = set()
     lines = []
     summary = []
-    for tag, seeds in ZONES:
+    for tag, seeds in zones:
         inzone, skipped, fans = closure(nl, seeds, a.max_fanout)
         rows = []
         xs = []
@@ -147,9 +158,9 @@ def main():
     for tag, seeds, n, h1, h2, box, nskip in summary:
         out.append("| %s | %s | %d | %d | %d | %s | %d |" % (tag, "/".join(seeds), n, h1, h2, box or "-", nskip))
     out.append("")
-    out.append("**三区并集 = %d 件；板上一共 %d 件 ⇒ 影响圈外必须逐件不变的有 %d 件**"
+    out.append("**%d 区并集 = %d 件；板上一共 %d 件 ⇒ 影响圈外必须逐件不变的有 %d 件**"
                "（对拍用 `dist/fab/PSDR_2.6.1_placement.csv`，这是\"只动局部\"的可判定验收）。"
-               % (len(allin), total, total - len(allin)))
+               % (len(zones), len(allin), total, total - len(allin)))
     out.append("")
     for tag, skipped in lines:
         out.append("## %s 区被挡掉的参考网（扇出前 12 个）" % tag)

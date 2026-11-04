@@ -10,8 +10,9 @@
 | U304_gain | U304 | 9 | 5 | 3 | x 7.9..16.0 mm, y 42.2..50.5 mm | 2 |
 | DPDT_switches | U16/U24/U30 | 102 | 10 | 89 | x 0.0..96.2 mm, y 2.5..61.0 mm | 10 |
 | HMC1023_lpf | U287 | 99 | 12 | 86 | x 0.0..96.2 mm, y 2.5..61.0 mm | 11 |
+| antenna_ports | ANT/VNA-IN/REF/DUT/VNA-OUT | 19 | 8 | 7 | x 4.2..16.0 mm, y 25.1..55.0 mm | 1 |
 
-**三区并集 = 124 件；板上一共 391 件 ⇒ 影响圈外必须逐件不变的有 267 件**（对拍用 `dist/fab/PSDR_2.6.1_placement.csv`，这是"只动局部"的可判定验收）。
+**4 区并集 = 129 件；板上一共 391 件 ⇒ 影响圈外必须逐件不变的有 262 件**（对拍用 `dist/fab/PSDR_2.6.1_placement.csv`，这是"只动局部"的可判定验收）。
 
 ## U304_gain 区被挡掉的参考网（扇出前 12 个）
 
@@ -24,3 +25,7 @@
 ## HMC1023_lpf 区被挡掉的参考网（扇出前 12 个）
 
 `GND`(261)、`+3V3`(58)、`+3V3_CPU`(50)、`HALF_VCC`(23)、`LPF_5V`(13)、`5V_REG_ENABLE`(2)、`AMP_POWER`(2)、`FLIP-FLOP_POWER`(2)、`GPS_POWER`(2)、`LPF_POWER`(2)、`POWER_GOOD`(2)
+
+## antenna_ports 区被挡掉的参考网（扇出前 12 个）
+
+`GND`(261)
