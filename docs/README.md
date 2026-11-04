@@ -43,4 +43,6 @@
   属外部断言，未逐条复核的数字不得直接进对外文本；`MANIFEST.csv` 只覆盖输入包。
   同目录还有下一轮的**可粘贴提示词**：`PROMPT-recheck-taskC.md`（TASK_C 剩余 32 行，带附件哈希与
   "CONTESTED 两值都算"的硬规则）、`PROMPT-uhsdr-frontend.md`（UHSDR/OVI40 前端，
-  只收 文件+commit+行号 级出处，并禁止替 PSDR 下结论）。
+  只收 文件+commit+行号 级出处，并禁止替 PSDR 下结论）、`PROMPT-full-history.md`（只查站外的全史普查）、
+  `PROMPT-chronicle-site.md`（**把编年史做成静态网页**：附件清单带 sha256、内容硬规则、
+  "诚实清单"必须存在、禁放替代件/降本内容、交付要附自检脚本并按事实级报告）。
