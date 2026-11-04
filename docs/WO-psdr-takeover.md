@@ -3803,3 +3803,24 @@ K-6.1 要求"全部可由仓内数据算出"，所以先做工具再写文档，
 **控制面预算的算术结论（算得）**：`FILTER_S0/S1` 只有 2 位 ⇒ 最多 4 档；
 若真做 6 段分立带通，**位数不够**，出路只有"用 `U30` 空掷位换路"或"接受 4 段"。
 段数与波段划分一律 `pending`（等 G3 数字），未填任何典型值。
+
+### K-18 网页素材交给外部执行方的通道：IMA `psdr` 文件夹（2026-11-04）
+
+`delegation/PROMPT-chronicle-site.md` 需要 6 份附件，已按 IMA 上传安全门逐个走完
+（`preflight-check` → 批量 `check_repeated_names`（6 份全部不重名）→ `create_media` →
+COS 上传成功 → `add_knowledge`），并回读文件夹清单确认 6 条都在：
+
+| 文件 | 字节 | 校验字节一致 |
+|---|---|---|
+| `PROMPT-chronicle-site.md` | 12,420 | 与仓内 `git show` 同源 |
+| `PSDR-chronicle.md` | 31,878 | 同上 |
+| `PSDR-upstream-threads.md` | 87,187 | 同上 |
+| `PSDR-documentation-archive.md` | 9,713 | 同上 |
+| `README.fork.md` | 13,252 | 同上 |
+| `zones_summary.md` | 1,516 | 同上 |
+
+`media_type=7`（text/markdown），原始字节未转码未压缩。**重跑脚本**：
+`D:\my git\_psdr_history\upload_ima.sh`（脚本不落任何临时凭证，只打印每份的成败与字节数）。
+
+托管的事在这里只记结论、不执行：**GitHub Pages 是公开且会被收录的动作，发布要单独批准**；
+先把 `index.html` 拿回来跑自检脚本、本地预览，再谈开 Pages。
