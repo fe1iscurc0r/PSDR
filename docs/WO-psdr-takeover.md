@@ -3756,3 +3756,17 @@ GitHub wiki 页面当日抓取失败（"error while loading"）、`documentation
 KA7OEI 是否写过、断供件 PCN、项目之前的痕迹），并钉死四条规矩：**只读不发帖、不改我们的仓、
 每条带 URL+原文+抓取时间、失败要写状态码且不许把 403/429 写成"不存在"**。
 交付表里专门留一节"与委托方已知事实冲突的地方"——我们最想知道自己哪里说错了。
+
+### K-16 收盘推送与两条自记（2026-11-04）
+
+* **推送走代理**：直连 `github.com:443` 本轮被重置（`Recv failure: Connection was reset`、
+  随后 `Failed to connect ... after 21104 ms`），而 `api.github.com` 始终 200 ⇒ 按本机既有配方
+  单命令加 `-c http.proxy=http://127.0.0.1:7890`，两批都上去了：
+  `84f3790..a5adcc7`、`a5adcc7..cdc2985`；`ls-remote` 回读 `next = cdc2985…`。
+  **没有**任何 force、没有碰 `upstream`、`master` 三镜像仍在 `c34afebe`。
+* **自记一条脏活**：`0b3394e` 与 `cdc2985` 的提交标题完全相同（都是
+  "docs(chronicle): 编年史落档…"）——第二次写主题时没回头看已有提交。两者内容不同
+  （前者=编年史初版 + 答案收档，后者=第〇纪/第一纪补 + 两份新档 + 全史普查提示词），
+  只靠 sha 区分。**不改历史**（不 amend、不 rebase），要读的时候按 sha 读。
+* 收盘状态：`next` 与 `origin/next` 同步在 `cdc2985`；工作树除 `.mimosa/`（不是我们的目录，未动）外干净；
+  仓外草稿与原始 JSON 在 `D:\my git\_psdr_history\`（含 42 个 REST 响应、6 份 PDF/xlsx/docx 提取文本）。
