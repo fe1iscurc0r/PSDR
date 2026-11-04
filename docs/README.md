@@ -38,3 +38,6 @@
   含答案 schema 与"无出处不作答"的硬规则；重跑一条命令，位号错配由 `EXPECT` 守卫挡住。
   `delegation/answers/` 是**对方交回的原件收档**（6 份，只加了 PROVENANCE 头，正文一字未改）：
   属外部断言，未逐条复核的数字不得直接进对外文本；`MANIFEST.csv` 只覆盖输入包。
+  同目录还有下一轮的**可粘贴提示词**：`PROMPT-recheck-taskC.md`（TASK_C 剩余 32 行，带附件哈希与
+  "CONTESTED 两值都算"的硬规则）、`PROMPT-uhsdr-frontend.md`（UHSDR/OVI40 前端，
+  只收 文件+commit+行号 级出处，并禁止替 PSDR 下结论）。

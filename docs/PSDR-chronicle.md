@@ -50,7 +50,10 @@ UHSDR 已实现该器件）在 2021 年就齐了；此后四年没人再碰。�
 
 ## 第二纪 · 接手七天（2026-10-30 → 11-04）
 
-`git log --author=fe1iscurc0r next` 共 **72 个提交**（另有 Jeff Benson 1 个），分布：
+`git log --author=fe1iscurc0r next` 在动笔时（HEAD `6f4bec4`）共 **72 个提交**，本史落档那一串提交
+（`0b3394e`/`d18961d` 与之后的索引改动）也记在这七天里，所以按天表读完后现算会得到更大的数——
+**这个数本文不追，要用的话现跑** `git log --format=%h --author=fe1iscurc0r next | wc -l`。
+下表按天，动笔时的分布（另有 Jeff Benson 1 个）：
 
 | 日期 | 提交 | 干了什么（只列锚点，细节看总账对应章） |
 |---|---|---|
@@ -204,7 +207,8 @@ uSDX 5.8–9.4 W / 76–93%）在 findings §4 有对应的落点与引用面。
 | 三处 `master` | 本地 / `origin` / `upstream` 全部 = `c34afebe`（11-04 纯快进，FF 前置检查见 §K-13） |
 | PR 分支工作树 | `D:/my git/PSDR-build-artifacts/bom_pr` = `cb6dda0`（#18）；`…/pr-kicad-sch` = `0d1941a`（#17，已合） |
 | tag | `fork-base/2026-10-30` |
-| 未推 / 待批准 | 上面那 1 个提交；`docs/PSDR-revB-workorder.md` 起稿；TASK_C 剩余行按新包重委派 |
+| 未推 / 待批准 | **3 个提交未推**（`6f4bec4`、`0b3394e`、`d18961d`，回滚点 `84f3790`）；`docs/PSDR-revB-workorder.md` 仍未起稿 |
+| 下一轮委派已备好 | `delegation/PROMPT-recheck-taskC.md`（TASK_C 剩余 32 行，值已随新包给出）；`delegation/PROMPT-uhsdr-frontend.md`（UHSDR/OVI40 前端器件级拆解） |
 | 待外部条件 | PR #18 审；#19/#20 maintainer 回复；4 只件的原厂 PDF（SXB-2089Z / MASWSS0129 / SPU0410HR5H-PB / W3062A）；M3 实测量（11 个冲突位号 + 两条轨） |
 
 ## 索引
