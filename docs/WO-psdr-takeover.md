@@ -3581,21 +3581,89 @@ Jeff 在 #18 问 "Are alternatives also suggested as part of this PR? Or is it o
   （`issues/18` 取 `comments`/`state` 一次、`issues/18/comments` 发前发后各一次，另有一次 GET 输出落到
   Windows 侧看不见的 `/tmp` 路径、重跑了一次）；没有把命令链整体重跑，所以不存在 201 之后再补一遍的路径。
 * 回帖**没有**改动 PR #18 的任何文件，也没有新开 issue（第 13 段只是把"要不要另开一条"作为问句留给作者）。
-  仓内 `BOM_changes_PR18.md` 等仍是 `cb6dda05` 那 4 个提交，`head` 未动。
+  PR 分支 `upstream-pr/bom-2.6.1-refdes-fix` 仍是 `cb6dda05` 那 4 个提交，`head` 未动。
 
 回帖里对外承诺可复核的三处，已在此对齐：13 个单元格的逐格清单在
-`Hardware/BOMs/PSDR_2.6.1/BOM_changes_PR18.md`；表内自相矛盾（R6 双值 / R14 双值）的取证在 §K-11；
+`Hardware/BOMs/PSDR_2.6.1/BOM_changes_PR18.md`——**该文件只存在于上面那条 PR 分支**（工作树
+`D:/my git/PSDR-build-artifacts/bom_pr`），`next` 里 `git ls-files` 查不到，引用时别再写成 `next` 的路径；
+表内自相矛盾（R6 双值 / R14 双值）的取证在 §K-11；
 `+3V3_CPU` 与 R6/R14/R164 三处版本改动在 `docs/PSDR-open-data-gaps.md` §2.1 与 `docs/PSDR-bringup-checklist.md` 优先 annex。
 
 顺带把 #16 那条已发出的评论回读了一遍（发完 #18 才知道要对着旧帖自查），抓到一处**我自己发早了的口径**：
 那条第 2 点写的是 "R6 100R to 180R and R14 100R to 68R change in the same direction"，
-按 §K-11 的取证，这句只对一半——2.6.1 表里第 41 行 `R6,14,268`（Qty 1、100R）与第 42/43 行的
+按 §K-11 的取证，这句只对一半——2.6.1 表里项 41（电子表格第 45 行）`R6,14,268`（Qty 1、100R）与项 42/43 的
 `R6`=180R、`R14`=68R **同时存在**，所以这是**表内自相矛盾**，"版本 delta" 只是它的一半。
 读者按现在这句话会以为 2.6.1 表自洽、是我们多事。⇒ 记进 findings §8.2 的 ⚠️ 条，
-补一条只讲这一句的 #16 回帖**等用户点头**（不擅自追帖）。
+补一条只讲这一句的 #16 回帖**等用户点头**（不擅自追帖）。（**§K-13：用户已点头，回帖已于 2026-11-04 发出**。）
 
 另：把 §7.3-3 的降级同步到之前没跟着改的四处旧文案（findings §2-B"仍缺"行、§8.1 SXB 行、
 `gaps` §3-1、本账 §K-10 那句），并按 2026-11-04 的复测把数字写实：
 `MASWSS0143`/`MASWSS0202` = 200（各连测两次）、`MASWSS0129` = 404（两次）、Qorvo 产品页 = **429**（两次）。
 同一轮把 `gaps`/findings 里 "`+3V3_CPU` 2.90/3.01 V" 的措辞钉在**计算值**（AP3417C 原厂 600 mV + 板上分压），
 未电测；以及 §1.6 那行的 GPS 分级：Linx 原件已到手 ⇒ `原件`，**同一行的 W3062A 不跟着升**，仍是取不到原件。
+
+### K-13 三处推送 + #16 追帖落地 + 一条新的机械依据（2026-11-04，用户"都做掉吧"）
+
+**1) 推 `next`。** 先做 FF 前置检查，再推：
+
+```
+$ git merge-base --is-ancestor origin/next next && echo FF-OK
+FF-OK
+$ git push origin next
+   d5ccb32..84f3790  next -> next
+$ git ls-remote origin refs/heads/next
+84f3790af2ae21ba9c45455f4379b30266867e07	refs/heads/next
+```
+
+10 个提交上去了，回滚点仍是 `d5ccb32`（`git push origin d5ccb32:next` 可退，非 force）。
+
+**2) 三处 `master` 镜像快进。** 本地三个 ref 都停在 `45acd0f`，而 #17 已合 ⇒ 上游 tip 应是 `c34afebe`。
+先按 ref 核，再按祖先核，最后才写：
+
+```
+$ curl -H "Authorization: Bearer $TOK" https://api.github.com/repos/MichaelRColton/PSDR/git/ref/heads/master
+c34afebe commit            # API 侧的真值（本地 remote-tracking 是旧的）
+$ git fetch upstream refs/heads/master:refs/remotes/upstream/master
+$ git merge-base --is-ancestor 45acd0f c34afebe && echo FF-OK
+FF-OK                      # 纯快进，不覆盖任何独有提交
+$ git fetch upstream refs/heads/master:refs/heads/master
+   45acd0f..c34afeb  master     -> master
+$ git push origin master
+   45acd0f..c34afeb  master -> master
+$ git ls-remote origin refs/heads/master
+c34afebed8bbeb0d8f5d6de6b4b9c96616611e5a	refs/heads/master
+```
+
+* 用 `git fetch <remote> refs/heads/master:refs/heads/master` 更新**本地未检出**的 `master`，
+  而不是 `checkout` + `merge`：`master` 不在任何工作树里（`git worktree list` = `next` + 两条 PR 分支），
+  fetch 默认非 force，**不是快进就会拒**，比手动 reset 安全。
+* 没有向 `upstream` 推任何东西（`upstream` 的 push URL 没被调用过）。
+
+**3) #16 追帖**（补 §K-12 那条自查，用户批准）：
+`https://github.com/MichaelRColton/PSDR/issues/16#issuecomment-6623233867`，2,353 字符，HTTP 201，
+前后计数 15→16，本方账号名下新增 1 条 ⇒ 只发一次。发前把两份**未修** .xls 又逐格重读了一遍，
+正文里的每个数字都来自这次重读，不是沿用旧笔记。
+
+**4) 发前自查拿到的新证据（比"表内矛盾"更硬的机械依据）。** 两份未修文件从 `45acd0f5` 取出后
+office-excel 导入（2.6：41,472 B，BIFF `076a7098…`；2.6.1：39,424 B，`020f17df…`），
+再用 stdlib（`zipfile` + `ElementTree`）直接读导入产物 xlsx 的 `B`/`C` 两列，按"列出的位号数 == `qty_per_unit`"
+这条表自订约定遍历：
+
+| 文件 | `ref_des` 含逗号的行数 | 违约行 |
+|---|---|---|
+| 2.6 未修 | 43 | 第 5 行 `-,+,CLK,IO,NRST`(2/5)、第 54 行 `R97,-99`(3/2) |
+| 2.6.1 未修 | 43 | 第 5 行(2/5)、**第 45 行 `R6,14,268`(1/3)**、第 56 行 `R97,-99`(3/2) |
+
+* 第 5 行是排针的**网络名**不是位号 ⇒ 不算组；**剩下的两处正是 PR #18 的编辑目标**，
+  这给 #18 添了一条不依赖人工比对的依据（先前只有逐格对照）。
+* 2.6 同一行（也是第 45 行）`C45`=**3**、`K45`=`100R`，且 2.6 没有单列 R6/R14
+  ⇒ 2.6.1 是"Qty 已改、位号文本没改"的半次编辑；`R6 100R→180R` 是**从第 46/47 行推出来的**，不是表写的。
+* 两份文件的列位不同（2.6 的位号值在 K 列、2.6.1 在 I 列）⇒ 跨版本对账必须按列名，不能按列号，
+  这条解释了 `PSDR2.6_BOM_flat.csv` 比 2.6.1 多两列（`qty_to_order` 等）。
+
+**5) 引用面又纠一处**：`BOM_changes_PR18.md` **只在 PR 分支上**，`next` 里 `git ls-files` 查不到。
+本账 §K-12 与 findings §8.2 原先把它写成 `next` 的仓内路径，已就地加注（追加记录不抹旧文）。
+
+**6) 本轮没做**：没新开 issue；没向 upstream 推；没动固件源码；没碰 #19/#20；
+`next` 上仍有待办三件——重委派 TASK_C 剩余行（合并文件已重做，KB 里那 59 个散输入是旧的）、
+`docs/PSDR-revB-workorder.md` 起稿、M3 实测量（11 个位号 + 两条轨）。

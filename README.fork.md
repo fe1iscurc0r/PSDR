@@ -66,8 +66,11 @@ As of 2026-11-03:
   "obsolete" is not verifiable from repository data (`OctopartBOM.csv` has no
   lifecycle column). All of it is upstream **PR #18** (4 commits / 4 files -- the
   last one adds a plain-text cell-by-cell change list so the binary `.xls` diff
-  can be reviewed without opening Excel); PR #17 (KiCad schematic, 3 commits /
-  23 files) is still open too. Neither has been reviewed upstream yet.
+  can be reviewed without opening Excel -- that list lives on the PR branch, not on
+  `next`); **PR #17 (KiCad schematic, 3 commits / 23 files) was merged upstream as
+  `c34afebe`**, and PR #18 is still open: a reviewer asked whether it proposes
+  alternatives or fixes, and the answer posted on 2026-11-04 is that it fixes, with
+  deliberately no substitute parts.
 - **Firmware status (read-only survey, fork-local).** No firmware source was
   modified on the F7 line; the survey lives entirely in `docs/`.
   `docs/PSDR-firmware-survey.md` annotates every project module (12,035 lines of
