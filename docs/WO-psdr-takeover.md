@@ -3551,7 +3551,10 @@ Jeff 在 #18 问 "Are alternatives also suggested as part of this PR? Or is it o
 
 顺带把可核断言全过一遍，都成立：PR #18 变更清单是 **7 + 6 = 13 个单元格**；两份 BOM 上游版都是
 `R97,-99`、我们树里都已是 `R97-99`（`git show 45acd0f5:` vs `HEAD:` 逐格比字节）；
-`R97/R98/R99` 三只都在网表里、该行 Qty=3 ⇒ "R98 没有归属行"成立；开关行 `Mfg` 格为空、
+`R97/R98/R99` 三只都在网表里、该行 Qty=3 ⇒ "R98 没有归属行"成立；
+**上游 2.6 那份同样是 `R97,-99` 且 Qty=3**（`45acd0f5` 的 .xls 经 office-excel 导入后逐格读到
+`B54="R97,-99" C54=3`，BIFF `076a7098…`）⇒ 回帖里 "in both BOMs" 有据。
+（这条先前是用"逐格比字节"的话写的，证据其实应该是导入器读出的单元格，已按实际取证方式改写。）开关行 `Mfg` 格为空、
 `Mfg Part #`=`MASWSS0129TR` ⇒ "只填型号不填厂商"的口径与文档一致；
 `OctopartBOM.csv` 我方改动前后**都是 87 处 CRLF、0 处裸 LF** ⇒ 没有引入混合换行；
 `#17` 合并进来的 `.gitattributes` 只钉 `*.kicad_*` 与 `sym-lib-table`，**不含 `* text=auto`**
