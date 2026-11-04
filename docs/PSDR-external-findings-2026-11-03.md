@@ -44,9 +44,9 @@ KB 的 U85.md  正文位号 = U24      本地 U85.md  = U85
 | 1.2 | "2× SY10EP52V 交叉耦合成正交 ÷2" | **器件身份错**：SY10EP52V 与 BOM 实购的 **MC10EP52DTG 都是"Differential Data and Clock D Flip-Flop"**，不是 ÷2；÷2 是 EP32V。**AC 表只有 `Maximum Frequency = 4 GHz Typical`，无任何最低输入频率行** | `原厂PDF(自核)`——我方自取 onsemi MC10EP52 数据手册（409,316 B，sha256 `c5e8a5cf…`），pdftotext 抽出正文确认 | `PSDR-firmware-survey.md §2.0` 架构图、`gaps #9`（这条**可结案**：问题本身是假问题） |
 | 1.2b | 同上（推论层） | ÷2 只能靠 `Q̄→D` 的通用接法成立，**官方手册没有 quadrature/÷2 应用电路**（EP52V 手册仅 7 页、无应用章节）⇒ "正交由分频器保证"这句话要降级为"由接线推断，未获手册背书" | 同上 | survey §2.0、HMC1023 文档、对外措辞 |
 | 1.3 | "滤波选择用 74CBTLV3253" | netlist 的 `part_type` 是 CBTLV3253，**BOM 实购是 SN74CB3Q3253DBQR（CB3Q 三供电系列）**——真值表/Ron/Cio 与 CBTLV 不同；两份手册都取了 | `原厂PDF(对方sha256，我方复算一致)`（CB3Q 1,380,608 B / `96d6c387…`；CBTLV 2,660,016 B / `d6fb46fe…` 我方复算相同） | `PSDR-HMC1023-netlist.md`、rev-B 控制线表、贴装/BOM 口径 |
-| 1.4 | "三片 DPDT 开关控制脚由 MCU 直驱"（对） | 补上判据：MASWSS0129 是 **DPDT**，控制脚 **VC1/VC2**，真值表只有 `10/01` 两态导通 ⇒ **必须互补驱动**；`1 = +2.9…+5 V`、压差 ≥2.7 V ⇒ 3.3 V GPIO 够用 | Rev V6 原文〔但 macom 官网已撤档、PDF 未找到 ⇒ `镜像`级，不作对外证据〕 | survey P1-4（极性注释）、#16 观测项、rev-B 控制表 |
+| 1.4 | "三片 DPDT 开关控制脚由 MCU 直驱"（对） | 补上判据：MASWSS0129 是 **DPDT**，控制脚 **VC1/VC2**（原件脚名；板上网表记作 `V1/V2`），真值表只有 `10/01` 两态导通 ⇒ **必须互补驱动**；`1 = +2.9…+5 V`、压差 ≥2.7 V ⇒ 3.3 V GPIO 够用（余量按**计算值**收紧：AP3417C 原厂 600 mV + 板上分压 ⇒ 算得 2.90/3.01 V，尚未电测，见 §8.2 第 3 条） | Rev V6 原文〔macom 官网已不托管这份 PDF ⇒ `镜像`级，不作对外证据〕 | survey P1-4（极性注释）、#16 观测项、rev-B 控制表 |
 | 1.5 | gaps #10 "WBC2-1TL 0.2–500 MHz" | 带宽/插损对；但 **"DC imbalance" 是引脚直流不平衡电流 8.5 mA**，不是幅度/相位不平衡度——术语要改，否则会被读成巴伦不平衡指标 | `原厂PDF(对方)`（Coilcraft 424-1） | `gaps #10` |
-| 1.6 | scope §5 的 GPS 降本路线 | **RXM-GPS-RM-T 不是 u-blox**，是 Linx（现 TE）RM 系列，核心 MediaTek MT3337E；跟踪灵敏度 −161 dBm、冷启 −143 dBm、1PPS ±11 ns、跟踪 12 mA/待机 135 µA；**W3062A 是 Pulse 无源陶瓷贴片天线（RHCP 0 dBic / 线极化峰值 2.5 dBi）**，不是有源模块自带天线 | Linx Data Guide 2016-10-06〔`镜像`；TE 直链未取到〕 | `PSDR-scope-and-cost.md §5`、M3 的"GPS 四指标比较"实测项 |
+| 1.6 | scope §5 的 GPS 降本路线 | **RXM-GPS-RM-T 不是 u-blox**，是 Linx（现 TE）RM 系列，核心 MediaTek MT3337E；跟踪灵敏度 −161 dBm、冷启 −143 dBm、1PPS ±11 ns、跟踪 12 mA/待机 135 µA；**W3062A 是 Pulse 无源陶瓷贴片天线（RHCP 0 dBic / 线极化峰值 2.5 dBi）**，不是有源模块自带天线 | Linx Data Guide 2016-10-06〔当时记 `镜像`；同日稍后我方从 TE 的 DDEController 取到真 PDF（`43d49463…`，27 页，Revised 10/6/2016）⇒ 已升 `原件`，见 §8.1；**同一行的 W3062A 那半条不跟着升**——它至今取不到原件，仍是对方给的经销商级〕 | `PSDR-scope-and-cost.md §5`、M3 的"GPS 四指标比较"实测项 |
 | 1.7 | survey P1-3 只写了"ISR 里跑 FFT" | ST 勘误 ES0290 Rev 7 **§2.2.1 "Missed ADC triggers from TIM1/TIM8, TIM2/TIM5/TIM4/TIM6/TRGO"**（Status A，有 workaround：EXTEN/JEXTEN=0x11 双边沿触发，或使能 DAC 时钟）。我们的采样链正是 TIM4 + ADC/DMA ⇒ 这是一条**必须评估的既有硬件缺陷**，不是代码问题 | `原厂PDF(对方)`（ES0290 Rev 7，2019-07-18） | survey 缺陷清单新增一条 P1；bringup 检查表加一条测点 |
 | 1.8 | survey 里写过"I2C2 BSY 勘误" | **BSY 条目属 SPI 从机**，不属 I2C；旧版 DocID027162 Rev 3 把它编在 I2C 小节下（历史编排错误）——引用时别再说"I2C2 BSY" | `原厂PDF(对方)` | survey/相关对外措辞 |
 
@@ -110,7 +110,7 @@ KB 的 U85.md  正文位号 = U24      本地 U85.md  = U85
 
 **B. 需要别的出口取件（对方 7 项里，我方已补 2 项）**
 - 我方已自取并复算一致：`MC10EP52`（onsemi，新件，409,316 B / `c5e8a5cf…`）、`SN74CB3Q3253`、`AD8302`、`SY10EP52V`、`SN74CBTLV3253`。
-- 仍缺：`MASWSS0129`（MACOM 撤档，官网 404）、`SXB-2089Z`（Qorvo 页 404）、`FAN4174`（onsemi 我方也被挡：`-L` 只回 HTML）、`ADE-2ASK`（Mini-Circuits 我方 403，**对方已取到 REV. H**，可请他们把 PDF 传回来）、`RXM-GPS-RM-T`（TE 只给查看器 HTML）、`SPU0410HR5H-PB`（Knowles 404）、`W3062A`（Pulse→YAGEO 断链）。
+- 仍缺：`MASWSS0129`（原厂 CDN 上本件 404、同路径兄弟件 200，curl 与浏览器两种客户端一致）、`SXB-2089Z`（Qorvo 站点检索不到；**我方出口直连得 429 限流，不是 404**，见 §7.3-3）、`FAN4174`（onsemi 我方也被挡：`-L` 只回 HTML）、`ADE-2ASK`（Mini-Circuits 我方 403，**对方已取到 REV. H**，可请他们把 PDF 传回来）、`RXM-GPS-RM-T`（TE 只给查看器 HTML）、`SPU0410HR5H-PB`（Knowles 404）、`W3062A`（Pulse→YAGEO 断链）。
 - 1.1 / 1.4 / 1.6 三条结论**在拿到原厂 PDF 前保持在 `镜像` 级**，不进 #16/#19 的对外文本。
 
 **C. 需要你点头才做的对外动作**
@@ -198,11 +198,12 @@ value only in asc  : 0   only in BOM: 1   neither: 72
    ⇒ 谁能定：**只有作者或实测**（都是 0603，可电测），已按可测项写进 §7.4；在此之前引用它们必须两个值都写。
 2. **"2.6→2.6.1 实质差异只有 R164"这句作废**，作废理由分两层：delta 有三处；
    而 2.6.1 表内还有**重复行自相矛盾**（见上一条）。这条已回写 `PSDR-open-data-gaps.md` §2.1。
-3. **还缺原件的手册**：MASWSS0129（**确认撤档**：`cdn.macom.com/datasheets/MASWSS0143.pdf`、`MASWSS0202.pdf`
-   我连测两次都 200，同路径的 `MASWSS0129.pdf` 两次都 404）、SXB-2089Z、SPU0410HR5H-PB、W3062A。
+3. **还缺原件的手册**：MASWSS0129（**原厂 CDN 已不托管这份文档**：`cdn.macom.com/datasheets/MASWSS0143.pdf`、
+   `MASWSS0202.pdf` 我连测两次都 200，同路径的 `MASWSS0129.pdf` 两次都 404 ⇒ 只写"文档取不到"，
+   **不写成官方停产断言**）、SXB-2089Z、SPU0410HR5H-PB、W3062A。
    ⚠️ **SXB-2089Z 这条我先前写成"Qorvo 撤档"，证据其实没这么强**：今日我方直连
-   `https://www.qorvo.com/products/p/SXB-2089Z` 得到的是 **429（限流）不是 404**，
-   "产品页 404 / 站内搜索 0 结果"来自另一出口的浏览器会话 ⇒ 准确说法是
+   `https://www.qorvo.com/products/p/SXB-2089Z` 得到的是 **429（限流）不是 404**（2026-11-04 各连测两次皆 429），
+   "产品页 404 / 站内搜索 0 结果"来自另一条抓取路径的浏览器会话 ⇒ 准确说法是
    **"Qorvo 站点检索不到该件、我方出口被限流，DS110610 目前只有镜像文本"**。
    已解决：FAN4174（改取现行合册 FAN4174/FAN4274 **Rev 4**，旧单只路径确已消失）、RXM-GPS-RM-T（TE 原件到手）、
    ADE-2ASK（REV. H，1–1000 MHz 与 LO +7 dBm 见首页）。
@@ -232,11 +233,11 @@ value only in asc  : 0   only in BOM: 1   neither: 72
 | ADE-2ASK REV. H | 取到 | **是**（`44a6c860…`） | 首页 "Level 7 (LO +7 dBm) **1 to 1000 MHz**" ⇒ 混频器上限 1 GHz，6 GHz 开关无意义的判断有原件了 |
 | FAN4174 | 取到（**换文档**） | n/a | 旧 `fan4174-d.pdf` 路径已消失（真浏览器也 302→HTML）；现行是合册 **FAN4174/FAN4274 Rev 4**（`9c61c664…`），首页"3.7 MHz of bandwidth at 5 V" ⇒ 基带运放的带宽上限从此有据 |
 | RXM-GPS-RM-T | 取到 | n/a | TE DDEController 只对浏览器会话给真 PDF（`43d49463…`，27 页，Revised 10/6/2016）⇒ GPS 那条"不是 u-blox"可升到原件级 |
-| **SXB-2089Z** | **取不到** | — | Qorvo 产品页 404、`rfmd.com` 旧路径 302 回首页、PCN 门户不可达、**Wayback 本机出口不可达** ⇒ §1.1 的 5–2500 MHz / PCN 19-0122 停在 `镜像` 级 |
-| MASWSS0129 | 取不到 | — | 不是网络问题而是**确认撤档**：同模式的 `cdn.macom.com/datasheets/MASWSS0143.pdf`、`MASWSS0202.pdf` 都返回 200，只有 0129 是 404 |
+| SXB-2089Z | **取不到** | — | Qorvo 站点检索不到该件 + **我方出口直连得 429 限流（2026-11-04 连测两次皆 429，不是 404）**、`rfmd.com` 旧路径 302 回首页、PCN 门户不可达、**Wayback 本机出口不可达** ⇒ §1.1 的 5–2500 MHz / PCN 19-0122 停在 `镜像` 级 |
+| MASWSS0129 | 取不到 | — | 不是网络问题：同模式的 `cdn.macom.com/datasheets/MASWSS0143.pdf`、`MASWSS0202.pdf` 都 200，只有 0129 是 404。**2026-11-04 复测**（curl 带浏览器 UA，同一出口，各连测两次）⇒ 0143/0202 = 200、0129 = 404 复现。措辞边界：这只证明"原厂 CDN 已不托管这份文档"，**不等于**官方宣布该件停产 |
 | SPU0410HR5H-PB / W3062A | 取不到 | — | Knowles 官方器件库搜"无结果"（站方 Incapsula）；Pulse→YAGEO 迁移断链，YAGEO 站无可达文档库 |
 
-### 8.2 已执行的对外动作（用户 2026-11-03 批准"C 你更正一下、建议放进开源参考"）
+### 8.2 已执行的对外动作（用户 2026-11-03 批准"C 你更正一下、建议放进开源参考"；2026-11-04 批准 #18 回帖）
 
 * **issue #16 追加一条更正评论**（`…/issues/16#issuecomment-6606601865`，15 条评论、经 REST 复算确认**只发出去一次**，
   MCP 那次 `-32602` 是响应外壳假错误）。内容三件事：
@@ -248,4 +249,16 @@ value only in asc  : 0   only in BOM: 1   neither: 72
   4. **开源参考按到文件级给出**：`mchf-eclipse/hardware/uhsdr_hmc1023.c`，commit `c447c2e4`
      （"Finalized the finalized HMC1023 driver :-)"，2018-10-21，作者 db4ple）——我用 GitHub API 自己核过；
      线程里 DM2NT 2021 年只给过整棵 `hardware/` 目录的链接，没到文件与 commit。
-* 未做：没附 PR、没改固件、没在 #19/#20 追加内容、没动上游任何分支。
+* **PR #18 追加一条回帖**（用户 2026-11-04 批准；`…/pull/18#issuecomment-6622367887`，2,823 字符，HTTP 201，
+  前后计数 1→2 且本方账号名下只有 1 条 ⇒ 只发出去一次）。回答的是 Jeff 的问题
+  "Are alternatives also suggested as part of this PR? Or is it only calling out what needs to be fixed?"：
+  **这条 PR 是修，不是建议，且刻意不给替代件**；同时把 §K-11 自查出的两条口径写进去了
+  （2.6.1 表内 R6/R14 各有两个值 ⇒ PR 消的是文件内部矛盾；"obsolete"不是随附数据能证明的）。
+  全文要点与逐格清单在 `Hardware/BOMs/PSDR_2.6.1/BOM_changes_PR18.md`。
+* **⚠️ 已发出的 #16 评论第 2 条口径偏低，尚未回帖更正**：那条写的是
+  "2.6 to 2.6.1 is not just R164 270K to 240K - R6 100R to 180R and R14 100R to 68R change in the same direction"。
+  这只对一半：**同一份 2.6.1 BOM 里第 41 行 `R6,14,268`（Qty 1、100R）与第 42/43 行 `R6`=180R、`R14`=68R 同时存在**，
+  所以 R6/R14 首先是**表内自相矛盾**，其次才是版本 delta。读者按现在这句话会以为 2.6.1 表是自洽的。
+  ⇒ 需要一条只补这一句的 #16 回帖（措辞已在 §K-11/§7.3-1 备好），**属新的对外动作，等用户点头**；
+  #18 那条回帖已经把完整口径说对了，所以这条只是补 #16 的历史记录。
+* 未做：没附新 PR、没改固件、没在 #19/#20 追加内容、没动上游任何分支、没新开 issue。
