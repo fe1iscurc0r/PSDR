@@ -4143,3 +4143,19 @@ F-3 滤波档位映射；F-4 VNA 两态；F-5 HMC1023 驱动（**动手前先问
 **注意**：① 这是 land pattern 偏移（向板内 0.3 mm、缩小 0.15 mm），未对照 SJ-42617 推荐值；
 ② 本机没有 kicad-cli，DRC 未重跑；③ `SHA256SUMS` 未更新，且 `reproduce_kicad.py` 会覆盖手工改动，
 后续要另存 `_revB` 版本。连线（VDDBG 与 4 处线距）按用户要求留给他们自己画。
+
+### K-37 EDA 现场：并网已由用户完成、铺铜 12/12 重建、DRC 复核（2026-11-05）
+
+* **并网核验（typed 回读）**：`pcb nets` 从 **278 → 277** 条；`$$$15137` 消失；
+  `LPF_5V` 长度 **2634.2 → 2789.3 mil**（+155 mil ≈ 3.9 mm，即用户画的那段线）。
+* **铺铜重建**：`easyeda pcb pour-rebuild` 返回 `pours 12 / rebuilt 12`，`save` ok；
+  `poured-list` 回读 `available=true, count=12`。
+* **DRC（EDA 自己的规则集）**：分组计数 419 Physical + 83 Safe Spacing + 73 Clearance + 14 同封装内 +
+  6 Connection Error + 4 Other Spacing + 1 Netlist Error。
+  与 `evidence/eda_drc_2026-11-02.json` 的基线（513 = 73+14+419+6+1）**结构性一致**；
+  新增的是 **83 Safe Spacing + 4 Other Spacing**（规则集差异，未逐一归因）。
+* **连线结论**：`LPF_5V`/`VDDBG` 上**没有缺失连接**。6 条 Connection Error 全部是 **`+3V3_FLIP_FLOP` 的
+  "free copper region"**（孤岛铜，源设计本来就有 7 块 HATOUT），不是要画的线；1 条 Netlist Error 是
+  **PCB 与原理图网表不一致**（我们只在 PCB 改了网名）——若有原理图需同步，否则 PCB-only 流程可忽略。
+* 419 Physical 里含 4 条 `LPF_5V` 的 **via 尺寸**违规（14 mil 内孔 vs EDA 规则 ≥19.7 mil），
+  属源设计的 0.356 mm 过孔，与本次改动无关。
