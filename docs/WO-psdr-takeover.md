@@ -4033,3 +4033,15 @@ GPS_ANTENNA、U16/U24/U30、microSD/microUSB/J170、三颗晶振。
 （去掉 U304、U16/U24/U30、U287、U314、GPS、混频管、巴伦、AD8131、触发器）；**加回 GPS = $169.70**。
 去掉的 9 行里 HMC1023($30.32)+AD8302($24.86)+GPS($20.38) 占六成。PCB 免费不计；SMT 费用需按厂方下单页报价，
 本文不给假数。写进 `docs/PSDR-assembly-sourcing.md` §6。
+
+### K-29 缺陷登记册（2026-11-04，用户"除了缺料还有什么缺陷"）
+
+新档 `docs/PSDR-defect-register.md`：把"缺料"之外的所有已知问题登记成 22 条（D-01…D-22），分五组：
+P0 挡开机（无超时 I2C、VDDBG 无供电、HMC1023 无驱动/CLK1 未配、`recieve_with_filter` 落进发射分支、滤波 mux 恒 (1,0)）、
+功能缺失（VNA 两态空、3 个 case 空、加电仍旁路）、电气/时钟（VCO 2.84 GHz 超规格、CLK1/CLK2 未配、
+`+3V3_CPU` 2.898/3.012 V、11 值冲突、CB3Q/CBTLV）、制造（52 条 clearance、39 条板边、0.9 mm 板厚、丝印 199/199/55、
+Morse 桨无钻孔）、资料/流程（Documentation 已读、原理图位号是 PSDR2 一代、PR #18 待审、网页三件未回）。
+
+**可立即执行的修法**只落了一条硬件动作：**`VDDBG` 飞线**（`LPF_5V` → `C292` 热端/U287.28），
+其余是"先量再判"。给检查表补了"四个一量判死点"：`+3V3_CPU` 电压对应 R113、`+5V_BOOST` ≈4.94 V、
+`VDDBG` ≈5 V、`FILTER_CAL` 有无 20–80 MHz。

@@ -25,6 +25,7 @@
 | `PSDR-documentation-archive.md` | **`Documentation/` 那 6 份作者材料的档案**（fork-only）：2014 半成品 VNA 说明页（作者自己的 TODO、"30mV/db 10mV/Degree" 说法，且**位号属 PSDR2 一代**：`U23`=AD8302、`U24-27`=DPDT）、2016 装配说明（图纸框还留着 `<INSERT COMPANY NAME HERE>`）、两份视频文稿（"open source""kits""我没把它设计成应急设备"原话）、2014 滤波系数表（512 点 == 固件 `FFT_BUFFER_SIZE 512`，表里是浮点系数而代码只填 1/0） | 想知道"作者留下过什么、我们此前漏了什么" |
 | `PSDR-external-findings-2026-11-03.md` | **外部执行方回传资料核实**（fork-only）：6 份答案的验收过程（49/55 行对账、错位实锤、4 个 sha256 复算一致）、8 条被推翻/修正的说法（SXB 是 5–2500 MHz、U279/280 是 D 触发器不是 ÷2、实购 CB3Q 非 CBTLV、ST 勘误 §2.2.1 ADC 触发丢失…）、HMC1023/AD8302/Si5338/总线开关的手册级补口、"信息不足"大头其实是我们包缺 `Value`、以及按谁能推动分四组的待办队列 | 要用这批外部结论之前，先读它的证据分级 |
 | `SOP-eda-import-2.6.1.md` | **EDA 导入 SOP**：7 步，含"直接导入只得 10/12，不是回归"与两处必须人工的步骤 | 下次往嘉立创EDA导板的人 |
+| `PSDR-defect-register.md` | **缺陷登记册**（fork-only）：除缺料外的 22 条已知问题，按 P0/功能/电气/制造/流程分组，每条给证据、卡在谁、现在能做什么；含 `VDDBG` 飞线与"一量判死"的四点 | 想知道"还差什么才能开机/打样" |
 | `PSDR-bringup-checklist.md` | **上电前检查表**（M3）：42 个测点带坐标与网络、射频只写观测方法、无实物逐条 SKIP | 板子到手那天 |
 | `psdr-build-notes.md` | 构建笔记（F4 线的工具链与坑） | 要复现编译的人 |
 | `PSDR-TAKEOVER-WORKORDER-2026-10-30.md`<br>`PSDR-TAKEOVER-PROMPT-2026-10-30.md`<br>`PSDR-TAKEOVER-EVALUATION-2026-10-30.md` | **上游给的工单/提示词与当时的评估**（历史输入，不是我们的产出；评估里个别结论已被后续实测更正，正文有标注） | 想知道起点是什么 |
