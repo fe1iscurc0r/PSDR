@@ -16,6 +16,15 @@
 #ifndef SIGNAL_PATH_TABLE_H
 #define SIGNAL_PATH_TABLE_H
 
+/*
+ * States 5/6 (the two VNA paths) are deliberately left at "write nothing".
+ * The relay combination cannot be derived from the files we hold: the DPDT
+ * datasheet only exists as a mirror (truth table known, physical pin-to-port
+ * mapping not), and the 74CB3Q/CBTLV mux truth table has not been measured.
+ * See docs/PSDR-switch-maps.md for the two measurements that unblock them.
+ * Do not fill these rows with guesses.
+ */
+
 #include <stdint.h>
 
 typedef struct
@@ -43,8 +52,8 @@ static const signal_path_state_t SIGNAL_PATH_TABLE[7] =
   /* 2 transmit_no_amp_no_filter     */ {1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1, 1, 0},
   /* 3 transmit_with_amp_no_filter   */ {1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 0},
   /* 4 tramsmit_with_amp_with_filter */ {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-  /* 5 vna_reflected                 */ {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-  /* 6 vna_through                   */ {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+  /* 5 vna_reflected (see header note) */ {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+  /* 6 vna_through   (see header note) */ {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 };
 
 #endif /* SIGNAL_PATH_TABLE_H */
