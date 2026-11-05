@@ -71,8 +71,13 @@ As of 2026-11-03:
   `c34afebe`**, and PR #18 is still open: a reviewer asked whether it proposes
   alternatives or fixes, and the answer posted on 2026-11-04 is that it fixes, with
   deliberately no substitute parts.
-- **Firmware status (read-only survey, fork-local).** No firmware source was
-  modified on the F7 line; the survey lives entirely in `docs/`.
+- **Firmware status (survey plus two fork-local fixes).** The survey lives in
+  `docs/`. Until 2026-11-04 no firmware source was modified; two local fixes
+  now sit on the fork only (never proposed upstream): a bounded Si5338 I2C
+  wait, and a table-driven `signalPath()` that stops state 1
+  (`recieve_with_filter`) from falling into the transmit branch. See
+  `docs/PSDR-firmware-fixes-F1-F2.md`; the tree is no longer a byte-identical
+  mirror of `PSDR_F7`.
   `docs/PSDR-firmware-survey.md` annotates every project module (12,035 lines of
   project code in `Source/`, 10,437 in `Source_F7/`; the other ~330k lines in each
   tree are ST HAL and CMSIS-DSP -- `python tools/fw_stats.py Source Source_F7`)

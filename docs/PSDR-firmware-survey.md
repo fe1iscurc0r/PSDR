@@ -96,7 +96,7 @@ $ git diff --stat upstream/PSDR_F7:Source next:Source_F7
 上面那 6 行 include 修正随旧基线一起被换掉了（新基线本来就能被 GCC 13 编过，见 §I-8/§I-9）。
 主线里的 `Makefile.linux`(138 行) 与 `.gitignore`(1 行) 仍是我们的，`Debug/PSDR.hex`
 那 6,000 行是**被撤出的上游构建产物**，两份参考 hex 现在跟踪在 `dist/reference/`。
-所以对外可以写的准确表述是：**F7 线我们与上游差一个构建文件，源码零改动**；
+所以对外可以写的准确表述是：**F7 线在 2026-11-04 之前与上游差一个构建文件、源码零改动**；2026-11-04 起 fork 里加了两处**本地修复**（F-1 I2C 有界等待、F-2 `signalPath` 表化并修状态 1 的 fall-through，见 `docs/PSDR-firmware-fixes-F1-F2.md`），`Source_F7/src/main.c` 的 blob 由 `5af0e159` 变为 `e8238ed3`，**不再与上游镜像**；
 F4 线不是这样——`git diff --stat upstream/master:Source next:Source` 给出
 `Makefile.linux` +156、`src/hal.c` +17/−2、`src/main.c` +1、`src/misc.c` +1、
 新增 `src/uart_hal_stub.c` 46 行（链接桩），那是让 GCC 13 链得上、跑得通的必要改动，

@@ -4076,3 +4076,19 @@ H-4 丝印位号让位；H-5（可选）`U30.6` 引出测试点。
 F-3 滤波档位映射；F-4 VNA 两态；F-5 HMC1023 驱动（**动手前先问 Michael**，他已在 `PSDR_F7` 做同一件事）；F-6 CLK1/VCO 核对。
 **顺序**：F-1/F-2 的主机测试与 H-1 飞线先做；F-5 等 H-1 + Michael 回话；H-2/H-3/H-4 投板前一起做。
 **不算解决**单列：换 R113 得 3.3 V（若实测 <2.9 V 才属"最小必要换值"）、11 个值冲突换值、CB3Q/CBTLV 改名、缺料替代。
+
+### K-32 固件 F-1/F-2 落地（2026-11-04，用户"先做 F1-F2，不要做到上游分支"）
+
+**只改 fork 的 `next`，没有 PR、没有碰任何上游分支。**
+
+* **F-1**：`Source_F7/src/main.c` 的 Si5338 就绪等待从无界 `while` 改为 **2 s 有界（20×100 ms）**，
+  超时 `trace_puts("Si5338 not ready - continuing without synthesizer")` 后继续（对应 #19 P0-2）。
+* **F-2**：新增 `Source_F7/src/signal_path_table.h`（`signal_path_state_t` + `SIGNAL_PATH_TABLE[7]`，12 线 × 7 态），
+  `signalPath()` 改为读表；**状态 1 `recieve_with_filter` 不再落进状态 2 的发射分支**（旧代码会写 `TRX=1`、`DAC=1`）；
+  非法值打印后返回；态 4/5/6 保持"不写"。`FILTER_S0/S1` 仍 `(1,0)`（CB3Q 真值表未实测，表里留 TODO）。
+* **验证**：主机测试 `tools/hosttest/test_signal_path.c` → `RESULT: PASS (7 states x 12 lines)`；
+  目标构建 WSL + `arm-none-eabi-gcc 13.2.1` → **0 errors**，`text 113916 / data 18488 / bss 18260`（改前 114068）。
+  **没有上板**。
+* **镜像关系变了**：`main.c` blob `5af0e159` → `e8238ed3`，`Source_F7/` 不再与 `upstream/PSDR_F7` 逐字节一致。
+  `docs/PSDR-firmware-survey.md` 与 `README.fork.md` 里"源码零改动"的措辞已同步限定为"2026-11-04 之前"。
+  新档 `docs/PSDR-firmware-fixes-F1-F2.md` 记录改动、blob、验证与回滚。
