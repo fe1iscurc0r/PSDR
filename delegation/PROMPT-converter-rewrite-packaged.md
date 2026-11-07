@@ -209,7 +209,7 @@ P0 没拿出可核证据之前，不要急着大改架构。
   包围盒 99.9998×64.9986 mm 与源一致，最大 sag 0.0007 mm。执行方在源码里实现等价修复，
   **并补一个含 `gr_arc` 的回归 fixture**（example 现在测不到这条路径）。
 - **Bug2 铺铜丢网**：`netNames` 表 @775–779 只按**数字网号**建键
-  （`/^\d+$/.test(node[1].v)`，`netNames[node[1].v] = name`）；`normNet` @1020
+  （`/^\d+$/.test(node[1].v)`，`netNames[node[1].v] = name`）；`netOf` @1018–1021（@1020 是其 return）
   `return netArr ? (netNames[netArr[0]] || '') : '';`；`convertZone` @1177
   `const netName = normNet((netNameArr && netNameArr[0]) || (netArr ? (netNames[netArr[0]] || '') : ''));`。
   我们的 zone 写的是名字串 `(net "GND")`（无数字网号、无 `net_name`）⇒ `netNames["GND"]` undefined
