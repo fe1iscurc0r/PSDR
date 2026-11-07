@@ -88,6 +88,8 @@ python tools/reproduce_kicad.py --check
 ## 3. 每区要产出什么（zone dossier 模板）
 
 三个区各出一份，**填表不许留空**，拿不准写 `pending`：
+（2026-11-07 已按此模板各出一份：`PSDR-dossier-U304-gain.md` / `PSDR-dossier-DPDT-switches.md` /
+`PSDR-dossier-HMC1023-lpf.md`，pending 均标注等哪个门；下表保留为模板底稿。）
 
 | 字段 | U304 增益级 | 三片 DPDT | U287 HMC1023 |
 |---|---|---|---|
@@ -153,5 +155,5 @@ python tools/reproduce_kicad.py --check
 
 1. ~~§2 的闭包扩到天线口~~ —— **2026-11-04 已完成**：四区 129 / 圈外 262（`--zone antenna_ports:…`）。
 2. ~~§4 补全部 case 的引脚状态~~ —— **已完成**：`docs/PSDR-signalpath-pinmap.md`（12 根线 × 7 个态）。
-3. `U287` 的 32 端子逐脚与原件表对齐（原件已到手，`docs/PSDR-HMC1023-netlist.md` 是现成底稿）——**未做**。
-4. 把 §3 的三份 dossier 填到只剩 `pending`，`pending` 全部标注"等哪个门"——**未做**。
+3. ~~`U287` 的 32 端子逐脚与原件表对齐~~ —— **2026-11-07 已完成**：`docs/PSDR-HMC1023-pinmap-check.md` 独立复核（网表 JSON × 手册 Table 6 逐脚一致），并更正 I/Q 通道归属笔误。
+4. ~~把 §3 的三份 dossier 填到只剩 `pending`，`pending` 全部标注"等哪个门"~~ —— **2026-11-07 已完成**：`docs/PSDR-dossier-U304-gain.md`、`docs/PSDR-dossier-DPDT-switches.md`、`docs/PSDR-dossier-HMC1023-lpf.md`（每格已填，pending 均标 G1/G2/G3 或"等用户画线"）。
