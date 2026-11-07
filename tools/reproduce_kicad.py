@@ -108,12 +108,19 @@ def write_manifest(rows, pads_label):
         "# every run only in those lines.",
         "# The DRC report is not listed: KiCad emits the same violation counts",
         "# but reports the items in a run-dependent order.",
+        "# 'exact-committed' rows hash a repo file the generator does not",
+        "# produce (the hand-edited rev-B derivative); --check hashes the",
+        "# committed file instead of regenerating it.",
     ]
     if pads_label:
         lines.append("# Reconciled against the upstream 2.6.1 CAM package:")
         lines.append("#   " + pads_label)
     for rel, kind, digest in rows:
         lines.append(f"{digest}  {rel}  [{kind}]")
+    revb = os.path.join(DIST, "PSDR_2.6.1_revB.kicad_pcb")
+    if os.path.exists(revb):
+        lines.append(f"{exact_sha256(revb)}  PSDR_2.6.1_revB.kicad_pcb"
+                     "  [exact-committed]")
     open(MANIFEST, "w", encoding="utf-8", newline="\n").write("\n".join(lines) + "\n")
     print("wrote", MANIFEST)
 
@@ -123,7 +130,7 @@ def parse_manifest():
     for line in open(MANIFEST, encoding="utf-8"):
         if line.startswith("#") or not line.strip():
             continue
-        m = re.match(r"^([0-9a-f]{64})  (\S+)  \[(exact|normalized)\]$", line.rstrip())
+        m = re.match(r"^([0-9a-f]{64})  (\S+)  \[(exact|normalized|exact-committed)\]$", line.rstrip())
         if not m:
             raise SystemExit(f"bad manifest line: {line!r}")
         rows.append((m.group(2), m.group(3), m.group(1)))
@@ -141,7 +148,10 @@ def verify(kicad, pads_gerbers):
         fresh = {rel: (kind, digest) for rel, kind, digest in collect(board, fab)}
         failed = 0
         for rel, kind, digest in rows:
-            got = fresh.get(rel)
+            if kind == "exact-committed":
+                got = (kind, exact_sha256(os.path.join(DIST, rel)))
+            else:
+                got = fresh.get(rel)
             status = "OK" if got and got[1] == digest else "DIFF"
             if status == "DIFF":
                 failed += 1
