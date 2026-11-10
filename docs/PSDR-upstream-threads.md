@@ -1,8 +1,9 @@
-# 上游 21 条 issue/PR 的原文存档（正文 + 全部评论）
+# 上游 23 条 issue/PR 的原文存档（正文 + 全部评论）
 
 抓取：2026-11-04，REST `GET /repos/MichaelRColton/PSDR/issues/{N}` 与 `/issues/{N}/comments?per_page=100`。
 2026-11-10 增量补录 #13/#16/#19/#20 的新评论（含 11-05/11-08 我方补记与 11-10 作者上午三条回复）；
 同日下午再补 6 条（#13×1、#16×3、#19×2）并更新 PR #18 为已合并、各帖评论数。
+2026-11-11 补录我方新开的 PR #22/#23（作者 #19 邀请的两条，UTC 2026-11-10T23:33Z＝本地 11-11 07:33；标题/正文/SHA/文件清单经 REST 回读核验，评论暂 0 条）。
 用途：**引用底稿**。这是别人的话，原文照录（只把连续空白压一下），**不代表本 fork 的判断**；
 分析请看 `docs/PSDR-chronicle.md` 第一纪/第一纪补。要断言的强度：`原件`（GitHub 页面直接读到）。
 
@@ -1869,4 +1870,78 @@ You wrote in #16 (2021-12-07): "Most of my code is not in the main branch on git
 3. If no, then these four stubs are the honest to-do list, and I would like to keep them written down somewhere public.
 
 Read with AI assistance; every citation above is a file and line in this repo.
+```
+
+---
+
+## #22 [PR] Add a portable Makefile.linux (same flags as build.sh, toolchain from PATH)
+
+- 状态 open｜开于 2026-11-11｜作者 @fe1iscurc0r｜评论 0 条
+- head `fe1iscurc0r:pr/makefile-linux` @ `fb586b3`｜base `MichaelRColton:master`（456c023）
+- 文件：`Makefile.linux`（+72/−0）｜draft: false｜maintainer_can_modify: true
+- 来源：作者 #19 邀请（"Your makefile is more portable than my script, so I'd be glad to have it in the repo"）
+
+**正文（@fe1iscurc0r）**
+
+```
+From the invitation in #19: build.sh works but hard-codes the CubeIDE toolchain path and the repo path. This adds Makefile.linux at the repo root. It builds the same source set with the same flags and takes the toolchain from PATH or PREFIX=.
+
+- Same source list as build.sh (Source/src, Source/system/src, Source/DSP_Lib/Source, Source/usb), minus *_template.c and _ref_*.
+- Same defines and includes, including Source/usb.
+- OPT defaults to -Os (as noted in #19); override with OPT=-O0 for debug.
+- Compiles DSP_Lib/Source/TransformFunctions/*.S.
+- Outputs build/PSDR_F7.elf/.hex/.bin, same names as build.sh.
+- No source changes.
+
+Tested on Ubuntu 24.04 with arm-none-eabi-gcc 13.2.1 and GNU Make 4.3, clean build from an empty build/:
+
+text 131080 / data 17824 / bss 35488
+
+Usage:
+
+make -f Makefile.linux                          # -Os
+make -f Makefile.linux -j8
+make -f Makefile.linux OPT=-O0                  # debug build
+make -f Makefile.linux PREFIX=/path/to/bin/arm-none-eabi-
+
+Prepared with AI assistance; build-tested as above.
+```
+
+---
+
+## #23 [PR] main: bound the Si5338 boot probe, continue boot and show the fault on screen
+
+- 状态 open｜开于 2026-11-11｜作者 @fe1iscurc0r｜评论 0 条
+- head `fe1iscurc0r:pr/si5338-bounded-retry` @ `40c5ff1`｜base `MichaelRColton:master`（456c023）
+- 文件：`Source/src/main.c`（+30/−4）｜draft: false｜maintainer_can_modify: true
+- 来源：作者 #19 邀请（"A bounded retry that then continues and shows the failure on screen is welcome; a PR against fix/hmc1023-lpf would be great"——该分支已并入 master，故 base 用 master）
+
+**正文（@fe1iscurc0r）**
+
+```
+From the invitation in #19: "A bounded retry that then continues and shows the failure on screen is welcome". The probe is now at Source/src/main.c:2332 (same code, the file grew since that comment):
+
+while(result!= HAL_OK)
+  result = HAL_I2C_IsDeviceReady(&handleI2C, (0x70 << 1), 100, 100);
+
+With no ACK this never returns, so boot never reaches the display init.
+
+Changes (Source/src/main.c only):
+
+- Probe at most 5 x 100 ms instead of forever.
+- Store the result in a new g_si5338_ready flag.
+- Skip i2cSetup()/setFreq() when the probe failed, so boot does not run the register init against a dead bus. (The unlock waits inside i2cSetup() already fall through on failure because read_Si5338() returns 0 when the transfer fails.)
+- updateDisplay() draws "No Si5338 ACK (U241)" in red in the free area of the right panel, so a dead synthesiser is a visible fault, not a hang.
+
+The success path is unchanged: with U241 present the first HAL_I2C_IsDeviceReady call still returns HAL_OK and the init runs exactly as before.
+
+Build-tested with arm-none-eabi-gcc 13.2.1:
+
+text 131232 / data 17824 / bss 35496
+
+The failure path still needs a hardware test with U241 removed; our test board has U241 fitted but no RF chain yet.
+
+The invitation mentioned fix/hmc1023-lpf; that branch is merged into master (2026-11-10T03:23:47Z) and this branch is based on master (456c023).
+
+Prepared with AI assistance; build-tested as above.
 ```
