@@ -15,6 +15,7 @@
 | `layer_coverage_2026-11-02.json` | 八个层对的双向覆盖率（`tools/kicad_layer_coverage.py`） | **可重跑**，命令写在文件里 |
 | `paste_check_2026-11-02.json` | 两层锡膏与焊盘的配对、层标签 2×2 判定、6 个 USB 屏蔽片开口 | **可重跑**（脚本在板外 `a1_paste_v4.py`，判读在 §C-20） |
 | `bom_roundtrip_2026-11-02.json` | 公开 PR #18 用的 .xls 重存副作用核查：非空格数 +2、合并单元格/数字格式无变化、8 条内嵌超链接存活 | **可重跑**（对比 `45acd0f` 那份即可）；里面明确写了该脚本哪两个探针是错的、所以那两个字段不作为证据 |
+| `eda_norf_board_dump_2026-11-10.json` | 无射频测试板整板 dump + 与 KiCad 原件逐条对账：VDDBG 飞线 = LPF_5V 原有过孔（U287 西侧，供 U287.2/4）→ 顶层 ~14 mm → 新过孔 → C292.1；与作者 #16 的 C292.1→LPF_5V 同岛不同起飞点 | **半可重跑**——dump 需同一 EDA 工程现场（`_command` 在文件里）；对账基线 `dist/kicad/PSDR_2.6.1_pcb_spike_full.kicad_pcb` 在仓库里 |
 
 ## 三条读它的人必须知道的话
 

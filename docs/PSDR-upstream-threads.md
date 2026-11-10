@@ -1,6 +1,8 @@
 # 上游 21 条 issue/PR 的原文存档（正文 + 全部评论）
 
 抓取：2026-11-04，REST `GET /repos/MichaelRColton/PSDR/issues/{N}` 与 `/issues/{N}/comments?per_page=100`。
+2026-11-10 增量补录 #13/#16/#19/#20 的新评论（含 11-05/11-08 我方补记与 11-10 作者上午三条回复）；
+同日下午再补 6 条（#13×1、#16×3、#19×2）并更新 PR #18 为已合并、各帖评论数。
 用途：**引用底稿**。这是别人的话，原文照录（只把连续空白压一下），**不代表本 fork 的判断**；
 分析请看 `docs/PSDR-chronicle.md` 第一纪/第一纪补。要断言的强度：`原件`（GitHub 页面直接读到）。
 
@@ -621,7 +623,7 @@ Added a basic template for the Contributing guide and a placeholder file for whe
 
 ## #13 [issue] Obsolete parts in 2.6.1 BOM
 
-- 状态 open｜开于 2021-01-30T21:14:18Z｜关于 None｜作者 @jeffersonbenson｜评论 1 条
+- 状态 open｜开于 2021-01-30T21:14:18Z｜关于 None｜作者 @jeffersonbenson｜评论 4 条
 - labels: hardware
 
 **正文（@jeffersonbenson）**
@@ -646,6 +648,57 @@ https://www.win-source.net/rf-amplifiers-sxb-2089z.html
 1465-1374-1-ND - RF DPDT Switch U16, U24, U30
 MASWSS0129TR-3000
 https://www.richardsonrfpd.com/Products/Product/MASWSS0129
+```
+
+**评论 @fe1iscurc0r｜2026-11-08T08:20:36Z｜id 6719200367**
+
+```
+Lately I've been looking at getting a few test boards made through JLCPCB. I was hoping to use their free ENIG (immersion gold) coupon, but I got stuck converting the board into JLCPCB's native EDA format, so there's no real progress on that front for now.
+```
+
+**评论 @fe1iscurc0r｜2026-11-10T03:35:07Z｜id 6758232886（已发，用户批准；A 稿：打样完成 + VDDBG 飞线同步）**
+
+```
+Follow-up to my 2026-11-08 note: the conversion problem is solved (JLCEDA Pro's native KiCad import did the job), and the test boards were ordered at JLCPCB on 2026-11-08 under their free prototyping offer. The prototype run is now complete. The board is the original 2.6.1 design with U304, U16, U24 and U30 left unpopulated - exactly the four obsolete parts this thread is about.
+
+A sync on the VDDBG fix (Michael's 2026-11-10 reply in #16): our board carries the same fix, etched as copper rather than a hand-added wire. It lands on the same point - C292 pin 1, which sits on the same isolated island as U287 pin 28 in the original copper - but the LPF_5V-side takeoff is different: we used the existing LPF_5V via just west of U287 (the one whose bottom-layer track feeds U287 pins 2 and 4), then about 14 mm of top-layer track, one new via, and a short bottom-layer stub into C292.1. Electrically it is the same connection as "C292 pin 1 to LPF_5V".
+
+Next step is flashing fix/hmc1023-lpf: with VDDBG connected, the default RX-through-HMC1023 path should be alive on this board. Bench bring-up will take a little while (my soldering iron and multimeter are still on their way to me), and I will report measurements here once it is done.
+
+Written with AI assistance.
+```
+
+> fork 核验注（2026-11-10）：飞线落点由嘉立创现场 typed dump 与 KiCad 原件逐条对账确认——
+> 无射频板唯一新增 LPF_5V 连接 = 原有 LPF_5V 过孔 (1094,504)mil [U287 西侧，底层轨供 U287.2/4，BFS 验证]
+> → 顶层 10 mil 约 490 mil → 新增过孔 (1385,415) → 底层 35 mil 截线 → C292.1 焊盘 (1350,415)。
+> C292.1 与 U287.28 原始铜皮同为孤岛（e5447/e5448）。另有 7 条新增 GND 补强（一条接 C292.2），未对外提。
+> 原始回读：`evidence/eda_norf_board_dump_2026-11-10.json`。用户确认：飞线为蚀刻走线，板为嘉立创免费打样。
+
+> fork 跟进注（2026-11-10 下午）：作者确认收到飞线同步；两条上电前提醒——①U16/U24/U30 全部串联在天线与混频器之间，
+> 不贴则**收发电通路都没有**，需贴件或桥接封装直通（U304 除外，它只是发射放大）；②现行固件已并入 **master**，
+> 开机默认 LPF=Bypass，有 VDDBG 修复的板要手选 0 dB/+20 dB 才走 HMC1023；未改板 SPI 仍应答但不传信号，
+> **寄存器读回不能验证飞线，必须过信号**。散件库存作者待清点（与邮件线并行，邮件内容不入仓）。
+
+**评论 @MichaelRColton｜2026-11-10T06:23:53Z｜id 6760638770**
+
+```
+Glad the conversion worked out, and nice work getting the VDDBG fix into copper.
+
+Two things to know before you bring the board up:
+
+**1. The board won't pass any signal without U16, U24 and U30.** Those three RF switches are all in series between the antenna connector and the mixers (U16 amp bypass, U24 bridge in/out, U30 RF port). With them unpopulated there is no receive or transmit path at all. You would need to either fit the parts or bridge each footprint so the signal goes straight through. U304 is different: it's only the transmit amplifier, and the radio receives fine without it.
+
+**2. Use `master`, not `fix/hmc1023-lpf`.** My first comment in #16 is out of date. Since then:
+- `master` has the current firmware.
+- The on-device setting is now "LPF" with three choices: Bypass, 0 dB and +20 dB. It starts on **Bypass**, so a board with the VDDBG fix needs to be switched to 0 dB or +20 dB to use the HMC1023.
+- I measured an unmodified board: with VDDBG unconnected the chip still answers on SPI but passes no signal, so reading its registers won't tell you whether your copper fix works. A signal through it will.
+
+On the obsolete parts: I'm not sure yet what I still have loose. I have assembled units and I think a few of the harder-to-find parts. I'll look and let you know.
+
+No rush on any of this. Good luck with exams.
+
+-Michael
+
 ```
 
 ---
@@ -746,7 +799,7 @@ Merging since sufficient time has elapsed to allow for comments
 
 ## #16 [issue] Enable Pre-Amp in Firmware
 
-- 状态 open｜开于 2021-02-06T14:25:36Z｜关于 None｜作者 @jeffersonbenson｜评论 16 条
+- 状态 open｜开于 2021-02-06T14:25:36Z｜关于 None｜作者 @jeffersonbenson｜评论 20 条
 - labels: enhancement, help wanted
 
 **正文（@jeffersonbenson）**
@@ -1115,6 +1168,130 @@ Why it matters for anyone diffing the versions mechanically: "R6 100R -> 180R" i
 What does not change from my earlier comment: `Hardware/PSDR.asc` records `Value 100R` for both R6 and R14 (the 2.6 value), the 11 board-file-vs-BOM disagreements stand, and only a multimeter or your memory settles which source is authoritative. PR #18's row-45 edit only removes the duplicated names from the text - it asserts no value, and I am not proposing one for either resistor.
 ```
 
+**评论 @MichaelRColton｜2026-11-10T02:06:28Z｜id 6756908658**
+
+```
+Update from the bench: the HMC1023 path works, and the firmware for it is now pushed on [`fix/hmc1023-lpf`](https://github.com/MichaelRColton/PSDR/tree/fix/hmc1023-lpf) (based on `PSDR_F7`, builds from the command line with `bash build.sh`).
+
+**What was actually wrong**
+
+- **Hardware:** U287 pin 28 (`VDDBG`) really has no 5 V on the 2.6.1 board, as @fe1iscurc0r found from the netlist. I added a wire from C292 pin 1 to `LPF_5V` and the chip came alive (reg 0 reads `0x114080`).
+- **Firmware:** nothing ever powered or configured the chip. The branch now drives `LPF_POWER` (PE11), programs the Si5338 CLK1A output as the 40 MHz cal clock, and writes the registers. The bug that cost me a day: `reg1` must be `0x1C`. Writing `0x12` (what I first copied) clears the I and Q channel-enable bits and the chip passes nothing at all (`6ce8a3b`).
+- The filter mux select lines map as `ch = (S1<<1)|S0`: 0 = external filter header (not fitted), 1 = bypass (what `signalPath()` always set), 2 = through the HMC1023 in the RX direction, 3 = through it in the TX direction. Checked live with a signal generator.
+
+The two HMC1023 channels are cascaded on this board (I out into Q in), so the gain stage is about +10 dB per channel, about +20 dB total, ahead of the mixers. There is now an on-device "+20dB" menu toggle and a console `H` command. With the HMC1023 at defaults I could just see a CW tone at -100 dBm on the waterfall; I have not done a proper MDS measurement with the gain on yet (waiting on attenuators), so I'm not quoting a sensitivity number.
+
+**Important if you flash this branch:** it now boots with RX routed *through* the HMC1023 (mux channel 2, internal filter bypassed, 5 V boost on), because that was the best path on the air here. On a board without the `VDDBG` wire that path is dead, so you would need the wire mod, or send `M1` on the console to go back to bypass.
+
+**Answers to the open questions**
+
+- *Is `AMP_SWITCH_A = 0` under "Amp relay set to on" a slip?* I can't say with confidence; that polarity was never verified (my own comment in the code says "I think"). What I can say from the bench: powering U304 raised the RX noise floor a lot regardless of which way the switch was set, with or without a signal present. U304 is the transmit amplifier in this design, so the branch leaves it off and out of the receive path. RX gain comes from the HMC1023.
+- *Which part is in U304 on built boards?* I have not looked at the marking under magnification yet. The BOM note ("the Digikey part # is the correct part") is the best evidence until I do.
+- *R6 / R14 values and the 11 board-file-vs-BOM mismatches:* agreed these need a meter on a real board; not done yet.
+- *3V3 rail:* not measured with a meter yet. One rough data point: the ST-Link reports the target at 3.25 V, which suggests the rail is not down at 2.9 to 3.0 V. I'll measure `+3V3_CPU` and the switch control pins properly.
+
+Other things on the branch that people asked about over the years: the PSDR now enumerates as a USB composite device (serial console plus two sound cards, demodulated audio and raw I/Q at 48 kHz for HDSDR/Quisk), AM demodulation works, and there is a PC control panel in `tools/psdr_panel.py`. Bench notes are in `docs/HMC1023-DEBUG-2026-11-03.md` and `docs/REVIEW.md`.
+
+-Michael
+
+*(Written with Claude's help from my bench notes.)*
+```
+
+**评论 @MichaelRColton｜2026-11-10T03:22:34Z｜id 6758050579**
+
+```
+Follow-up with a measurement on an **unmodified** 2.6.1 board (no `VDDBG` wire), and a firmware change because of it.
+
+Signal generator into the antenna port, -60 dBm carrier at 7.000 MHz, radio tuned 1 kHz off in LSB, reading the passband level over the console:
+
+| RX path | Signal vs. off-frequency noise |
+|---|---|
+| Bypass (mux channel 1) | about 17 to 22 dB above the noise |
+| Through the HMC1023, gain off | buried (0 dB) |
+| Through the HMC1023, gain on | buried (0 dB) |
+
+Two things follow:
+
+- The `VDDBG` wire really is required. Without it the chip passes no signal at all.
+- The chip still **answers on SPI** on the unmodified board (reg 0 reads `0x114080` and the config registers read back correctly), so firmware cannot tell a wired board from an unwired one that way.
+
+So I changed the default. The on-device "+20dB ON/OFF" item is now **LPF** with three settings: **Bypass**, **0 dB** and **+20 dB** (console `l0` / `l1` / `l2`). Bypass is the power-on default, which means the branch now receives normally on an unmodified board. Boards with the wire can select 0 dB or +20 dB, and the choice is remembered. This replaces the warning in my previous comment about needing `M1`.
+
+Pushed to `fix/hmc1023-lpf`.
+
+-Michael
+
+*(Written with Claude's help from bench measurements.)*
+
+```
+
+**评论 @MichaelRColton｜2026-11-10T05:30:39Z｜id 6759861284**
+
+```
+An answer to the open `AMP_SWITCH` question, now measured instead of guessed.
+
+Setup: unmodified 2.6.1 board, 7.1 MHz, a test tone through the transmit chain, antenna port into 40 dB of attenuation and a spectrum analyzer.
+
+| Transmit state | Output at the same drive |
+|---|---|
+| `transmit_no_amp_no_filter` | -55.6 dBm |
+| `transmit_with_amp_no_filter` as it was (`AMP_SWITCH_A = 0`, `B = 1`, amp powered) | -65.4 dBm (10 dB *worse*) |
+| Same state with `AMP_SWITCH_A = 1`, `B = 0` | -28.1 dBm (about +27.5 dB) |
+
+So @fe1iscurc0r was right: the `A = 0` under the "Amp relay set to on" comment was wrong. `A = 1 / B = 0` routes through U304; `A = 0 / B = 1` is bypass, and the old "with amp" state powered the amplifier without ever putting it in the path. Fixed on `master`.
+
+Other things the same session showed, for anyone looking at transmit:
+
+- This is a milliwatt-level exciter: about +8 dBm out at the highest drive I tried, already heavily distorted.
+- There is no output filtering, so the odd harmonics are those of a square wave (3rd about 9 dB below the fundamental). It needs a low-pass filter before it goes near an antenna.
+- The transmit drive used to be the speaker volume setting. It is now its own value (console `O<drive>`), and there is a console command to key the transmitter for a set time with a test tone (`X<ms> <tone bin> <amp>`), which is how these were taken.
+- Only a test tone has been measured so far, not microphone SSB.
+
+Numbers and open items are in `docs/WISHLIST.md`.
+
+-Michael
+
+*(Written with Claude's help from bench measurements.)*
+
+```
+
+**评论 @MichaelRColton｜2026-11-10T07:16:09Z｜id 6761445468**
+
+```
+**Warning about the transmit amplifier (U304): it is not stable. Please do not key it into an antenna.**
+
+My comment above said the amp path gives about +27 dB once the switch polarity is fixed. That is true, but more measurement showed a serious problem.
+
+On the unit I measured (unmodified 2.6.1, 7.1 MHz, antenna port through an attenuator into a spectrum analyzer), with the amp powered:
+
+- It breaks into a parasitic oscillation at about **2.547 GHz, +8 to +10 dBm at the antenna port**. That is stronger than the wanted signal. The second harmonic shows at 5.09 GHz.
+- While it oscillates, the 7 MHz output is 11 to 17 dB lower than it should be.
+- Whether it oscillates depends on the drive level **and on the load**. Into a 40 dB pad it happened only at mid drive levels. Into a 10 dB pad it also happened at very low drive, including with no drive at all. So I can't name a setting that is safe, and an antenna is a less friendly load than either pad.
+- At the highest drive settings there are weaker lines around 2.3 to 2.5 GHz, roughly 20 dB below the carrier.
+
+This is one unit on one band, and I have not tried a fix yet. The likely direction is to remove the amplifier's gain at gigahertz (the radio only needs 35 MHz): a small shunt capacitor at its input or output, series loss on the output, and proper decoupling at the bias chokes. It probably also explains why powering the amp raises the receive noise floor.
+
+What changed in the firmware on `master`:
+
+- There is a "TX" power setting on the radio, shown in dBm and mW from a per-unit calibration table.
+- The first three steps do **not** use the amp (about -31, -21 and -17 dBm on this unit). The two amp steps (about +9 and +12 dBm) are shown in red.
+- `tools/tx_power_cal.py` calibrates the readout with an RSA306 and checks 2 to 3 GHz at each step.
+
+Separately, there is still no output low-pass filter, so the third harmonic is only about 8 dB below the fundamental at any setting.
+
+Details are in `docs/WISHLIST.md`.
+
+-Michael
+
+*(Written with Claude's help from bench measurements.)*
+
+```
+
+> fork 跟进注（2026-11-10 下午）：三条递进——①未改板实测证明 VDDBG 飞线必需且 SPI 读回无法区分改没改；
+> 开机默认改为 Bypass（LPF 三档 l0/l1/l2），上一条"M1 救砖"警告作废。②AMP_SWITCH 极性实测坐实我方纸面判断：
+> A=1/B=0 才过 U304（+27.5 dB），旧 with-amp 态加电却旁路；已在 master 修。③**U304 不稳定：2.547 GHz 寄生振荡、
+> 天线口 +8…+10 dBm，勿接天线键控**；master 把两档 amp 功率标红。对 dossier 的影响见 U304 dossier §5 补记。
+
 ---
 
 ## #17 [PR] Add a KiCad schematic for PSDR 2.6.1 generated from the PADS netlist
@@ -1180,7 +1357,7 @@ Happy to keep this separate, or open it as its own PR if a generated board is of
 
 ## #18 [PR] Fix BOM Ref Des typos (R98, R6/R14), record the four DNP parts (#14) and their manufacturer part numbers (#13)
 
-- 状态 open｜开于 2026-11-01T12:46:28Z｜关于 None｜作者 @fe1iscurc0r｜评论 2 条
+- 状态 **merged**（2026-11-10T03:23:47Z 合入 master）｜开于 2026-11-01T12:46:28Z｜关于 None｜作者 @fe1iscurc0r｜评论 2 条
 
 **正文（@fe1iscurc0r）**
 
@@ -1278,7 +1455,7 @@ Reply written with AI assistance from the repo's own files; the cell-level claim
 
 ## #19 [issue] Two firmware spots that may stop a board from booting (F7 main loop, Si5338 I2C wait) - opinion before any PR
 
-- 状态 open｜开于 2026-11-02T13:14:50Z｜关于 None｜作者 @fe1iscurc0r｜评论 3 条
+- 状态 open｜开于 2026-11-02T13:14:50Z｜关于 None｜作者 @fe1iscurc0r｜评论 8 条
 
 **正文（@fe1iscurc0r）**
 
@@ -1404,11 +1581,113 @@ Carrying over from my earlier comment: the fill-screen trap is indeed not on thi
 Say the word about what you want done with any of this and I will follow your lead. Read, built and measured with AI assistance.
 ```
 
+**评论 @fe1iscurc0r｜2026-11-05T05:19:19Z｜id 6650396895**
+
+```
+One addendum on the synthesiser side, from the same read-only pass. These are not boot blockers, so they are not part of the two items in the original post - but they affect whether the clock that comes out is the clock that was asked for.
+
+**1. The VCO constant is 2.84 GHz, above the Rev 1.6 datasheet range.**
+
+`src/i2c.c:727` has `unsigned long long vcoFreq = 2840000000;` and `setFreq()` computes the MultiSynth divider as `integer = vcoFreq / frequency` (`:767`). Si5338 Rev 1.6 gives the VCO range as 2.2-2.8 GHz. If the part runs at 2.8 GHz while the code divides by 2.84, every output lands about 1.4% low (100 MHz requested -> ~98.6 MHz). If it really runs at 2.84 GHz, that is outside the published range. Either way it is cheap to settle on hardware: set a known frequency, measure CLK0, compare with the request.
+
+Question: was 2.84 GHz taken from an earlier datasheet revision, or from a factory-programmed NVM image for this design?
+
+**2. Only MULTISYNTH0 is ever written.**
+
+The tree writes `MULTISYNTH0` (defined `:521`, used `:808`) and nothing to MULTISYNTH1/2/3. On the board, `CLK1A` (`U241.18`) goes through `C283` to `U287.11` (`CALCK`, the HMC1023 calibration clock, 20-80 MHz), and `CLK2A` (`U241.14`) goes to `U121.39` (PE9, a timer input). Neither is configured here, so both depend on whatever the part holds in NVM at power-up.
+
+Since you are setting up the HMC1023 bring-up on this branch, that is probably the next thing worth knowing: the calibration clock is either already in NVM, or `CALCK` is silent no matter what the driver does.
+
+Pin route for reference: `U241.18 CLK1A` -> net `FILTER_CAL` -> `C283.2`, `C283.1` -> `U287.11 CALCK` (AC coupled).
+
+Same disclaimer as the original post: read-only, no PR attached, happy to be corrected. Line numbers are `PSDR_F7 @ ab2c8fd`, `Source/src/main.c` and `src/i2c.c`.
+
+Read with AI assistance.
+```
+
+**评论 @MichaelRColton｜2026-11-10T02:06:29Z｜id 6756908997**
+
+```
+@fe1iscurc0r Thanks for checking the branches properly, and you were right to correct me. My bench work is now pushed on [`fix/hmc1023-lpf`](https://github.com/MichaelRColton/PSDR/tree/fix/hmc1023-lpf), so here are answers against that tree.
+
+**Base branch.** Yes: `PSDR_F7` is the canonical firmware base and `PSDR_Rebuild` is superseded. `fix/hmc1023-lpf` sits on top of `PSDR_F7` and is where current work is. Please base anything new on that branch rather than `PSDR_F7` itself, since it changes `main.c` heavily. No need to patch two trees.
+
+**The unbounded Si5338 wait.** You're right, it is in `PSDR_F7` and it is still there on my branch (`Source/src/main.c:1825`). I was wrong to say that tree was clean of it. A bounded retry that then continues and shows the failure on screen is welcome; a PR against `fix/hmc1023-lpf` would be great.
+
+**Command-line build.** There is now a `build.sh` in the branch root (GCC 13.3 from STM32CubeIDE, Windows paths). Two things I had to do to get a from-source build running that may matter for your `Makefile.linux`: build with `-Os` (the DSP does not keep up at `-O0`), and remove the `SCB_EnableDCache()` call, which bus-faulted at boot (`fa950c8`). Your makefile is more portable than my script, so I'd be glad to have it in the repo.
+
+**`VDDBG`.** Confirmed as a real board bug, and fixed on my bench unit with a wire from C292 pin 1 to `LPF_5V`. With that, the HMC1023 answers on SPI and passes signal. Details are in #16.
+
+**Synthesiser addendum**
+
+- *MultiSynth1 / `CALCK`:* correct, it was never written, so CLK1A came up at the reset default (divide by 4, far too fast to be a usable cal clock). The branch now programs MS1 to divide by 71 for 40 MHz (`24f113d`). It currently runs all the time; gating it to calibration only is on the to-do list. CLK2A to PE9 is still not configured.
+- *2.84 GHz VCO:* I have not tracked down where that number originally came from. What I can say is that tuning lands where it should on the bench (generator tones and WWV appear at the expected dial frequency), and a 1.4% error would be about 98 kHz off at 7 MHz, so the VCO does appear to be running at 2.84 GHz. That is above the 2.8 GHz in the Rev 1.6 datasheet, so it's a fair thing to flag. I have not measured CLK0 directly with a counter.
+
+-Michael
+
+*(Written with Claude's help from my bench notes.)*
+```
+
+**评论 @fe1iscurc0r｜2026-11-10T02:56:11Z｜id 6757665219（已发，用户批准）**
+
+```
+Confirmed: we will base any future firmware work on `fix/hmc1023-lpf`, and treat `PSDR_Rebuild` as superseded.
+
+Your two build findings apply to us directly: our `Makefile.linux` defaults to `-O0`, and our mirror still calls `SCB_EnableDCache()` - both are now recorded for reconciliation the next time we build. We have not changed anything yet.
+
+On the two invitations (a bounded Si5338 retry PR, and `Makefile.linux` into the repo): thank you - we will read your branch first and come back with a concrete scope before sending any PR.
+
+Recorded as well: MS1 now programmed to divide by 71 for the 40 MHz cal clock (CLK2A/PE9 still unconfigured), and the 2.84 GHz VCO question stays open - a counter measurement of CLK0 against a requested frequency would settle it cheaply.
+
+Read and written with AI assistance.
+```
+
+**评论 @MichaelRColton｜2026-11-10T03:25:12Z｜id 6758088245**
+
+```
+Housekeeping note for anyone with a fork: I've tidied the branch layout, as promised above.
+
+- **`master` now holds the current STM32F746 firmware.** `fix/hmc1023-lpf` was merged into it (it merged cleanly with the KiCad schematic and license), and PR #18 (BOM fixes) is merged too. Please base new work on `master`.
+- The old branches are now **tags** instead of branches, so nothing is lost and the branch list is short:
+  - `archive/master-F4` (the STM32F4 firmware `master` used to carry)
+  - `archive/PSDR_F7`, `archive/PSDR_F7_DMA`, `archive/PSDR_Rebuild`, `archive/DMA_Video`, `archive/DMA_Video_Alt`
+- `PSDR2.5_PCB` was deleted outright; every commit on it was already in `master`.
+- `fix/hmc1023-lpf` still exists for now so the links in these threads keep working. It points at the same code as `master`.
+
+@fe1iscurc0r your `PSDR_F7`-based mirror corresponds to `archive/PSDR_F7` (`ab2c8fd`), which is an ancestor of `master`, so rebasing should be straightforward.
+
+-Michael
+
+*(Written with Claude's help.)*
+
+```
+
+**评论 @MichaelRColton｜2026-11-10T06:23:54Z｜id 6760639011**
+
+```
+Closing the loop on the 2.84 GHz question, with two pieces of evidence.
+
+**Datasheet.** The current Skyworks Si5338 datasheet (Rev. 1.6, August 2021), section 3.3 "Synthesis Stages", gives the VCO range as 2.2 to 2.84 GHz, and Figure 6 is labelled "2.2-2.84 GHz". The bypass-mode output ranges in the same section (367–473.33 MHz and 550–710 MHz) are 2.2 and 2.84 GHz divided by 6 and 4, so the figure is consistent. So 2.84 GHz is the top of the specified range, not outside it. If you have a revision that says 2.8, I'd be curious which one.
+
+**Measurement.** I checked one unit against a 10 MHz GPS-disciplined reference. It zero-beat at 10.000757 MHz on the dial, an error of about 76 ppm, which is ordinary crystal tolerance. If the VCO were really at 2.80 GHz while the code divides by 2.84, the error would be 1.4%, about 140 kHz at 10 MHz. So the VCO is running at 2.84 GHz as the code assumes.
+
+There is now a per-unit calibration value for that crystal error (console `J<ppb>`, saved on the radio), on `master`.
+
+-Michael
+
+```
+
+> fork 跟进注（2026-11-10 下午）：**基线变更**——master 已合并 fix/hmc1023-lpf 与 PR #18，成为现行固件；
+> 旧分支转 tags（archive/PSDR_F7 等），我方镜像基线 ab2c8fd = archive/PSDR_F7，是 master 祖先。
+> 此前"以 fix/hmc1023-lpf 为基"的口径由本条取代（该分支暂留只为链接不断）。VCO 2.84 GHz 疑案关闭：
+> 我方重下 Rev 1.6 原件（sha256 与外包记录一致，datasheets/Si5338.pdf）p20 §3.3 实写 **2.2–2.84 GHz**，
+> 我方此前"超 2.8 上限"是误读；作者 GPS 驯服参考实测 76 ppm 亦佐证。D-09 关闭。
+
 ---
 
 ## #20 [issue] Are the VNA and filtered signal paths implemented anywhere? signalPath() has four empty stubs - question, no PR
 
-- 状态 open｜开于 2026-11-03T01:25:20Z｜关于 None｜作者 @fe1iscurc0r｜评论 1 条
+- 状态 open｜开于 2026-11-03T01:25:20Z｜关于 None｜作者 @fe1iscurc0r｜评论 4 条
 
 **正文（@fe1iscurc0r）**
 
@@ -1475,6 +1754,72 @@ So the substance stands: four of the seven `signalPaths` cases are empty in **bo
 Housekeeping: this got filed twice by accident - the duplicate is #21, now closed; keeping this one.
 
 Read with AI assistance.
+```
+
+**评论 @fe1iscurc0r｜2026-11-05T05:19:17Z｜id 6650396629**
+
+```
+Adding one more fact to my own list, because it changes what "empty" means for state 1.
+
+`recieve_with_filter` (`Source/src/main.c:855`) has no body and **falls through** into `transmit_no_amp_no_filter` (`:858-889`). So selecting "receive with filter" does not merely leave the relays alone - it executes the transmit branch:
+
+- `DAC_MUX = 1` (`:880`, comment "0 = speaker/earphone")
+- `TRX_SWITCH = 1` (`:883`, comment "Both TX/RX Muxes set to TX")
+- and the same bypass values on the three DPDT pairs as the "no filter" case.
+
+The practical consequence for anyone patching this later: state 1 is not a stub to be filled in, it is a state that currently commands the TX path while the name says receive. Whatever body `recieve_with_filter` gets, it needs its own `break` first.
+
+For completeness, the full pin matrix from the source (all four implemented states write the same `FILTER_S0/S1 = (1,0)`, as noted in the body):
+
+| state | AMP_POWER | 5V_REG_EN | AMP_SW A/B | IMP_BR A/B | TX_RF A/B | DAC_MUX | TRX_SWITCH | FILTER_S0/S1 |
+|---|---|---|---|---|---|---|---|---|
+| 0 recieve_no_filter | 1 (off) | 0 | 0/1 | 0/1 | 1/0 | 0 | 0 | 1/0 |
+| 1 recieve_with_filter | 1 | 0 | 0/1 | 0/1 | 1/0 | 1 | 1 | 1/0 |
+| 2 transmit_no_amp_no_filter | 1 | 0 | 0/1 | 0/1 | 1/0 | 1 | 1 | 1/0 |
+| 3 transmit_with_amp_no_filter | 0 (on) | 1 (on) | 0/1 (bypass) | 0/1 | 1/0 | 1 | 1 | 1/0 |
+| 4/5/6 | - | - | - | - | - | - | - | - |
+
+(1 = high, 0 = low. State 3 keeps the amplifier relay bypassed although `AMP_POWER` is on and the comment at `:900` says "Amp relay set to on" - that part is in #16.)
+
+Still no PR and no request - just keeping the record complete. Line numbers are `PSDR_F7 @ ab2c8fd`, `Source/src/main.c`.
+
+Read with AI assistance.
+```
+
+**评论 @MichaelRColton｜2026-11-10T02:06:30Z｜id 6756909258**
+
+```
+@fe1iscurc0r Answering your three questions:
+
+**1 and 2. Is there a branch with these paths?** Partly, as of today: [`fix/hmc1023-lpf`](https://github.com/MichaelRColton/PSDR/tree/fix/hmc1023-lpf).
+
+- **HMC1023 register setup and filtered receive: yes.** See `hmc1023_config_rx()`, `rx_path_default()` and `rx_route_apply()` in `Source/src/main.c`. I did not fill in the `recieve_with_filter` case; instead `rx_route_apply()` runs after `signalPath(recieve_no_filter)` on each receive pass and sets the mux and switches. Folding that back into the enum properly is cleanup still to do.
+- **Filter mux polarity, verified live** (`ch = (S1<<1)|S0`, both muxes share the select lines): 0 = external filter header pads (nothing fitted), 1 = bypass (the `(1,0)` state every case wrote), 2 = through the HMC1023 in the receive direction, 3 = through it in the transmit direction.
+- **VNA states: no.** `vna_reflected` and `vna_through` are not implemented on any branch, and neither is `tramsmit_with_amp_with_filter`. Nothing reads the AD8302 yet.
+
+**3.** So yes, those stubs are the honest to-do list, and this issue is a fine place to keep it. Your routing description for `vna_reflected` (insert the bridge with `IMP_BRIDGE_SWITCH_A/B`, route to the VNA-OUT connector with `TX_RF_SWITCH_A/B`) matches my understanding of the hardware. The switch polarities for those two are not bench-verified, only the defaults used in receive (`TX_RF` A/B = 1/0 puts the antenna on the receiver, `IMP_BRIDGE` A/B = 0/1 bypasses the bridge).
+
+One correction to the fall-through note: in the tree I have, `recieve_with_filter` has its own `break` (an empty case, then `break;`, then `case transmit_no_amp_no_filter:`), on both `PSDR_F7` (`ab2c8fd`, around line 855) and my branch. So selecting it does nothing rather than running the transmit branch. Worth a second look on your side in case we are reading different blobs. Agreed that the commented-out `default:` is a hazard.
+
+-Michael
+
+*(Written with Claude's help from my bench notes.)*
+```
+
+> **fork 核验注（2026-11-10，非原帖内容）**：作者的更正成立。经 REST 直取上游原文核对，
+> `PSDR_F7` 与 `PSDR_Rebuild` 两分支的 `Source/src/main.c` 中 `case recieve_with_filter:` 均为
+> 空 case + 独立 `break;`（分别 :855-857 / :860-862），**不存在 fall-through**。我方 11-05 评论
+> （id 6650396629）的该论断有误，需在上游公开更正；fork 的 F-2 提交 `861b195`（"修状态 1 落进
+> 发射分支"）前提同样不成立，处置另议（固件冻结，待用户点名）。
+
+**评论 @fe1iscurc0r｜2026-11-10T02:55:47Z｜id 6757659427（已发，用户批准）**
+
+```
+You are right, and we were wrong. We re-fetched both files directly via the contents API: `PSDR_F7` `Source/src/main.c` (blob `5af0e159`) lines 855-857 and `PSDR_Rebuild` (blob `def78a44`) lines 860-862 both show `case recieve_with_filter:` as an empty case followed by its own `break;`. We retract the fall-through claim in our 2026-11-05 comment; row 1 of the pin matrix in that comment should read "no writes (empty case + break)", not the TX values.
+
+Thank you for the bench-verified mux truth table (`ch = (S1<<1)|S0`: 0 = external filter header, 1 = bypass, 2 = HMC1023 RX direction, 3 = HMC1023 TX direction) - recorded on our side. The two VNA stubs remain the honest to-do list, and our routing description stands as written.
+
+Written with AI assistance; the blob ids and line numbers above are checkable via the GitHub contents API.
 ```
 
 ---
