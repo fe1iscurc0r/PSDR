@@ -1,6 +1,7 @@
 # PSDR 替代件/采购研究记录（2026-11-10，fork-only）
 
-范围：#55 U304 前放替代、#56 Amp 板备料、#59 GPS 国产降本、#60 MASWSS0129 T/R 开关替代。
+范围：#55 U304 前放替代、#56 Amp 板备料、#59 GPS 国产降本、#60 MASWSS0129 T/R 开关替代；
+§7 附记当日 100 W 开关功放设想的口径结论（设想已搁置）。
 口径：**只研究，不采购、不改板、不动固件**；测试板（2.6.1 revB）已发货，DFM 不再追。
 证据分级：原件级（原厂 PDF/官网产品页）> 协议文档级 > 分销快照级 > 社区转述级；查不到写"未证实"。
 结论性表述已同步进 `docs/PSDR-alternates-proposal.md` §2.2/§4.1；本文存证据细节与来源。
@@ -149,6 +150,32 @@ L1/L2 料号 10U/值 2u2；R4/R5 值 1R74/描述 0603 但料号 0805）——做
 5. ZDH3020/ZDH5438 询价；GALI-4+ 现价；HMC482 原货渠道真伪。
 6. GPS_RESET 的 MCU 脚位两处记录不一致（网表脚62/PD15 vs .ioc PE15）。
 
+## 7. 100 W PWM/Class-E 功放设想（2026-11-10 讨论，当日搁置）
+
+用户与作者邮件里讨论的功放设想；**只存档结论，不采购、不设计、不改板**（用户当日明确"先不用管，目前做不起来"）。
+
+**设想要点**（用户原话）：STM32F746 定时器+DMA 出 PWM → 栅极驱动 → Class-E MOSFET；SSB 用 PWM 占空比直接做包络；2–35 MHz、100 W 目标；自称 90% 效率、-45 dBc；靠 APD+DPD 把 -33 调到 -45；成本 300–500 元。
+
+**口径更正（本轮关键）**：设想里的 **-45 dBc 指三阶互调（IMD3），不是杂散**。最初评估按 FCC §97.307(d) 的短波杂散限值（<30 MHz、2003 年后安装 ≥43 dB 低于基波；-30 dB 仅是"2003 年前安装且平均功率 <5 W"的豁免档）——**指标用错了**：
+
+- 杂散限值管的是谐波/杂散域；IMD3 的 `2f1−f2`、`2f2−f1` 落在主信号旁几 kHz，属带外产物。FCC 对 splatter 只有定性要求（§97.307(b)：不得产生 splatter/键控干扰邻频），**没有 -43 dBc 这个数字**；国内的"43+10lg(PEP) 或 50 dBc 取较低"同属杂散域，同样不适用。
+- 因此 KX3 的 -30 dBc（若指两音 IMD）与 -45 dBc **不矛盾**：前者是便携机常见档位，后者是高出一大截的目标。
+
+**IMD3 量级（两音法，相对 PEP）**：
+
+| 水平 | IMD3 |
+|---|---|
+| 商用短波机典型 | -30…-36 dBc |
+| 干净机型 | ≈ -40 dBc |
+| **-45 dBc** | 很好（比 -30 好 15 dB ≈ 互调功率低 ~32 倍） |
+| uSDX 类 Class-E QRP | 常见 -25…-30 dBc |
+
+**结论**：-45 dBc IMD3 本身是**高目标**（不是法规底线），难点在"90% 效率 + -45 dBc"的组合：Class-E/PWM 非线性，IMD3 天然在 -25…-30 档，全靠 APD/DPD 的环路精度、带宽与记忆效应补偿，效率-线性-带宽互相拉扯。对 100 W 短波功放，-45 dBc 属"很好"档。
+
+**比较前要统一的口径**：相对 PEP 还是相对单音（差 6 dB）；两音间隔（ARRL 常用 700 Hz/1 kHz，间隔变 IMD 也变）；测点在天线口还是功放级。
+
+**未证实**：KX3 的 -30 dBc 官方原件——Elecraft 官网改版后规格页为 JS 渲染，PDF 链接与 Wayback 均未取到；按便携机常见档位对待，待补原件后核对。
+
 ## Sources（本轮检索，2026-11-10）
 
 - [ATGM336H-5N NMEA 解析与移植要点（GN 语句坑、引脚表）](https://m.blog.csdn.net/weixin_29195615/article/details/165563757)
@@ -168,3 +195,6 @@ L1/L2 料号 10U/值 2u2；R4/R5 值 1R74/描述 0603 但料号 0805）——做
 - [dzsc 贸易商 HMC482ST89ETR 声称现货（未证实）](https://m.dzsc.com/product/1186584-2022122815835609.html)
 - [Partstat ADI EOL 表（无 HMC482 行）](https://blog.partstat.com/analog-devices-eol-notices/)
 - [DigiKey Mini-Circuits 专题页（GALI 族起价旧快照）](https://www.digikey.cn/zh/product-highlight/m/mini-circuits/monolithic-amplifiers)
+- [47 CFR §97.307（Cornell LII，§7 的 FCC 原文）](https://www.law.cornell.edu/cfr/text/47/97.307)
+- [ITU-R SM.329-7 Spurious emissions（杂散域口径）](https://www.itu.int/dms_pubrec/itu-r/rec/sm/R-REC-SM.329-7-199707-S!!PDF-E.pdf)
+- [发射设备杂散域发射功率限值要求（摘录页，标准号待核）](https://m.renrendoc.com/paper/350770220.html)
