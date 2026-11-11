@@ -1297,12 +1297,13 @@ Details are in `docs/WISHLIST.md`.
 > 当日新增窄带 FM/静噪/瀑布流式传输/USB 复合设备/经 HMC1023 发射（干净 TX 通路）/Si5338 分频 32 位溢出修复
 > （LO ≤3.2 MHz 死区已修）/速度优化（改 -O2 构建）等提交；新增台架文档 `docs/NEXT-REV-IDEAS.md`。
 > 我方 PR #22/#23 仍 open、零评论零 review，base 已被 GitHub 自动跟到 `e33f80e`（mergeable 计算中）。
-> **U304 身份（G1）电气坐实**：作者四份台架文档（`WISHLIST.md`/`NEXT-REV-IDEAS.md`/`REVIEW.md`/
-> `HMC1023-DEBUG-2026-11-03.md`）通篇称 U304 为 **HMC482**；`WISHLIST.md` 仍把 "check which part is really
-> fitted (BOM says SXB-2089Z, footprint says HMC482)" 列为待办（丝印未读），但两条实测已独立否定 BOM 的
-> SXB-2089Z（50–850 MHz）：①7.1 MHz 经 U304 有 ~27 dB 增益（HF 无增益的 SXB 不可能）；②2.547 GHz 寄生振荡
-> （需 GHz 增益，SXB 上限 850 MHz 不可能，HMC482 DC–5 GHz 符合）。⇒ 实装为 DC 起始宽带件（HMC482 族），
-> 选型方向定死；确切料号待丝印。详见 U304 dossier §6、提案 §2.2 注、研究记录 §6。
+> **U304 身份（G1）复核更正**：作者四份台架文档（`WISHLIST.md`/`NEXT-REV-IDEAS.md`/`REVIEW.md`/
+> `HMC1023-DEBUG-2026-11-03.md`）通篇称 U304 为 **HMC482**，但 `WISHLIST.md` 仍把 "check which part is
+> really fitted (BOM says SXB-2089Z, footprint says HMC482)" 列为待办（丝印未读）。台架实测（7.1 MHz
+> ~27 dB 增益 + 2.547 GHz 自激）只证明实装件是"HF 到 GHz 都有增益"的宽带件；**SXB-2089Z（镜像级
+> 5–2500 MHz）与 HMC482（DC–5 GHz）都符合，数据无法区分** ⇒ **G1 仍 pending**，决定性证据是丝印。
+> 附带增量：两只候选件的手册供电都高于本板 5 V ⇒ 欠压假设待实测。详见 U304 dossier §6、
+> 提案 §2.2 注、研究记录 §6。
 
 ---
 

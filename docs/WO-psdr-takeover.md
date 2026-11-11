@@ -2858,7 +2858,7 @@ VHF/UHF 走外置变频器 + 板上原始 I/Q 焊盘（RXI/TXI/RXQ/TXQ，均 `PA
 
 | 件 | 结论 | 依据 |
 |---|---|---|
-| U304 `SXB-2089Z`（同族 SBB2089Z） | **50–850 MHz** ⇒ HF 全段无增益 | SIRENZA 手册标题即"50 - 850 MHz, Cascadable Active Bias InGaP/GaAs HBT MMIC Amplifier"；Qorvo 参数页 min 50 / max 850 MHz、20 dB、NF 2.7 dB、5 V/90 mA、SOT-89 |
+| U304 `SXB-2089Z`（⚠️ 2026-11-11 更正：**不是**同族 SBB2089Z） | **镜像级 5–2500 MHz**（原件未取得）；50–850 MHz 是 **SBB2089Z** 的规格 | DS110610 第三方文本（测试条件 Vs=8V / RBIAS=20Ω / VDEVICE=5.2V / ID=120–150 mA）；Qorvo 源 429/404。本行原写"50–850 MHz ⇒ HF 无增益"是我方 2026-11-03 已公开撤回的错配（#16 id 6606601865） |
 | 封装名对应的 HMC482ST89 | **DC–5 GHz**，但要 **+6～+12 V** | 厂商转载页（P1dB +22 dBm、20 dB、SOT-89）⇒ 与本板 `+5V_AMP` 不符 ⇒ 名字是化石、电气按 5 V 件重设计过 |
 | 巴伦 L39/L82 `WBC2-1TL` | 是 **Coilcraft WBC 系列**（不是 Mini-Circuits），族表 WBC1-1L **0.400–600 MHz** ⇒ 1.8 MHz 可用 | 华秋/立创参数条目 + elecfans 的 WBC 系列文章（WBC2-1TL 逐档仍待核） |
 | U279/U280 `SY10EP52V` | **最低输入频率没查到**，仍是缺口 | 中英文检索只拿到同类 GaAs/SiGe 分频件"正弦波有下限、方波可到 DC"的旁证（HMC438/433/492） |
