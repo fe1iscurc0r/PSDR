@@ -1305,6 +1305,22 @@ Details are in `docs/WISHLIST.md`.
 > 附带增量：两只候选件的手册供电都高于本板 5 V ⇒ 欠压假设待实测。详见 U304 dossier §6、
 > 提案 §2.2 注、研究记录 §6。
 
+**评论 @fe1iscurc0r｜2026-11-11T09:42:14Z｜id 6792477216**
+
+```
+Three board-level details on the U304 oscillation, in case they help the fix. All of this is from the netlist and the board file, not measurements.
+
+1. Bias topology. L11 (220 uH) is on the input side, in series with R6 to +5V_AMP: +5V_AMP -> R6 -> L11 -> U304 pin 1. L19 (220 uH) is on the output side, direct from +5V_AMP to pin 3. So both RF pins carry DC. If you add a small shunt capacitor at pin 1 or pin 3 to kill the GHz gain, the DC is unaffected; but the GHz decoupling (100 pF) belongs on the supply side of the chokes (the +5V_AMP end of R6/L19), not only at the device pins. There is a 1 mm pad named BIAS directly on the RF_AMP_IN node (pin 1), which is a convenient place to measure the input-side bias voltage.
+
+2. The supply may be low (hypothesis). A reseller copy of the HMC482 data lists +6 to +12 V. The third-party DS110610 text for the SXB-2089Z gives test conditions Vs = 8 V, RBIAS = 20 ohm, VDEVICE = 5.2 V, ID = 120/135/150 mA. The board only has +5V_AMP. Whichever part is fitted, 5 V is below its datasheet condition. That is consistent with the +12 to +15 dBm saturation you measured (HMC482-class P1dB is +22 dBm), but 7 MHz is far outside the intended band of either part and matching loss would also lower the saturation power, so this is only a hypothesis. A useful check when the amp is powered: the voltage on the BIAS pad, the voltage on pin 3, and the total current drawn from +5V_AMP.
+
+3. On the part identity. 50-850 MHz is the SBB2089Z, not the SXB-2089Z in the BOM. For the SXB-2089Z we only have a third-party copy of DS110610 (5-2500 MHz); the Qorvo source was not reachable for us (429/404 on different attempts). So the bench curves (gain at 7 MHz, oscillation at 2.5 GHz) do not tell the SXB-2089Z and the HMC482 apart - both fit. Reading the marking settles which datasheet applies, and therefore the bias target.
+
+Also, R6 is 100R in the board file and 180R in the 2.6.1 BOM (mentioned before); compute the input-side current for both values.
+
+Written with AI assistance. Everything above is from the board data files in the repo; please treat anything I got wrong as fixable rather than settled.
+```
+
 ---
 
 ## #17 [PR] Add a KiCad schematic for PSDR 2.6.1 generated from the PADS netlist
