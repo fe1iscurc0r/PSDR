@@ -1321,6 +1321,31 @@ Also, R6 is 100R in the board file and 180R in the 2.6.1 BOM (mentioned before);
 Written with AI assistance. Everything above is from the board data files in the repo; please treat anything I got wrong as fixable rather than settled.
 ```
 
+**评论 @fe1iscurc0r｜2026-11-12T09:59:23Z｜id 6820512498**
+
+```
+You already have a lot of bench data. Our board has not arrived yet, so the items below are ones only you can do right now. No urgency - whenever convenient, these would close a few of our rev-B gates:
+
+1. U304 marking (the key one, one minute): please read the part number under magnification. It decides which datasheet applies, and therefore the bias target. On our side we only have a third-party copy of the SXB-2089Z data; the Qorvo source is not reachable.
+
+2. U304 bias (one of our gates): amp powered, dummy load, not into an antenna:
+   - DC voltage on the BIAS pad (U304 pin 1, RF_AMP_IN);
+   - DC voltage on U304 pin 3;
+   - the +5V_AMP rail voltage;
+   - input-side current: measure the voltage across R6 (R6 is 100R in the board file and 180R in the 2.6.1 BOM; compute both).
+   We suspect 5 V is low for either candidate part (HMC482 +6 to +12 V; SXB tested at Vs = 8 V, 120-150 mA).
+
+3. 3V3 rail and switch control (same gate): measure +3V3_CPU (U114 output) and the high level on any one of the U16/U24/U30 control pins. The divider calculates to 2.898/3.012 V, while the switches need at least +2.9 V, so the margin may be only 0.1 V.
+
+4. Two values on the real board: the resistance of R6 and R113 (board file 100R/383K, BOM 180R/402K).
+
+5. Switch marking (the #13 item): are U211/U298 CBTLV or CB3Q (the netlist says CBTLV, the BOM buys CB3Q).
+
+None of this needs a board change and none of it touches transmit. If you can send the numbers back, we can close these gates and stop guessing at the rev-B bias and switch selection. If you try the shunt-cap/decoupling fix on U304, the values and the 2-3 GHz result would also be useful.
+
+Written with AI assistance; everything above comes from the board data files in the repo.
+```
+
 ---
 
 ## #17 [PR] Add a KiCad schematic for PSDR 2.6.1 generated from the PADS netlist
