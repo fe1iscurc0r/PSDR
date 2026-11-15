@@ -3,6 +3,29 @@
 问题来自"10×10 cm 以内可以免费打板"这件事。先给能读到的，再给**读不到但打样必须自己定**的，
 最后给"免费档能不能过"的判断。所有数字都标口径。
 
+## 0. 主板版本谱系（2026-11-12，用原始 Gerber 自带 TOP.png 与照片对质）
+
+`Hardware/Gerbers/` 里有 **5 套主板** Gerber，每套自带 `TOP.png`/`BOTTOM.png` 官方渲染，可直接和照片逐区对位：
+
+| 版本 | Gerber 目录 | 顶面大丝印 | MCU | 天线侧 DPDT | GPS 天线 | 备注 |
+|---|---|---|---|---|---|---|
+| 2.0 | `PSDR2 Main Board/` | **PSDR2** + "Michael R Colton KE7HIA" + 分区说明字 | U3 | 渲染字小未逐格读 | **右上大块（GPS Ant）** | Hackaday 项目图 / 作者早期整机 = 这一版 |
+| 2.5 | `PSDR25 Main Board/` | **psdr** | U21 | U25/U26/U27 | 右缘中下 + CW1/CW2/CW3 右上角 | 过渡版 |
+| 2.6 | `PSDR26 Main Board/` | psdr | — | — | — | 介于 2.5/2.6.1，本仓未逐区读 |
+| **2.6.1** | `PSDR261 Main Board/` | **psdr** | **U121** | **U16/U24/U30** | 右缘中下（`GPS_ANTENNA` 竖字）+ MICROSD + CW1/CW2 | **最新 PCB = 打样与重建基准** |
+
+**照片对质结论（2026-11-12）**：用户两张照片**都是顶面**——第一张（PSDR2 logo、分区字、GPS 右上、布局整齐）= **2.0**；
+第二张（psdr logo、U121/U16/U24/U30/U304、GPS 右下、走线更满）= **2.6.1**，与 `PSDR261 Main Board/TOP.png` 逐区一致。
+⇒ **用户打的板是最新版 2.6.1，没打错**；"布局凌乱 / GPS 移位 / 位号不同"全是 2.0→2.6.1 的真实改版，不是层序、镜像或版本错误。
+
+⚠️ **本轮更正（上一轮判错）**：曾把第二张照片误判成"底面"、把 `psdr` 误判成底面丝印——**错**。`psdr` 是 2.5/2.6.1 的**顶面**丝印；
+2.6.1 的**底面**丝印是镜像字 `psdr` / `portablesdr.com` / `Michael Colton - KE7HIA` / `HW V2.6.1 - 6/29/2016` / `Serial No`
+（见 `PSDR261 Main Board/BOTTOM.png`），底面器件是 U304/U287/U241/U314/音频那一批。
+
+**下单/DFM 一律用 `Hardware/Gerbers/PSDR261 Main Board/`**（§1 与 `PSDR-defect-register.md` 同口径）。
+⚠️ 坑：`dist/gerber/` 只规范化了 **PSDR1 / PSDR2 / PSDR25**（外加编码器/功放/测试板），**没有 PSDR261**——
+那套 2.5 的包只用于 EDA 导入实验，**绝不能拿去打 2.6.1**。
+
 ## 1. 读得到的（源：CAM 包 + 我们的复现对账）
 
 | 项 | 值 | 出处 |
