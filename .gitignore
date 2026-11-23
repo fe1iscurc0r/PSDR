@@ -98,3 +98,7 @@ Source_F7/build_linux_f7/
 /TestingMakeFile2/**/*.elf
 /TestingMakeFile2/**/*.hex
 /TestingMakeFile2/**/*.bin
+
+# Local agent/tool scratch dirs (Qoder/mimosa caches), never part of the project.
+.mimosa/
+.zcode/

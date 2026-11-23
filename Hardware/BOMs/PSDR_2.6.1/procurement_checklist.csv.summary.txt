@@ -1,0 +1,2 @@
+rows=86 populated=80 dnp=6 refdes_total=337 unobtainium_rows=2
+cost_2016_usd: populated=267.55 dnp=4.99
