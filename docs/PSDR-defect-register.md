@@ -21,7 +21,7 @@
 
 | ID | 缺陷 | 证据 | 现在能做的 |
 |---|---|---|---|
-| **D-06** | **VNA 固件空**：`vna_reflected`/`vna_through` 两个 case 什么都不写 | `main.c:926-931`；硬件链完整（`PSDR-vna-path.md`） | 文档化；#20 已问上游 |
+| **D-06** | **VNA 固件空**：`vna_reflected`/`vna_through` 两个 case 什么都不写 | `main.c:926-931`；硬件链完整（`PSDR-vna-path.md`） | **部分推进（master `456c023`，README 0967a7129）**：作者加了 AD8302 读数（console `h`），50 Ω 负载读对，但**无显示、无校准、bridge/port 切换仍 experimental**；`vna_*` 两个 case 本身仍未填。文档化；#20 已问上游 |
 | **D-07** | 态 4/5/6 全空 + `default:` 被注释 ⇒ 进入这些态时控制脚保持上一次状态 | `main.c:923-935` | 同上 |
 | **D-08** | `transmit_with_amp` 加电（`AMP_POWER=0`、`5V_REG=1`）但 `AMP_SWITCH_A/B` 仍写旁路值，注释却写 "set to on" | `main.c:900-902`；**作者 2026-11-10 实测坐实并已在 master 修**：A=1/B=0 才过 U304，A=0/B=1 是旁路 | **上游已解决**，我方镜像冻结。实测（7.1 MHz）：no-amp -55.6 dBm / 旧 with-amp -65.4 / A=1B=0 -28.1（+27.5 dB）；U304 dossier §5.6 |
 

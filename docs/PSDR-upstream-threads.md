@@ -1346,6 +1346,20 @@ None of this needs a board change and none of it touches transmit. If you can se
 Written with AI assistance; everything above comes from the board data files in the repo.
 ```
 
+> fork 跟进注（2026-11-23，REST 扫描 + README `0967a7129`）：**作者未回 #16 测量清单**（最后一条仍是
+> 我方 6820512498）；PR #22/#23 仍 open、mergeable=True、零评论零 review。master 仅前移一个提交
+> `c259ebe → 0967a7129`（2026-11-13T21:09Z，一份大 README）。README 给出**作者一手实测基线**（落档到
+> `PSDR-defect-register.md` D-06 与本注）：
+> - **接收灵敏度**（2.4 kHz BW 噪声等效输入）：HMC1023 **Bypass ≈ -85 dBm**；经 HMC1023 **+20 dB ≈ -105…-110 dBm**
+>   （到 ~70 MHz，>100 MHz 略差）；窄带 FM ≈ **-90 dBm usable**（SINAD 29 dB@-20 dBm）。噪底由混频后基带级定，
+>   ⇒ 印证"只有在前端加增益/降基带噪声有用"（NEXT-REV-IDEAS 方向）。
+> - **发射**：无放大 -31…-17 dBm；HMC482 +9…+12 dBm；**经 HMC1023 路径 ~0 dBm、谐波 <-45 dBc**（自带滤波）；
+>   无 HMC1023 路径 3 次谐波 -9 dBc，需外接 LPF。⇒ 印证 rev-B `workorder §8` D5/D6。
+> - **HMC482（U304）README 正式定性 "conditionally unstable"**，功率菜单标红，"Do not use on the air until
+>   the hardware is fixed"。⇒ 印证 D-23。
+> - **VNA**：作者加了 AD8302 读数（console `h`），50 Ω 读对，但无显示/校准、`vna_*` case 仍空（D-06 部分推进）。
+> - 旁带抑制 ~-55 dBc；频率校准 console `J`；GPS/MicroSD/antenna analyzer 均"first firmware，未成品"。
+
 ---
 
 ## #17 [PR] Add a KiCad schematic for PSDR 2.6.1 generated from the PADS netlist
